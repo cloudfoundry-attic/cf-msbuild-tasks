@@ -1,0 +1,357 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>CloudFoundry.CloudController.Common</name>
+    </assembly>
+    <members>
+        <member name="T:CloudFoundry.CloudController.Common.Exceptions.CloudFoundryException">
+            <summary>
+            Exception class raised when something goes wrong in calling the Cloud Foundry endpoints.
+            </summary>
+        </member>
+        <member name="M:CloudFoundry.CloudController.Common.Exceptions.CloudFoundryException.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:CloudFoundry.CloudController.Common.Exceptions.CloudFoundryException"/> class.
+            </summary>
+        </member>
+        <member name="M:CloudFoundry.CloudController.Common.Exceptions.CloudFoundryException.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:CloudFoundry.CloudController.Common.Exceptions.CloudFoundryException"/> class.
+            </summary>
+            <param name="message">The message that describes the error.</param>
+        </member>
+        <member name="M:CloudFoundry.CloudController.Common.Exceptions.CloudFoundryException.#ctor(System.String,System.Exception)">
+            <summary>
+            Initializes a new instance of the <see cref="T:CloudFoundry.CloudController.Common.Exceptions.CloudFoundryException"/> class.
+            </summary>
+            <param name="message">The error message that explains the reason for the exception.</param>
+            <param name="innerException">The exception that is the cause of the current exception, or a null reference (Nothing in Visual Basic) if no inner exception is specified.</param>
+        </member>
+        <member name="M:CloudFoundry.CloudController.Common.Exceptions.CloudFoundryException.#ctor(CloudFoundry.CloudController.Common.Exceptions.CloudFoundryExceptionObject)">
+            <summary>
+            Initializes a new instance of the <see cref="T:CloudFoundry.CloudController.Common.Exceptions.CloudFoundryException"/> class.
+            </summary>
+            <param name="exceptionObject">The exception object.</param>
+        </member>
+        <member name="M:CloudFoundry.CloudController.Common.Exceptions.CloudFoundryException.ValidateExceptionObject(CloudFoundry.CloudController.Common.Exceptions.CloudFoundryExceptionObject)">
+            <summary>
+            Validates the exception object.
+            </summary>
+            <param name="exceptionObject">The exception object.</param>
+            <returns></returns>
+            <exception cref="T:System.ArgumentNullException">exceptionObject</exception>
+        </member>
+        <member name="P:CloudFoundry.CloudController.Common.Exceptions.CloudFoundryException.ExceptionObject">
+            <summary>
+            Gets or sets the exception object.
+            </summary>
+            <value>
+            The exception object.
+            </value>
+        </member>
+        <member name="P:CloudFoundry.CloudController.Common.Exceptions.CloudFoundryException.Response">
+            <summary>
+            Gets or sets the http response.
+            </summary>
+            <value>
+            The http response.
+            </value>
+        </member>
+        <member name="T:CloudFoundry.CloudController.Common.Exceptions.CloudFoundryExceptionObject">
+            <summary>
+            Json object that comes from the server
+            </summary>
+        </member>
+        <member name="P:CloudFoundry.CloudController.Common.Exceptions.CloudFoundryExceptionObject.Code">
+            <summary>
+            Gets or sets the http status code.
+            </summary>
+            <value>
+            The status code.
+            </value>
+        </member>
+        <member name="P:CloudFoundry.CloudController.Common.Exceptions.CloudFoundryExceptionObject.Description">
+            <summary>
+            Gets or sets the description.
+            </summary>
+            <value>
+            The description.
+            </value>
+        </member>
+        <member name="P:CloudFoundry.CloudController.Common.Exceptions.CloudFoundryExceptionObject.ErrorCode">
+            <summary>
+            Gets or sets the error code.
+            </summary>
+            <value>
+            The error code.
+            </value>
+        </member>
+        <member name="T:CloudFoundry.Common.Http.SimpleHttpClient">
+            <inheritdoc/>
+        </member>
+        <member name="M:CloudFoundry.Common.Http.SimpleHttpClient.#ctor(System.Threading.CancellationToken)">
+            <summary>
+            Initializes a new instance of the <see cref="T:CloudFoundry.Common.Http.SimpleHttpClient"/> class.
+            </summary>
+            <param name="cancellationToken">The cancellation token.</param>
+        </member>
+        <member name="M:CloudFoundry.Common.Http.SimpleHttpClient.#ctor(System.Threading.CancellationToken,System.TimeSpan)">
+            <summary>
+            Initializes a new instance of the <see cref="T:CloudFoundry.Common.Http.SimpleHttpClient"/> class.
+            </summary>
+            <param name="cancellationToken">The cancellation token.</param>
+            <param name="timeout">The timeout.</param>
+        </member>
+        <member name="M:CloudFoundry.Common.Http.SimpleHttpClient.Finalize">
+            <summary>
+            Finalizes an instance of the <see cref="T:CloudFoundry.Common.Http.SimpleHttpClient"/> class.
+            </summary>
+        </member>
+        <member name="M:CloudFoundry.Common.Http.SimpleHttpClient.Dispose">
+            <summary>
+            Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+            </summary>
+        </member>
+        <member name="M:CloudFoundry.Common.Http.SimpleHttpClient.SendAsync">
+            <inheritdoc/>
+        </member>
+        <member name="M:CloudFoundry.Common.Http.SimpleHttpClient.SendAsync(System.Collections.Generic.IEnumerable{CloudFoundry.CloudController.Common.Http.HttpMultipartFormData})">
+            <inheritdoc/>
+        </member>
+        <member name="M:CloudFoundry.Common.Http.SimpleHttpClient.Dispose(System.Boolean)">
+            <summary>
+            Releases unmanaged and - optionally - managed resources.
+            </summary>
+            <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
+        </member>
+        <member name="P:CloudFoundry.Common.Http.SimpleHttpClient.Content">
+            <inheritdoc/>
+        </member>
+        <member name="P:CloudFoundry.Common.Http.SimpleHttpClient.ContentType">
+            <inheritdoc/>
+        </member>
+        <member name="P:CloudFoundry.Common.Http.SimpleHttpClient.Headers">
+            <inheritdoc/>
+        </member>
+        <member name="P:CloudFoundry.Common.Http.SimpleHttpClient.Method">
+            <inheritdoc/>
+        </member>
+        <member name="P:CloudFoundry.Common.Http.SimpleHttpClient.Timeout">
+            <inheritdoc/>
+        </member>
+        <member name="P:CloudFoundry.Common.Http.SimpleHttpClient.Uri">
+            <inheritdoc/>
+        </member>
+        <member name="T:CloudFoundry.CloudController.Common.Http.HttpHeadersCollection">
+            <inheritdoc/>
+        </member>
+        <member name="M:CloudFoundry.CloudController.Common.Http.HttpHeadersCollection.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:CloudFoundry.CloudController.Common.Http.HttpHeadersCollection"/> class.
+            </summary>
+        </member>
+        <member name="M:CloudFoundry.CloudController.Common.Http.HttpHeadersCollection.#ctor(System.Net.Http.Headers.HttpResponseHeaders)">
+            <summary>
+            Initializes a new instance of the <see cref="T:CloudFoundry.CloudController.Common.Http.HttpHeadersCollection"/> class.
+            </summary>
+            <param name="responseHeaders">The response headers.</param>
+            <exception cref="T:System.ArgumentNullException">responseHeaders</exception>
+        </member>
+        <member name="M:CloudFoundry.CloudController.Common.Http.HttpHeadersCollection.Add(System.String,System.Collections.Generic.IEnumerable{System.String})">
+            <inheritdoc/>
+        </member>
+        <member name="M:CloudFoundry.CloudController.Common.Http.HttpHeadersCollection.Add(System.String,System.String)">
+            <inheritdoc/>
+        </member>
+        <member name="M:CloudFoundry.CloudController.Common.Http.HttpHeadersCollection.AddRange(System.Net.Http.Headers.HttpResponseHeaders)">
+            <inheritdoc/>
+        </member>
+        <member name="M:CloudFoundry.CloudController.Common.Http.HttpHeadersCollection.AddRange(System.Net.Http.Headers.HttpContentHeaders)">
+            <inheritdoc/>
+        </member>
+        <member name="M:CloudFoundry.CloudController.Common.Http.HttpHeadersCollection.Clear">
+            <inheritdoc/>
+        </member>
+        <member name="M:CloudFoundry.CloudController.Common.Http.HttpHeadersCollection.Contains(System.String)">
+            <inheritdoc/>
+        </member>
+        <member name="M:CloudFoundry.CloudController.Common.Http.HttpHeadersCollection.GetEnumerator">
+            <inheritdoc/>
+        </member>
+        <member name="M:CloudFoundry.CloudController.Common.Http.HttpHeadersCollection.GetValues(System.String)">
+            <inheritdoc/>
+        </member>
+        <member name="M:CloudFoundry.CloudController.Common.Http.HttpHeadersCollection.System#Collections#IEnumerable#GetEnumerator">
+            <inheritdoc/>
+        </member>
+        <member name="M:CloudFoundry.CloudController.Common.Http.HttpHeadersCollection.Remove(System.String)">
+            <inheritdoc/>
+        </member>
+        <member name="M:CloudFoundry.CloudController.Common.Http.HttpHeadersCollection.TryGetValue(System.String,System.Collections.Generic.IEnumerable{System.String}@)">
+            <inheritdoc/>
+        </member>
+        <member name="P:CloudFoundry.CloudController.Common.Http.HttpHeadersCollection.Item(System.String)">
+            <inheritdoc/>
+        </member>
+        <member name="T:CloudFoundry.CloudController.Common.Http.HttpMultipartFormData">
+            <inheritdoc/>
+        </member>
+        <member name="M:CloudFoundry.CloudController.Common.Http.HttpMultipartFormData.#ctor(System.String,System.String,System.String,System.IO.Stream)">
+            <summary>
+            Initializes a new instance of the <see cref="T:CloudFoundry.CloudController.Common.Http.HttpMultipartFormData"/> class.
+            </summary>
+            <param name="name">The name of the form field.</param>
+            <param name="fileName">The file name of the form field.</param>
+            <param name="contentType">The content type of the form field.</param>
+            <param name="content">The content for the field.</param>
+        </member>
+        <member name="P:CloudFoundry.CloudController.Common.Http.HttpMultipartFormData.Content">
+            <inheritdoc/>
+        </member>
+        <member name="P:CloudFoundry.CloudController.Common.Http.HttpMultipartFormData.ContentType">
+            <inheritdoc/>
+        </member>
+        <member name="P:CloudFoundry.CloudController.Common.Http.HttpMultipartFormData.FileName">
+            <inheritdoc/>
+        </member>
+        <member name="P:CloudFoundry.CloudController.Common.Http.HttpMultipartFormData.Name">
+            <inheritdoc/>
+        </member>
+        <member name="T:CloudFoundry.CloudController.Common.Http.SimpleHttpResponse">
+            <inheritdoc/>
+        </member>
+        <member name="M:CloudFoundry.CloudController.Common.Http.SimpleHttpResponse.#ctor(System.Net.Http.HttpContent,CloudFoundry.CloudController.Common.Http.HttpHeadersCollection,System.Net.HttpStatusCode)">
+            <summary>
+            Initializes a new instance of the <see cref="T:CloudFoundry.CloudController.Common.Http.SimpleHttpResponse"/> class.
+            </summary>
+            <param name="content">The http content.</param>
+            <param name="headers">The http headers.</param>
+            <param name="status">The http status.</param>
+        </member>
+        <member name="M:CloudFoundry.CloudController.Common.Http.SimpleHttpResponse.ReadContentAsStringAsync">
+            <inheritdoc/>
+        </member>
+        <member name="P:CloudFoundry.CloudController.Common.Http.SimpleHttpResponse.Content">
+            <inheritdoc/>
+        </member>
+        <member name="P:CloudFoundry.CloudController.Common.Http.SimpleHttpResponse.Headers">
+            <inheritdoc/>
+        </member>
+        <member name="P:CloudFoundry.CloudController.Common.Http.SimpleHttpResponse.RequestMessage">
+            <inheritdoc/>
+        </member>
+        <member name="P:CloudFoundry.CloudController.Common.Http.SimpleHttpResponse.StatusCode">
+            <inheritdoc/>
+        </member>
+        <member name="T:CloudFoundry.CloudController.Common.ObjectExtensions">
+            <summary>
+            Holds extension methods for common objects and tasks.
+            </summary>
+        </member>
+        <member name="M:CloudFoundry.CloudController.Common.ObjectExtensions.AssertIsNotNull``1(``0,System.String)">
+            <summary>
+            Throws an argument exception if the given object is null.
+            </summary>
+            <typeparam name="T">Given Type of the object.</typeparam>
+            <param name="input">The object.</param>
+            <param name="parameterName">A string that represents a name for the object.</param>
+        </member>
+        <member name="M:CloudFoundry.CloudController.Common.ObjectExtensions.AssertIsNotNull``1(``0,System.String,System.String)">
+            <summary>
+            Throws an argument exception if the given object is null.
+            </summary>
+            <typeparam name="T">Given Type of the object.</typeparam>
+            <param name="input">The object.</param>
+            <param name="parameterName">A string that represents a name for the object.</param>
+            <param name="message">A message to include in the thrown exception.</param>
+        </member>
+        <member name="M:CloudFoundry.CloudController.Common.ObjectExtensions.AssertIsNotNullOrEmpty(System.String,System.String)">
+            <summary>
+            Throws an argument exception if the given string is null or empty.
+            </summary>
+            <param name="input">The given string.</param>
+            <param name="parameterName">A string that represents a name for the object.</param>
+        </member>
+        <member name="M:CloudFoundry.CloudController.Common.ObjectExtensions.AssertIsNotNullOrEmpty(System.String,System.String,System.String)">
+            <summary>
+            Throws an argument exception if the given string is null or empty.
+            </summary>
+            <param name="input">The given string.</param>
+            <param name="parameterName">A string that represents a name for the object.</param>
+            <param name="message">A message to include in the thrown exception.</param>
+        </member>
+        <member name="M:CloudFoundry.CloudController.Common.ObjectExtensions.ConvertToStream(System.String)">
+            <summary>
+            Converts the given string to a stream.
+            </summary>
+            <param name="content">The string to convert.</param>
+            <returns>A stream that includes the given string.</returns>
+        </member>
+        <member name="T:CloudFoundry.CloudController.Common.PushTools.FileFingerprint">
+            <summary>
+            Fingerprint that contains the essential file information for the push job
+            </summary>
+        </member>
+        <member name="P:CloudFoundry.CloudController.Common.PushTools.FileFingerprint.Size">
+            <summary>
+            Gets or sets the size of the file.
+            </summary>
+        </member>
+        <member name="P:CloudFoundry.CloudController.Common.PushTools.FileFingerprint.SHA1">
+            <summary>
+            Gets or sets the sha1 of the file's content.
+            </summary>
+        </member>
+        <member name="P:CloudFoundry.CloudController.Common.PushTools.FileFingerprint.FileName">
+            <summary>
+            Gets or sets the name of the file.
+            </summary>
+        </member>
+        <member name="T:CloudFoundry.CloudController.Common.PushTools.AppPushTools">
+            <summary>
+            Helper tools for application push
+            </summary>
+        </member>
+        <member name="T:CloudFoundry.CloudController.Common.PushTools.IAppPushTools">
+            <summary>
+            Interface that must be implemented by providers of push tooling.
+            </summary>
+        </member>
+        <member name="M:CloudFoundry.CloudController.Common.PushTools.IAppPushTools.GetFileFingerprints(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Gets the file fingerprints from the application folder <see cref="T:CloudFoundry.CloudController.Common.PushTools.AppPushTools"/>
+            </summary>
+            <param name="appPath">The path to the application folder.</param>
+            <param name="cancellationToken">The cancellation token.</param>
+            <returns>Return a dictionary of file fingerprints, with sha1 as key and a list of file fingerprints as value.</returns>
+        </member>
+        <member name="M:CloudFoundry.CloudController.Common.PushTools.IAppPushTools.GetZippedPayload(System.String,System.String[],System.Threading.CancellationToken)">
+            <summary>
+            Creates a zip archive containing specific files from the application folder <see cref="T:CloudFoundry.CloudController.Common.PushTools.AppPushTools"/>
+            </summary>
+            <param name="appPath">The path to the application folder</param>
+            <param name="files">The files that will be added to the archive.</param>
+            <param name="cancellationToken">The cancellation token.</param>
+            <returns>An open stream of the zip file</returns>
+        </member>
+        <member name="M:CloudFoundry.CloudController.Common.PushTools.AppPushTools.GetFileFingerprints(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Gets the file fingerprints from the application folder
+            As the sha1 is calculated based on the content of the file, 
+            there is a possibility that one key can have multiple fingerprints (duplicate files)
+            </summary>
+            <param name="appPath">The path to the application folder</param>
+            <param name="cancellationToken">The cancellation token.</param>
+            <returns>Return a dictionary of file fingerprints, with sha1 as key and a list of file fingerprints as value.</returns>
+        </member>
+        <member name="M:CloudFoundry.CloudController.Common.PushTools.AppPushTools.GetZippedPayload(System.String,System.String[],System.Threading.CancellationToken)">
+            <summary>
+            Creates a zip archive containing specific files from the application folder
+            </summary>
+            <param name="appPath">The path to the application folder</param>
+            <param name="files">The files that will be added to the archive.</param>
+            <param name="cancellationToken">The cancellation token.</param>
+            <returns>An open stream of the zip file</returns>
+        </member>
+    </members>
+</doc>

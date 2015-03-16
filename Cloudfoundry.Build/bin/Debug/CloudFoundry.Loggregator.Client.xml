@@ -1,0 +1,227 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>CloudFoundry.Loggregator.Client</name>
+    </assembly>
+    <members>
+        <member name="T:CloudFoundry.Loggregator.Client.ApplicationLog">
+            <summary>
+            Class that represents a message coming from Loggregator.
+            </summary>
+        </member>
+        <member name="P:CloudFoundry.Loggregator.Client.ApplicationLog.Message">
+            <summary>
+            Gets the text of the log message.
+            </summary>
+        </member>
+        <member name="P:CloudFoundry.Loggregator.Client.ApplicationLog.LogMessageType">
+            <summary>
+            Gets the type of the log message.
+            </summary>
+        </member>
+        <member name="P:CloudFoundry.Loggregator.Client.ApplicationLog.Timestamp">
+            <summary>
+            Gets the timestamp of the log message.
+            </summary>
+        </member>
+        <member name="P:CloudFoundry.Loggregator.Client.ApplicationLog.AppId">
+            <summary>
+            Gets the Cloud Foundry app unique identifier.
+            </summary>
+        </member>
+        <member name="P:CloudFoundry.Loggregator.Client.ApplicationLog.SourceId">
+            <summary>
+            Gets the source id of the log message.
+            </summary>
+        </member>
+        <member name="P:CloudFoundry.Loggregator.Client.ApplicationLog.DrainUrls">
+            <summary>
+            Gets the drain urls
+            </summary>
+        </member>
+        <member name="P:CloudFoundry.Loggregator.Client.ApplicationLog.SourceName">
+            <summary>
+            Gets the source of the log message.
+            </summary>
+        </member>
+        <member name="T:CloudFoundry.Loggregator.Client.ApplicationLogMessageType">
+            <summary>
+            Enumeration of Application log message types
+            </summary>
+        </member>
+        <member name="F:CloudFoundry.Loggregator.Client.ApplicationLogMessageType.Output">
+            <summary>
+            Application log message is output
+            </summary>
+        </member>
+        <member name="F:CloudFoundry.Loggregator.Client.ApplicationLogMessageType.Error">
+            <summary>
+            Application log message is error
+            </summary>
+        </member>
+        <member name="T:CloudFoundry.Loggregator.Client.ConnectionState">
+            <summary>
+            Enumeration of possible connection states.
+            </summary>
+        </member>
+        <member name="F:CloudFoundry.Loggregator.Client.ConnectionState.None">
+            <summary>
+            Websocket has no connection.
+            </summary>
+        </member>
+        <member name="F:CloudFoundry.Loggregator.Client.ConnectionState.Connecting">
+            <summary>
+            Websocket is currently connecting.
+            </summary>
+        </member>
+        <member name="F:CloudFoundry.Loggregator.Client.ConnectionState.Open">
+            <summary>
+            Websocket is open.
+            </summary>
+        </member>
+        <member name="F:CloudFoundry.Loggregator.Client.ConnectionState.Closing">
+            <summary>
+            Websocket is currently closing.
+            </summary>
+        </member>
+        <member name="F:CloudFoundry.Loggregator.Client.ConnectionState.Closed">
+            <summary>
+            Websocket is closed.
+            </summary>
+        </member>
+        <member name="T:CloudFoundry.Loggregator.Client.ErrorEventArgs">
+            <summary>
+            An EventArgs class for error events.
+            </summary>
+        </member>
+        <member name="P:CloudFoundry.Loggregator.Client.ErrorEventArgs.Error">
+            <summary>
+            Gets the error that occured while trying to communicate with the Loggregator service.
+            </summary>
+            <value>
+            An exception that describes the error.
+            </value>
+        </member>
+        <member name="T:CloudFoundry.Loggregator.Client.LoggregatorException">
+            <summary>
+            Exception class raised when something goes wrong while trying to communicate with Loggregator.
+            </summary>
+        </member>
+        <member name="M:CloudFoundry.Loggregator.Client.LoggregatorException.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:CloudFoundry.Loggregator.Client.LoggregatorException"/> class.
+            </summary>
+        </member>
+        <member name="M:CloudFoundry.Loggregator.Client.LoggregatorException.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:CloudFoundry.Loggregator.Client.LoggregatorException"/> class.
+            </summary>
+            <param name="message">The message that describes the error.</param>
+        </member>
+        <member name="T:CloudFoundry.Loggregator.Client.LoggregatorLog">
+            <summary>
+            This is the Loggregator client. To use it, you need a Loggregator endpoint and an authorization token from UAA.
+            </summary>
+        </member>
+        <member name="M:CloudFoundry.Loggregator.Client.LoggregatorLog.#ctor(System.Uri,System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:CloudFoundry.Loggregator.Client.LoggregatorLog"/> class.
+            </summary>
+            <param name="loggregatorEndpoint">The Loggregator endpoint.</param>
+            <param name="authenticationToken">The authentication token.</param>
+        </member>
+        <member name="M:CloudFoundry.Loggregator.Client.LoggregatorLog.Finalize">
+            <summary>
+            Finalizes an instance of the <see cref="T:CloudFoundry.Loggregator.Client.LoggregatorLog"/> class.
+            </summary>
+        </member>
+        <member name="M:CloudFoundry.Loggregator.Client.LoggregatorLog.StopLogStream">
+            <summary>
+            Stops the log stream.
+            </summary>
+        </member>
+        <member name="M:CloudFoundry.Loggregator.Client.LoggregatorLog.Tail(System.String)">
+            <summary>
+            Starts tailing logs from Loggregator for the specified app.
+            </summary>
+            <param name="appGuid">The Cloud Foundry app unique identifier.</param>
+            <exception cref="T:System.ArgumentNullException">appGuid</exception>
+        </member>
+        <member name="M:CloudFoundry.Loggregator.Client.LoggregatorLog.Recent(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Returns a LogMessage containing recent logs
+            </summary>
+            <param name="appGuid">The Cloud Foundry app unique identifier.</param>
+            <param name="cancellationToken">The cancellation token.</param>
+            <exception cref="T:System.ArgumentNullException">appGuid</exception>
+            <returns></returns>
+        </member>
+        <member name="M:CloudFoundry.Loggregator.Client.LoggregatorLog.Dispose">
+            <summary>
+            Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+            </summary>
+        </member>
+        <member name="M:CloudFoundry.Loggregator.Client.LoggregatorLog.Dispose(System.Boolean)">
+            <summary>
+            Releases unmanaged and - optionally - managed resources.
+            </summary>
+            <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
+        </member>
+        <member name="E:CloudFoundry.Loggregator.Client.LoggregatorLog.ErrorReceived">
+            <summary>
+            Occurs when an error is received from Loggregator.
+            </summary>
+        </member>
+        <member name="E:CloudFoundry.Loggregator.Client.LoggregatorLog.MessageReceived">
+            <summary>
+            Occurs when a message is received from Loggregator.
+            </summary>
+        </member>
+        <member name="E:CloudFoundry.Loggregator.Client.LoggregatorLog.StreamClosed">
+            <summary>
+            Occurs when the Loggregator stream is closed.
+            </summary>
+        </member>
+        <member name="E:CloudFoundry.Loggregator.Client.LoggregatorLog.StreamOpened">
+            <summary>
+            Occurs when the Loggregator stream is opened. 
+            </summary>
+        </member>
+        <member name="P:CloudFoundry.Loggregator.Client.LoggregatorLog.LoggregatorEndpoint">
+            <summary>
+            Gets or sets the Loggregator endpoint.
+            You can get this using the CloudFoundry.CloudController.V2.Client.Info.GetV1Info method.
+            </summary>
+        </member>
+        <member name="P:CloudFoundry.Loggregator.Client.LoggregatorLog.AuthenticationToken">
+            <summary>
+            Gets or sets the UAA authentication token.
+            </summary>
+        </member>
+        <member name="P:CloudFoundry.Loggregator.Client.LoggregatorLog.State">
+            <summary>
+            Gets the state of the connection to the Loggregator endpoint.
+            </summary>
+        </member>
+        <member name="T:CloudFoundry.Loggregator.Client.MessageEventArgs">
+            <summary>
+            An EventArgs class for message events.
+            </summary>
+        </member>
+        <member name="P:CloudFoundry.Loggregator.Client.MessageEventArgs.LogMessage">
+            <summary>
+            Gets the message that was received from Loggregator.
+            </summary>
+            <value>
+            The message that was received from Loggregator.
+            </value>
+        </member>
+        <member name="M:CloudFoundry.Loggregator.Client.ProtobufSerializer.DeserializeApplicationLog(System.Byte[])">
+            <summary>
+            Deserializes an ApplicationLog based on raw data using protobuf
+            </summary>
+            <param name="data">byte[] data</param>
+            <returns>An ApplicationLog instance</returns>
+        </member>
+    </members>
+</doc>

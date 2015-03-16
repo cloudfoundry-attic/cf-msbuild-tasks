@@ -1,0 +1,268 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>CloudFoundry.Logyard.Client</name>
+    </assembly>
+    <members>
+        <member name="T:CloudFoundry.Logyard.Client.ConnectionState">
+            <summary>
+            Enumeration of possible connection states.
+            </summary>
+        </member>
+        <member name="F:CloudFoundry.Logyard.Client.ConnectionState.None">
+            <summary>
+            Websocket has no connection.
+            </summary>
+        </member>
+        <member name="F:CloudFoundry.Logyard.Client.ConnectionState.Connecting">
+            <summary>
+            Websocket is currently connecting.
+            </summary>
+        </member>
+        <member name="F:CloudFoundry.Logyard.Client.ConnectionState.Open">
+            <summary>
+            Websocket is open.
+            </summary>
+        </member>
+        <member name="F:CloudFoundry.Logyard.Client.ConnectionState.Closing">
+            <summary>
+            Websocket is currently closing.
+            </summary>
+        </member>
+        <member name="F:CloudFoundry.Logyard.Client.ConnectionState.Closed">
+            <summary>
+            Websocket is closed.
+            </summary>
+        </member>
+        <member name="T:CloudFoundry.Logyard.Client.ErrorEventArgs">
+            <summary>
+            An EventArgs class for error events.
+            </summary>
+        </member>
+        <member name="P:CloudFoundry.Logyard.Client.ErrorEventArgs.Error">
+            <summary>
+            Gets the error that occured while trying to communicate with the Logyard service.
+            </summary>
+            <value>
+            An exception that describes the error.
+            </value>
+        </member>
+        <member name="T:CloudFoundry.Logyard.Client.LogyardException">
+            <summary>
+            Exception class raised when something goes wrong while trying to communicate with Logyard.
+            </summary>
+        </member>
+        <member name="M:CloudFoundry.Logyard.Client.LogyardException.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:CloudFoundry.Logyard.Client.LogyardException"/> class.
+            </summary>
+        </member>
+        <member name="M:CloudFoundry.Logyard.Client.LogyardException.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:CloudFoundry.Logyard.Client.LogyardException"/> class.
+            </summary>
+            <param name="message">The message that describes the error.</param>
+        </member>
+        <member name="T:CloudFoundry.Logyard.Client.LogyardLog">
+            <summary>
+            This is the Logyard client. To use it, you need a Logyard endpoint and an authorization token from UAA.
+            </summary>
+        </member>
+        <member name="M:CloudFoundry.Logyard.Client.LogyardLog.#ctor(System.Uri,System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:CloudFoundry.Logyard.Client.LogyardLog"/> class.
+            </summary>
+            <param name="logyardEndpoint">The logyard endpoint.</param>
+            <param name="authenticationToken">The authentication token.</param>
+        </member>
+        <member name="M:CloudFoundry.Logyard.Client.LogyardLog.Finalize">
+            <summary>
+            Finalizes an instance of the <see cref="T:CloudFoundry.Logyard.Client.LogyardLog"/> class.
+            </summary>
+        </member>
+        <member name="M:CloudFoundry.Logyard.Client.LogyardLog.StopLogStream">
+            <summary>
+            Stops the log stream.
+            </summary>
+        </member>
+        <member name="M:CloudFoundry.Logyard.Client.LogyardLog.StartLogStream(System.String)">
+            <summary>
+            Starts streaming logs from Logyard for the specified app.
+            It streams for all instances of the app, without tailing.
+            </summary>
+            <param name="appGuid">The Cloud Foundry app unique identifier.</param>
+        </member>
+        <member name="M:CloudFoundry.Logyard.Client.LogyardLog.StartLogStream(System.String,System.Int32)">
+            <summary>
+            Starts streaming logs from Logyard for the specified app, without tailing.
+            </summary>
+            <param name="appGuid">The Cloud Foundry app unique identifier.</param>
+            <param name="instanceNumber">The number of the app instance that will be the source of the log stream.</param>
+        </member>
+        <member name="M:CloudFoundry.Logyard.Client.LogyardLog.StartLogStream(System.String,System.Int32,System.Boolean)">
+            <summary>
+            Starts streaming logs from Logyard for the specified app, without tailing.
+            </summary>
+            <param name="appGuid">The Cloud Foundry app unique identifier.</param>
+            <param name="instanceNumber">The number of the app instance that will be the source of the log stream.</param>
+            <param name="tail">If set to <c>true</c> the application log files will be tailed.</param>
+            <exception cref="T:System.ArgumentNullException">appGuid</exception>
+        </member>
+        <member name="M:CloudFoundry.Logyard.Client.LogyardLog.Dispose">
+            <summary>
+            Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+            </summary>
+        </member>
+        <member name="M:CloudFoundry.Logyard.Client.LogyardLog.Dispose(System.Boolean)">
+            <summary>
+            Releases unmanaged and - optionally - managed resources.
+            </summary>
+            <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
+        </member>
+        <member name="E:CloudFoundry.Logyard.Client.LogyardLog.ErrorReceived">
+            <summary>
+            Occurs when an error is received from Logyard.
+            </summary>
+        </member>
+        <member name="E:CloudFoundry.Logyard.Client.LogyardLog.MessageReceived">
+            <summary>
+            Occurs when a message is received from Logyard.
+            </summary>
+        </member>
+        <member name="E:CloudFoundry.Logyard.Client.LogyardLog.StreamClosed">
+            <summary>
+            Occurs when the Logyard stream is closed.
+            </summary>
+        </member>
+        <member name="E:CloudFoundry.Logyard.Client.LogyardLog.StreamOpened">
+            <summary>
+            Occurs when the Logyard stream is opened. 
+            </summary>
+        </member>
+        <member name="P:CloudFoundry.Logyard.Client.LogyardLog.LogyardEndpoint">
+            <summary>
+            Gets or sets the logyard endpoint.
+            You can get this using the CloudFoundry.CloudController.V2.Client.Info.GetV1Info method.
+            </summary>
+        </member>
+        <member name="P:CloudFoundry.Logyard.Client.LogyardLog.AuthenticationToken">
+            <summary>
+            Gets or sets the UAA authentication token.
+            </summary>
+        </member>
+        <member name="P:CloudFoundry.Logyard.Client.LogyardLog.State">
+            <summary>
+            Gets the state of the connection to the Logyard endpoint.
+            </summary>
+        </member>
+        <member name="T:CloudFoundry.Logyard.Client.Message">
+            <summary>
+            Class that represents a message coming from Logyard.
+            </summary>
+        </member>
+        <member name="P:CloudFoundry.Logyard.Client.Message.Error">
+            <summary>
+            Gets the error that was included in the message (if any).
+            </summary>
+        </member>
+        <member name="P:CloudFoundry.Logyard.Client.Message.Value">
+            <summary>
+            Gets the log message.
+            </summary>
+        </member>
+        <member name="T:CloudFoundry.Logyard.Client.MessageEventArgs">
+            <summary>
+            An EventArgs class for message events.
+            </summary>
+        </member>
+        <member name="P:CloudFoundry.Logyard.Client.MessageEventArgs.Message">
+            <summary>
+            Gets the message that was received from Logyard.
+            </summary>
+            <value>
+            The message that was received from Logyard.
+            </value>
+        </member>
+        <member name="T:CloudFoundry.Logyard.Client.MessageValue">
+            <summary>
+            Class representing a log message coming from Logyard.
+            </summary>
+        </member>
+        <member name="P:CloudFoundry.Logyard.Client.MessageValue.FileName">
+            <summary>
+            Gets the name of the file the log message is comming from.
+            </summary>
+        </member>
+        <member name="P:CloudFoundry.Logyard.Client.MessageValue.Source">
+            <summary>
+            Gets the source of the log message.
+            </summary>
+        </member>
+        <member name="P:CloudFoundry.Logyard.Client.MessageValue.InstanceIndex">
+            <summary>
+            Gets the index of the Cloud Foundry application instance that generated the message.
+            </summary>
+            <value>
+            The index of the instance.
+            </value>
+        </member>
+        <member name="P:CloudFoundry.Logyard.Client.MessageValue.AppGuid">
+            <summary>
+            Gets the Cloud Foundry app unique identifier.
+            </summary>
+        </member>
+        <member name="P:CloudFoundry.Logyard.Client.MessageValue.AppName">
+            <summary>
+            Gets or sets the name of the application.
+            </summary>
+        </member>
+        <member name="P:CloudFoundry.Logyard.Client.MessageValue.AppSpace">
+            <summary>
+            Gets the Cloud Foundry space the app .
+            </summary>
+            <value>
+            The application space.
+            </value>
+        </member>
+        <member name="P:CloudFoundry.Logyard.Client.MessageValue.Text">
+            <summary>
+            Gets the text of the log message.
+            </summary>
+        </member>
+        <member name="P:CloudFoundry.Logyard.Client.MessageValue.NodeId">
+            <summary>
+            Gets an identifier for the node hosting the application.
+            </summary>
+        </member>
+        <member name="P:CloudFoundry.Logyard.Client.MessageValue.UnixTime">
+            <summary>
+            Gets the timestamp of the log message in unix time format.
+            </summary>
+        </member>
+        <member name="P:CloudFoundry.Logyard.Client.MessageValue.HumanTime">
+            <summary>
+            Gets the timestamp of the log message in human readable time format.
+            </summary>
+        </member>
+        <member name="P:CloudFoundry.Logyard.Client.MessageValue.Syslog">
+            <summary>
+            Gets a syslog entry that was included with the log message.
+            </summary>
+        </member>
+        <member name="T:CloudFoundry.Logyard.Client.ValueSyslog">
+            <summary>
+            Class representing a syslog value in a Logyard message.
+            </summary>
+        </member>
+        <member name="P:CloudFoundry.Logyard.Client.ValueSyslog.Priority">
+            <summary>
+            Gets the priority of the message.
+            </summary>
+        </member>
+        <member name="P:CloudFoundry.Logyard.Client.ValueSyslog.Time">
+            <summary>
+            Gets the time of the message.
+            </summary>
+        </member>
+    </members>
+</doc>
