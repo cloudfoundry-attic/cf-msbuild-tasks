@@ -75,16 +75,25 @@
     <Reference Include="WebSocket4Net">
       <HintPath>..\packages\WebSocket4Net.0.11\lib\net45\WebSocket4Net.dll</HintPath>
     </Reference>
+    <Reference Include="YamlDotNet, Version=3.5.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\YamlDotNet.3.5.1\lib\net35\YamlDotNet.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BuildAndPush.cs" />
+    <Compile Include="BaseTask.cs" />
+    <Compile Include="BindRoutes.cs" />
+    <Compile Include="BindService.cs" />
+    <Compile Include="CreateApp.cs" />
+    <Compile Include="CreateRoutes.cs" />
+    <Compile Include="CreateService.cs" />
+    <Compile Include="LoadYaml.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Cloudfoundry.Build\CloudFoundry.Build.csproj">
-      <Project>{dba0ace5-c3d5-4c7b-bcff-f17120d45eba}</Project>
-      <Name>CloudFoundry.Build</Name>
-    </ProjectReference>
+    <Compile Include="ProvisionedServices.cs" />
+    <Compile Include="PushApp.cs" />
+    <Compile Include="PushProperties.cs" />
+    <Compile Include="UpdateApp.cs" />
+    <Compile Include="Utils.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
