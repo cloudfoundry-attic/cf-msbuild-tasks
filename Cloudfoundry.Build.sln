@@ -5,6 +5,8 @@ VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudFoundry.Build.Tasks", "CloudFoundry.Build.Tasks\CloudFoundry.Build.Tasks.csproj", "{C53D0A90-12ED-470D-AB2F-E440DC02E509}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApplication1", "WebApplication1\WebApplication1.csproj", "{D8FCCE95-5DE5-46AA-9BD3-CE92B6CC0926}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -20,6 +22,12 @@ Global
 		{C53D0A90-12ED-470D-AB2F-E440DC02E509}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C53D0A90-12ED-470D-AB2F-E440DC02E509}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C53D0A90-12ED-470D-AB2F-E440DC02E509}.Release|x86.ActiveCfg = Release|Any CPU
+		{D8FCCE95-5DE5-46AA-9BD3-CE92B6CC0926}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D8FCCE95-5DE5-46AA-9BD3-CE92B6CC0926}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D8FCCE95-5DE5-46AA-9BD3-CE92B6CC0926}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D8FCCE95-5DE5-46AA-9BD3-CE92B6CC0926}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D8FCCE95-5DE5-46AA-9BD3-CE92B6CC0926}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D8FCCE95-5DE5-46AA-9BD3-CE92B6CC0926}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

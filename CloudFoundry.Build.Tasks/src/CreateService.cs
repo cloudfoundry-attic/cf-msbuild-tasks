@@ -13,19 +13,19 @@ namespace CloudFoundry.Build.Tasks
     public class CreateService : BaseTask
     {
         [Required]
-        public String Space { get; set; }
+        public string Space { get; set; }
 
         [Required]
-        public String Name { get; set; }
+        public string Name { get; set; }
 
         [Required]
-        public String Plan { get; set; }
+        public string Plan { get; set; }
 
         [Required]
-        public String Type { get; set; }
+        public string Type { get; set; }
 
         [Output]
-        public String ServiceGuid { get; set; }
+        public string ServiceGuid { get; set; }
 
         public override bool Execute()
         {
@@ -38,16 +38,15 @@ namespace CloudFoundry.Build.Tasks
 
             if (Space != string.Empty)
             {
-                PagedResponseCollection<ListAllSpacesResponse> spaceList = client.Spaces.ListAllSpaces().Result;
+                PagedResponseCollection<ListAllSpacesResponse> spaceList = client.Spaces.ListAllSpaces(new RequestOptions() { Query = "name:" + Space }).Result;
 
-                var space = spaceList.Where(o => o.Name == Space).FirstOrDefault();
-
-                if (space == null)
+                spaceGuid = new Guid(spaceList.FirstOrDefault().EntityMetadata.Guid);
+            
+                if (spaceGuid == null)
                 {
                     logger.LogError("Space {0} not found", Space);
                     return false;
                 }
-                spaceGuid = new Guid(space.EntityMetadata.Guid);
             }
 
             Guid? planGuid = null;
