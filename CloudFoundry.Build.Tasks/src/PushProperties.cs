@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using YamlDotNet.Serialization;
 
-namespace CloudFoundry.Build
+namespace CloudFoundry.Build.Tasks
 {
     public class AppDetails
     {

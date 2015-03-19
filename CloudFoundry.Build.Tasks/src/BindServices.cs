@@ -52,7 +52,7 @@ namespace CloudFoundry.Build.Tasks
                         }
                         else
                         {
-                            throw ex;
+                            throw;
                         }
                     }
                 }

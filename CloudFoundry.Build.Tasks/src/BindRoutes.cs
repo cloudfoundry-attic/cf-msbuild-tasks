@@ -21,9 +21,9 @@ namespace CloudFoundry.Build.Tasks
            
             logger = new Microsoft.Build.Utilities.TaskLoggingHelper(this);
 
-            if (AppGuid == string.Empty)
+            if (AppGuid.Length == 0)
             {
-                logger.LogError("AppGuid must be specified");
+                logger.LogError("Application Guid must be specified");
                 return false;
             }
 

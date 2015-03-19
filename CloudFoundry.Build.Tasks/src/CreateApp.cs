@@ -37,7 +37,7 @@ namespace CloudFoundry.Build.Tasks
             Guid? spaceGuid = null;
             Guid? stackGuid = null;
 
-            if (Space != string.Empty)
+            if (Space.Length > 0)
             {
                 PagedResponseCollection<ListAllSpacesResponse> spaceList = client.Spaces.ListAllSpaces(new RequestOptions() { Query = "name:" + Space }).Result;
 
@@ -50,7 +50,7 @@ namespace CloudFoundry.Build.Tasks
                 }
             }
 
-            if (Stack != string.Empty)
+            if (Stack.Length > 0)
             {
                 PagedResponseCollection<ListAllStacksResponse> stackList = client.Stacks.ListAllStacks().Result;
 
@@ -78,7 +78,7 @@ namespace CloudFoundry.Build.Tasks
                 {
                     request.Instances = Instances;
                 }
-                if (Buildpack != string.Empty)
+                if (Buildpack != null)
                 {
                     request.Buildpack = Buildpack;
                 }
