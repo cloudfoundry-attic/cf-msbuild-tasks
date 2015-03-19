@@ -33,52 +33,53 @@ namespace CloudFoundry.Build.Tasks
 
             if (Space != string.Empty)
             {
-                PagedResponseCollection<ListAllSpacesResponse> spaceList = client.Spaces.ListAllSpaces().Result;
+                PagedResponseCollection<ListAllSpacesResponse> spaceList = client.Spaces.ListAllSpaces(new RequestOptions() { Query = "name:" + Space }).Result;
 
-                var space = spaceList.Where(o => o.Name == Space).FirstOrDefault();
-
-                if (space == null)
-                {
-                    logger.LogError("Space {0} not found", Space);
-                    return false;
-                }
-                spaceGuid = new Guid(space.EntityMetadata.Guid);
+                spaceGuid = new Guid(spaceList.FirstOrDefault().EntityMetadata.Guid);
             }
 
             List<string> createdGuid = new List<string>();
             PagedResponseCollection<ListAllDomainsDeprecatedResponse> domainInfoList = client.DomainsDeprecated.ListAllDomainsDeprecated().Result;
 
-
-            foreach (String url in Routes)
-            {   
+            if (spaceGuid.HasValue)
+            {
+                foreach (String url in Routes)
+                {
                     logger.LogMessage("Creating route {0}", url);
                     string domain = url.Substring(url.IndexOf('.') + 1);
-             
+
                     ListAllDomainsDeprecatedResponse domainInfo = domainInfoList.Where(o => o.Name == domain).FirstOrDefault();
                     CreateRouteRequest req = new CreateRouteRequest();
                     req.DomainGuid = new Guid(domainInfo.EntityMetadata.Guid);
                     req.SpaceGuid = spaceGuid;
                     req.Host = url.Split('.').First().ToLower();
-                try{
-                    CreateRouteResponse response = client.Routes.CreateRoute(req).Result;
-                    createdGuid.Add(response.EntityMetadata.Guid);
-                }
-                catch (AggregateException ex)
-                {
-                    foreach (Exception e in ex.Flatten().InnerExceptions)
+                    try
                     {
-                        if (e is CloudFoundryException)
+                        CreateRouteResponse response = client.Routes.CreateRoute(req).Result;
+                        createdGuid.Add(response.EntityMetadata.Guid);
+                    }
+                    catch (AggregateException ex)
+                    {
+                        foreach (Exception e in ex.Flatten().InnerExceptions)
                         {
-                            logger.LogWarning(e.Message);
-                        }
-                        else
-                        {
-                            throw ex;
+                            if (e is CloudFoundryException)
+                            {
+                                logger.LogWarning(e.Message);
+                            }
+                            else
+                            {
+                                throw ex;
+                            }
                         }
                     }
                 }
+                RouteGuids = createdGuid.ToArray();
             }
-            RouteGuids = createdGuid.ToArray();
+            else
+            {
+                logger.LogError("Space {0} not found", Space);
+                return false;
+            }
 
             return true;
         }

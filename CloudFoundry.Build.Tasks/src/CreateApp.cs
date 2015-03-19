@@ -39,16 +39,15 @@ namespace CloudFoundry.Build.Tasks
 
             if (Space != string.Empty)
             {
-                PagedResponseCollection<ListAllSpacesResponse> spaceList = client.Spaces.ListAllSpaces().Result;
+                PagedResponseCollection<ListAllSpacesResponse> spaceList = client.Spaces.ListAllSpaces(new RequestOptions() { Query = "name:" + Space }).Result;
 
-                var space = spaceList.Where(o => o.Name == Space).FirstOrDefault();
+                spaceGuid = new Guid(spaceList.FirstOrDefault().EntityMetadata.Guid);
 
-                if (space == null)
+                if (spaceGuid == null)
                 {
                     logger.LogError("Space {0} not found", Space);
                     return false;
                 }
-                spaceGuid = new Guid(space.EntityMetadata.Guid);
             }
 
             if (Stack != string.Empty)

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace CloudFoundry.Build
 {
-    public class ProvisionedServices
+    public class ProvisionedService
     {
         private string name;
         private string plan;

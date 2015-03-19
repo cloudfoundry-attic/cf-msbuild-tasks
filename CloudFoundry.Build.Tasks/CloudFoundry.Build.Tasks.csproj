@@ -81,19 +81,20 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BaseTask.cs" />
-    <Compile Include="BindRoutes.cs" />
-    <Compile Include="BindService.cs" />
-    <Compile Include="CreateApp.cs" />
-    <Compile Include="CreateRoutes.cs" />
-    <Compile Include="CreateService.cs" />
-    <Compile Include="LoadYaml.cs" />
+    <Compile Include="src\BaseTask.cs" />
+    <Compile Include="src\BindRoutes.cs" />
+    <Compile Include="src\BindServices.cs" />
+    <Compile Include="src\CreateApp.cs" />
+    <Compile Include="src\CreateRoutes.cs" />
+    <Compile Include="src\CreateService.cs" />
+    <Compile Include="src\CreateServices.cs" />
+    <Compile Include="src\LoadYaml.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ProvisionedServices.cs" />
-    <Compile Include="PushApp.cs" />
-    <Compile Include="PushProperties.cs" />
-    <Compile Include="UpdateApp.cs" />
-    <Compile Include="Utils.cs" />
+    <Compile Include="src\ProvisionedService.cs" />
+    <Compile Include="src\PushApp.cs" />
+    <Compile Include="src\PushProperties.cs" />
+    <Compile Include="src\UpdateApp.cs" />
+    <Compile Include="src\Utils.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
