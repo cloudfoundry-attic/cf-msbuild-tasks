@@ -19,6 +19,7 @@ namespace CloudFoundry.Build.Tasks
 
         [Output]
         public string[] ServicesGuids { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling")]
         public override bool Execute()
         {
 
@@ -28,7 +29,7 @@ namespace CloudFoundry.Build.Tasks
 
             Guid? spaceGuid = null;
 
-            if (Space != string.Empty)
+            if (Space.Length > 0)
             {
                 PagedResponseCollection<ListAllSpacesResponse> spaceList = client.Spaces.ListAllSpaces(new RequestOptions() { Query = "name:" + Space }).Result;
 

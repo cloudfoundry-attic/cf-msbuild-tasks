@@ -5,6 +5,7 @@ using CloudFoundry.UAA;
 using Microsoft.Build.Framework;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,16 +23,16 @@ namespace CloudFoundry.Build.Tasks
         [Output]
         public String[] RouteGuids { get; set; }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling")]
         public override bool Execute()
-        {
-          
+        { 
             logger = new Microsoft.Build.Utilities.TaskLoggingHelper(this);
 
             CloudFoundryClient client = InitClient();
 
             Guid? spaceGuid = null;
 
-            if (Space != string.Empty)
+            if (Space.Length > 0)
             {
                 PagedResponseCollection<ListAllSpacesResponse> spaceList = client.Spaces.ListAllSpaces(new RequestOptions() { Query = "name:" + Space }).Result;
 
@@ -46,13 +47,21 @@ namespace CloudFoundry.Build.Tasks
                 foreach (String url in Routes)
                 {
                     logger.LogMessage("Creating route {0}", url);
-                    string domain = url.Substring(url.IndexOf('.') + 1);
+                    string domain = string.Empty;
+                    string host = string.Empty;
+                    Utils.ExtractDomainAndHost(url, out domain, out host);
+
+                    if (domain.Length == 0 || host.Length == 0)
+                    {
+                        logger.LogError("Error extracting domain and host information from route {0}", url);
+                        continue;
+                    }
 
                     ListAllDomainsDeprecatedResponse domainInfo = domainInfoList.Where(o => o.Name == domain).FirstOrDefault();
                     CreateRouteRequest req = new CreateRouteRequest();
                     req.DomainGuid = new Guid(domainInfo.EntityMetadata.Guid);
                     req.SpaceGuid = spaceGuid;
-                    req.Host = url.Split('.').First().ToLower();
+                    req.Host = host;
                     try
                     {
                         CreateRouteResponse response = client.Routes.CreateRoute(req).Result;
@@ -68,7 +77,7 @@ namespace CloudFoundry.Build.Tasks
                             }
                             else
                             {
-                                throw ex;
+                                throw;
                             }
                         }
                     }

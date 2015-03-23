@@ -29,7 +29,7 @@ namespace CloudFoundry.Build.Tasks
         {
             logger = new Microsoft.Build.Utilities.TaskLoggingHelper(this);
 
-            if (AppGuid == string.Empty)
+            if (AppGuid.Length == 0)
             {
                 logger.LogError("Application guid must be specified");
                 return false;
@@ -38,7 +38,7 @@ namespace CloudFoundry.Build.Tasks
             CloudFoundryClient client = InitClient();
 
             UpdateAppRequest request = new UpdateAppRequest();
-            if (Name != string.Empty)
+            if (Name.Length > 0)
             {
                 request.Name = Name;
             }
@@ -50,11 +50,11 @@ namespace CloudFoundry.Build.Tasks
             {
                 request.Instances = Instances;
             }
-            if (Buildpack != string.Empty)
+            if (Buildpack.Length > 0)
             {
                 request.Buildpack = Buildpack;
             }
-            if (State != string.Empty)
+            if (State.Length > 0)
             {
                 request.State = State;
             }

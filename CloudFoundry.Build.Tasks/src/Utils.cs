@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -25,13 +26,14 @@ namespace CloudFoundry.Build.Tasks
             return returnValue;
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Will be used in a paramter save to file task")]
         internal static void SerializeToFile(PushProperties ConfigurationParameters, String FilePath)
         {
             Serializer serializer = new Serializer(YamlDotNet.Serialization.SerializationOptions.EmitDefaults, null);
 
             StringBuilder builder = new StringBuilder();
 
-            using (TextWriter writer = new StringWriter(builder))
+            using (TextWriter writer = new StringWriter(builder,CultureInfo.InvariantCulture))
             {
                 serializer.Serialize(writer, ConfigurationParameters);
             }
@@ -54,7 +56,7 @@ namespace CloudFoundry.Build.Tasks
             settings.Indent = false;
             settings.OmitXmlDeclaration = false;
 
-            using (StringWriter textWriter = new StringWriter())
+            using (StringWriter textWriter = new StringWriter(CultureInfo.InvariantCulture))
             {
                 using (XmlWriter xmlWriter = XmlWriter.Create(textWriter, settings))
                 {
@@ -84,6 +86,15 @@ namespace CloudFoundry.Build.Tasks
                     return (T)serializer.Deserialize(xmlReader);
                 }
             }
+
+        }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1308:NormalizeStringsToUppercase", Justification = "Normalization to lowercase is better for urls")]
+        internal static void ExtractDomainAndHost(string Route, out string domain, out string host)
+        {
+            Route = Route.Replace("http://", string.Empty).Replace("https://", string.Empty);
+            domain = Route.Substring(Route.IndexOf('.') + 1);
+            host = Route.Split('.').First().ToLower(CultureInfo.InvariantCulture);
         }
     }
 }

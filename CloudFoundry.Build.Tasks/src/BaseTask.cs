@@ -11,24 +11,18 @@ namespace CloudFoundry.Build.Tasks
 {
     public class BaseTask : ITask
     {
-        private IBuildEngine buildEngine;
-        private ITaskHost taskHost;
         internal Microsoft.Build.Utilities.TaskLoggingHelper logger;
 
         public IBuildEngine BuildEngine
         {
-            get
-            { return buildEngine; }
-            set
-            { buildEngine = value; }
+            get;
+            set;
         }
 
         public ITaskHost HostObject
         {
-            get
-            { return taskHost; }
-            set
-            { taskHost = value; }
+            get;
+            set;
         }
 
         [Required]

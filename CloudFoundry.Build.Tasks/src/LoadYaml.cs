@@ -54,7 +54,7 @@ namespace CloudFoundry.Build.Tasks
         public string PlacementZone { get; set; }
 
         [Output]
-        public string SSOEnabled { get; set; }
+        public string SsoEnabled { get; set; }
 
         private PushProperties Configuration { get; set; }
 
@@ -82,7 +82,7 @@ namespace CloudFoundry.Build.Tasks
 
                 Services = Utils.Serialize<List<ProvisionedService>>(servicesList);
                 PlacementZone = Configuration.placement_zone;
-                SSOEnabled = Configuration.sso_enabled;
+                SsoEnabled = Configuration.sso_enabled;
 
                 //logger.LogMessage("Autoscale settings: {0}", Autoscale);
                 //logger.LogMessage("Services configuration: {0}", Services);
@@ -91,7 +91,7 @@ namespace CloudFoundry.Build.Tasks
             catch (Exception ex)
             {
                 logger.LogErrorFromException(ex);
-                return false;
+                throw;
             }
 
             return true;

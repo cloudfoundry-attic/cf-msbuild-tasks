@@ -19,10 +19,10 @@ namespace CloudFoundry.Build.Tasks
         public string Name { get; set; }
 
         [Required]
-        public string Plan { get; set; }
+        public string ServicePlan { get; set; }
 
         [Required]
-        public string Type { get; set; }
+        public string ServiceType { get; set; }
 
         [Output]
         public string ServiceGuid { get; set; }
@@ -36,7 +36,7 @@ namespace CloudFoundry.Build.Tasks
 
             Guid? spaceGuid = null;
 
-            if (Space != string.Empty)
+            if (Space.Length > 0)
             {
                 PagedResponseCollection<ListAllSpacesResponse> spaceList = client.Spaces.ListAllSpaces(new RequestOptions() { Query = "name:" + Space }).Result;
 
@@ -50,13 +50,13 @@ namespace CloudFoundry.Build.Tasks
             }
 
             Guid? planGuid = null;
-            PagedResponseCollection<ListAllServicesResponse> servicesList = client.Services.ListAllServices(new RequestOptions() { Query = "label:" + Type }).Result;
+            PagedResponseCollection<ListAllServicesResponse> servicesList = client.Services.ListAllServices(new RequestOptions() { Query = "label:" + ServiceType }).Result;
 
             foreach (var service in servicesList)
             {
                var planList = client.Services.ListAllServicePlansForService(new Guid(service.EntityMetadata.Guid)).Result;
 
-               var plan = planList.Where(o => o.Name == Plan).FirstOrDefault();
+               var plan = planList.Where(o => o.Name == ServicePlan).FirstOrDefault();
 
                if (plan != null)
                {
@@ -75,7 +75,7 @@ namespace CloudFoundry.Build.Tasks
 
             ServiceGuid = result.EntityMetadata.Guid;
 
-            logger.LogMessage("Created {0} service {1}", Type, result.Name);
+            logger.LogMessage("Created {0} service {1}", ServiceType, result.Name);
             return true;
         }
     }
