@@ -1,4 +1,4 @@
-﻿using CloudFoundry.CloudController.V2;
+﻿using CloudFoundry.CloudController.V2.Client;
 using CloudFoundry.CloudController.V2.Client.Data;
 using CloudFoundry.UAA;
 using Microsoft.Build.Framework;
@@ -38,26 +38,12 @@ namespace CloudFoundry.Build.Tasks
             CloudFoundryClient client = InitClient();
 
             UpdateAppRequest request = new UpdateAppRequest();
-            if (Name.Length > 0)
-            {
-                request.Name = Name;
-            }
-            if (Memory > 0)
-            {
-                request.Memory = Memory;
-            }
-            if (Instances > 0)
-            {
-                request.Instances = Instances;
-            }
-            if (Buildpack.Length > 0)
-            {
-                request.Buildpack = Buildpack;
-            }
-            if (State.Length > 0)
-            {
-                request.State = State;
-            }
+
+            request.Name = Name;
+            request.Memory = Memory;
+            request.Instances = Instances;
+            request.Buildpack = Buildpack;
+            request.State = State;
 
             UpdateAppResponse response = client.Apps.UpdateApp(new Guid(AppGuid), request).Result;
 

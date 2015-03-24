@@ -1,5 +1,5 @@
 ﻿using CloudFoundry.CloudController.Common.Exceptions;
-using CloudFoundry.CloudController.V2;
+using CloudFoundry.CloudController.V2.Client;
 using CloudFoundry.CloudController.V2.Client.Data;
 using Microsoft.Build.Framework;
 using System;

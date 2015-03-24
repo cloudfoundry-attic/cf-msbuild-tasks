@@ -10,53 +10,88 @@ namespace CloudFoundry.Build.Tasks
 {
     public class AppDetails
     {
-        public string name { get; set; }
-        public string url { get; set; }
+        [YamlMember(Alias = "name")]
+        public string Name { get; set; }
+
+
+        [YamlMember(Alias = "url")]
+        public string Url { get; set; }
     }
 
     public class Cpu
     {
-        public int max { get; set; }
-        public int min { get; set; }
+        [YamlMember(Alias = "max")]
+        public int MaxCpu { get; set; }
+
+        [YamlMember(Alias = "min")]
+        public int MinCpu { get; set; }
     }
 
     public class Instances
     {
-        public int max { get; set; }
-        public int min { get; set; }
+        [YamlMember(Alias = "max")]
+        public int MaxInstances { get; set; }
+        [YamlMember(Alias = "min")]
+        public int MinInstances { get; set; }
     }
 
     public class Autoscale
     {
-        public Cpu cpu { get; set; }
-        public string enabled { get; set; }
-        public Instances instances { get; set; }
+        [YamlMember(Alias = "cpu")]
+        public Cpu Cpu { get; set; }
+
+        [YamlMember(Alias = "enabled")]
+        public string Enabled { get; set; }
+
+        [YamlMember(Alias = "instances")]
+        public Instances InstancesInfo { get; set; }
     }
 
     public class ServiceDetails
     {
-        public string plan { get; set; }
-        public string type { get; set; }
+
+        [YamlMember(Alias = "plan")]
+        public string Plan { get; set; }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1721:PropertyNamesShouldNotMatchGetMethods", Justification = "Based on default cf yaml format"), YamlMember(Alias = "type")]
+        public string Type { get; set; }
     }
 
     public class PushProperties
     {
         [YamlMember(Alias = "app-dir")]
-        public string app_dir { get; set; }
-        public Dictionary<string, AppDetails> applications { get; set; }
-        public Autoscale autoscale { get; set; }
-        public int disk { get; set; }
-        public int memory { get; set; }
-        public int instances { get; set; }
-        public string name { get; set; }
+        public string AppDir { get; set; }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly", Justification = "Set by deserialization"), YamlMember(Alias = "applications")]
+        public Dictionary<string, AppDetails> Applications { get; set; }
+        
+        [YamlMember(Alias = "autoscale")]
+        public Autoscale AutoscaleInfo { get; set; }
+
+
+        [YamlMember(Alias = "disk")]
+        public int Disk { get; set; }
+
+        [YamlMember(Alias = "memory")]
+        public int Memory { get; set; }
+
+        [YamlMember(Alias = "instances")]
+        public int Instances { get; set; }
+
+        [YamlMember(Alias = "name")]
+        public string Name { get; set; }
      
         [YamlMember(Alias = "placement-zone")]
-        public string placement_zone { get; set; }
-        public Dictionary<string, ServiceDetails> services { get; set; }
+        public string PlacementZone { get; set; }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly", Justification = "Set by deserialization"), YamlMember(Alias = "services")]
+        public Dictionary<string, ServiceDetails> Services { get; set; }
 
         [YamlMember(Alias = "sso-enabled")]
-        public string sso_enabled { get; set; }
-        public string stack { get; set; }
+        public string SsoEnabled { get; set; }
+
+        [YamlMember(Alias = "stack")]
+        public string Stack { get; set; }
     }
 
 }

@@ -1,5 +1,5 @@
 ﻿using CloudFoundry.CloudController.Common.Exceptions;
-using CloudFoundry.CloudController.V2;
+using CloudFoundry.CloudController.V2.Client;
 using CloudFoundry.CloudController.V2.Client.Data;
 using CloudFoundry.UAA;
 using Microsoft.Build.Framework;
@@ -58,6 +58,13 @@ namespace CloudFoundry.Build.Tasks
                     }
 
                     ListAllDomainsDeprecatedResponse domainInfo = domainInfoList.Where(o => o.Name == domain).FirstOrDefault();
+
+                    if (domainInfo == null)
+                    {
+                        logger.LogError("Domain {0} not found", domain);
+                        continue;
+                    }
+
                     CreateRouteRequest req = new CreateRouteRequest();
                     req.DomainGuid = new Guid(domainInfo.EntityMetadata.Guid);
                     req.SpaceGuid = spaceGuid;
