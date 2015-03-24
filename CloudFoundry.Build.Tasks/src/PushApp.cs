@@ -1,4 +1,4 @@
-﻿using CloudFoundry.CloudController.V2;
+﻿using CloudFoundry.CloudController.V2.Client;
 using CloudFoundry.UAA;
 using Microsoft.Build.Framework;
 using System;

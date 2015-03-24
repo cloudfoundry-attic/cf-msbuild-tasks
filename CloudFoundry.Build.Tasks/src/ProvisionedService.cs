@@ -22,7 +22,8 @@ namespace CloudFoundry.Build.Tasks
             get { return plan; }
             set { plan = value; }
         }
-        
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1721:PropertyNamesShouldNotMatchGetMethods", Justification = "Based on default cf yaml format")]
         public string Type
         {
             get { return type; }

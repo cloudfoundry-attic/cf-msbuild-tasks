@@ -65,24 +65,24 @@ namespace CloudFoundry.Build.Tasks
             try
             {
                 Configuration = Utils.DeserializeFromFile(ConfigurationFile);
-                Stack = Configuration.stack;
-                AppName = Configuration.name;
-                AppPath = Configuration.app_dir;
-                Routes = Configuration.applications.Values.Select(o => o.url).ToArray();
-                Memory = Configuration.memory;
-                Instances = Configuration.instances;
-                Autoscale = Utils.Serialize<Autoscale>(Configuration.autoscale);
-                Disk = Configuration.disk;
+                Stack = Configuration.Stack;
+                AppName = Configuration.Name;
+                AppPath = Configuration.AppDir;
+                Routes = Configuration.Applications.Values.Select(o => o.Url).ToArray();
+                Memory = Configuration.Memory;
+                Instances = Configuration.Instances;
+                Autoscale = Utils.Serialize<Autoscale>(Configuration.AutoscaleInfo);
+                Disk = Configuration.Disk;
 
                 List<ProvisionedService> servicesList = new List<ProvisionedService>();
-                foreach (var service in Configuration.services)
+                foreach (var service in Configuration.Services)
                 {
-                    servicesList.Add(new ProvisionedService() { Name = service.Key, Plan = service.Value.plan, Type = service.Value.type });
+                    servicesList.Add(new ProvisionedService() { Name = service.Key, Plan = service.Value.Plan, Type = service.Value.Type });
                 }
 
                 Services = Utils.Serialize<List<ProvisionedService>>(servicesList);
-                PlacementZone = Configuration.placement_zone;
-                SsoEnabled = Configuration.sso_enabled;
+                PlacementZone = Configuration.PlacementZone;
+                SsoEnabled = Configuration.SsoEnabled;
 
                 //logger.LogMessage("Autoscale settings: {0}", Autoscale);
                 //logger.LogMessage("Services configuration: {0}", Services);

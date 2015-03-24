@@ -1,4 +1,5 @@
-﻿using CloudFoundry.CloudController.V2;
+﻿using CloudFoundry.CloudController.V2.Client;
+using CloudFoundry.CloudController.V2.Client;
 using CloudFoundry.UAA;
 using Microsoft.Build.Framework;
 using System;
@@ -7,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+[assembly:CLSCompliant(true)]
 namespace CloudFoundry.Build.Tasks
 {
     public class BaseTask : ITask
@@ -52,6 +54,7 @@ namespace CloudFoundry.Build.Tasks
             CloudFoundryClient client = new CloudFoundryClient(new Uri(ServerUri), new System.Threading.CancellationToken());
 
             client.Login(creds).Wait();
+
             return client;
         }
 

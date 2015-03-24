@@ -1,0 +1,5 @@
+/packages/
+/TestResults/
+*.Build.v12.suo
+/lib/
+*/obj/
