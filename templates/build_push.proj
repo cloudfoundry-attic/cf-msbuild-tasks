@@ -1,0 +1,61 @@
+	<UsingTask AssemblyFile="$(SolutionDir)packages\\Cloudfoundry.Build.Tasks.dll" TaskName="LoadYaml"></UsingTask>
+
+	<UsingTask AssemblyFile="$(SolutionDir)packages\\Cloudfoundry.Build.Tasks.dll" TaskName="CreateApp"></UsingTask>
+
+	<UsingTask AssemblyFile="$(SolutionDir)packages\\Cloudfoundry.Build.Tasks.dll" TaskName="PushApp"></UsingTask>
+
+	<UsingTask AssemblyFile="$(SolutionDir)packages\\Cloudfoundry.Build.Tasks.dll" TaskName="CreateRoutes"></UsingTask>
+
+	<UsingTask AssemblyFile="$(SolutionDir)packages\\Cloudfoundry.Build.Tasks.dll" TaskName="BindRoutes"></UsingTask>
+
+	<UsingTask AssemblyFile="$(SolutionDir)packages\\Cloudfoundry.Build.Tasks.dll" TaskName="CreateService"></UsingTask>
+
+	<UsingTask AssemblyFile="$(SolutionDir)packages\\Cloudfoundry.Build.Tasks.dll" TaskName="BindServices"></UsingTask>
+	
+	<UsingTask AssemblyFile="$(SolutionDir)packages\\Cloudfoundry.Build.Tasks.dll" TaskName="SaveYaml"></UsingTask>
+	
+	<PropertyGroup>
+		<User>admin</User>
+		<Password>admin</Password>
+		<Server>http://api.1.2.3.4.xip.io</Server>
+		<AppName>test</AppName>
+		<AppPath>C:\test\</AppPath>
+		<Memory>512</Memory>
+		<Instances>1</Instances>
+		<Stack>win2012</Stack>
+		<ServiceName>test</ServiceName>
+		<ServicePlan>free</ServicePlan>
+		<ServiceType>mysql</ServiceType>
+	</PropertyGroup>
+
+	<Target Name="Publish">
+
+		<ItemGroup>
+			<Routes Include="test.1.2.3.4.xip.io"></Routes>
+		</ItemGroup>
+	
+		<CreateApp Name="$(AppName)" Stack="$(Stack)" Space="TestSpace" User="$(User)" Password="$(Password)" ServerUri="$(Server)">
+			<Output TaskParameter="AppGuid" PropertyName="AppGuid"/>
+		</CreateApp>
+
+		<PushApp AppGuid="$(AppGuid)" AppPath="$(AppPath)" Start="true" User="$(User)" Password="$(Password)" ServerUri="$(Server)"></PushApp>
+		
+		<CreateRoutes User="$(User)" Password="$(Password)" ServerUri="$(Server)" Space="TestSpace" Routes="@(Routes)">
+			<Output TaskParameter="RouteGuids" PropertyName="RouteGuids"></Output>
+		</CreateRoutes>
+
+		<BindRoutes User="$(User)" Password="$(Password)" ServerUri="$(Server)" AppGuid="$(AppGuid)" RouteGuids="$(RouteGuids)"></BindRoutes>
+
+		<CreateService User="$(User)" Password="$(Password)" ServerUri="$(Server)" Name="$(ServiceName)" ServiceType="$(ServiceType)" ServicePlan="$(ServicePlan)" Space="TestSpace">
+			<Output TaskParameter="ServiceGuid" PropertyName="ServiceGuid"></Output>
+		</CreateService>
+		
+		<ItemGroup>
+			<ServicesGuids Include="$(ServiceGuid)"></ServicesGuids>
+		</ItemGroup>
+		
+		<BindServices User="$(User)" Password="$(Password)" ServerUri="$(Server)" AppGuid="$(AppGuid)" ServicesGuids="@(ServicesGuids)"></BindServices>
+
+		<SaveYaml AppPath="$(AppPath)" AppName="$(AppName)" ConfigurationFile="C:\test\manifest.yaml" InstancesNumber ="$(Instances)" Memory="$(Memory)" Route="@(Routes)" Stack="$(Stack)" ServiceName="$(ServiceName)"  ServiceType="$(ServiceType)" ServicePlan="$(ServicePlan)"></SaveYaml>
+
+	</Target>
