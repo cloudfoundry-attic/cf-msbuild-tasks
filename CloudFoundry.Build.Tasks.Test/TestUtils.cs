@@ -234,5 +234,40 @@ namespace CloudFoundry.Build.Tasks.Test
             return Task.Factory.StartNew(() => { return new RemoveAppFromRouteResponse(); });
         }
 
-}
+        private static int callNumber = 0;
+        internal static Task<GetAppSummaryResponse> CustomGetAppSummary(CloudController.V2.Client.Base.AbstractAppsEndpoint arg1, Guid? arg2)
+        {
+            return Task.Factory.StartNew<GetAppSummaryResponse>(() => {
+
+                switch (callNumber)
+                {
+                    case 0:
+                        {
+                            callNumber += 1;
+                            return new GetAppSummaryResponse() { State = "PENDING", RunningInstances = 0 };
+                        }
+                    case 1:
+                        {
+                            callNumber += 1;
+                            return new GetAppSummaryResponse() { State = "STAGED", RunningInstances = 0 };
+                        }
+                    case 2:
+                        {
+                            return new GetAppSummaryResponse() { State = "STARTED", RunningInstances = 1 };
+                        }
+                    default: { return new GetAppSummaryResponse(); }
+                }
+            });
+        }
+
+        internal static Task<GetV1InfoResponse> CustomGetV1Info(InfoEndpoint arg1)
+        {
+            return Task.Factory.StartNew<GetV1InfoResponse>(() => { return new GetV1InfoResponse() { AppLogEndpoint = "ws://logs.1.2.3.4.xip.io" }; });
+        }
+
+        internal static void CustomStartLogStreamString(Logyard.Client.LogyardLog arg1, string arg2)
+        {
+         
+        }
+    }
 }

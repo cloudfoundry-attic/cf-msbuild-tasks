@@ -108,6 +108,7 @@
     <Compile Include="src\ProvisionedService.cs" />
     <Compile Include="src\PushApp.cs" />
     <Compile Include="src\PushProperties.cs" />
+    <Compile Include="src\RestartApp.cs" />
     <Compile Include="src\SaveYaml.cs" />
     <Compile Include="src\UnbindRoute.cs" />
     <Compile Include="src\UnbindService.cs" />
