@@ -50,6 +50,9 @@
     <Reference Include="CloudFoundry.Logyard.Client">
       <HintPath>..\packages\cf-dotnet-sdk.1.0.0.132\lib\Net45\CloudFoundry.Logyard.Client.dll</HintPath>
     </Reference>
+    <Reference Include="CloudFoundry.Logyard.Client.1.0.0.132.Fakes">
+      <HintPath>FakesAssemblies\CloudFoundry.Logyard.Client.1.0.0.132.Fakes.dll</HintPath>
+    </Reference>
     <Reference Include="CloudFoundry.UAA.Client">
       <HintPath>..\packages\cf-dotnet-sdk.1.0.0.132\lib\Net45\CloudFoundry.UAA.Client.dll</HintPath>
     </Reference>
@@ -104,6 +107,7 @@
     <Compile Include="BindServicesTaskTest.cs" />
     <Compile Include="CreateRoutesTaskTest.cs" />
     <Compile Include="CreateServiceTaskTest.cs" />
+    <Compile Include="RestartAppTaskTest.cs" />
     <Compile Include="TestUtils.cs" />
     <Compile Include="CreateServicesTaskTest.cs" />
     <Compile Include="PushAppTaskTest.cs" />
@@ -117,6 +121,7 @@
   <ItemGroup>
     <None Include="app.config" />
     <Fakes Include="Fakes\CloudFoundry.CloudController.V2.Client.fakes" />
+    <Fakes Include="Fakes\CloudFoundry.Logyard.Client.fakes" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

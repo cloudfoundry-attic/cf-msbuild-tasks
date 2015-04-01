@@ -26,7 +26,6 @@ namespace CloudFoundry.Build.Tasks
             return returnValue;
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Will be used in a paramter save to file task")]
         internal static void SerializeToFile(PushProperties ConfigurationParameters, String FilePath)
         {
             Serializer serializer = new Serializer(YamlDotNet.Serialization.SerializationOptions.EmitDefaults, null);
