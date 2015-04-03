@@ -11,7 +11,9 @@
     <AssemblyName>CloudFoundry.Build.Tasks</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <NuGetPackageImportStamp>fdbbc9ae</NuGetPackageImportStamp>
+    <NuGetPackageImportStamp>25f5d139</NuGetPackageImportStamp>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -36,25 +38,20 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="CloudFoundry.CloudController.Common, Version=1.0.0.132, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\cf-dotnet-sdk.1.0.0.132\lib\Net45\CloudFoundry.CloudController.Common.dll</HintPath>
+    <Reference Include="CloudFoundry.CloudController.Common">
+      <HintPath>..\packages\cf-dotnet-sdk.1.0.0.148\lib\Net45\CloudFoundry.CloudController.Common.dll</HintPath>
     </Reference>
-    <Reference Include="CloudFoundry.CloudController.V2.Client, Version=1.0.0.132, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\cf-dotnet-sdk.1.0.0.132\lib\Net45\CloudFoundry.CloudController.V2.Client.dll</HintPath>
+    <Reference Include="CloudFoundry.CloudController.V2.Client">
+      <HintPath>..\packages\cf-dotnet-sdk.1.0.0.148\lib\Net45\CloudFoundry.CloudController.V2.Client.dll</HintPath>
     </Reference>
-    <Reference Include="CloudFoundry.Loggregator.Client, Version=1.0.0.132, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\cf-dotnet-sdk.1.0.0.132\lib\Net45\CloudFoundry.Loggregator.Client.dll</HintPath>
+    <Reference Include="CloudFoundry.Loggregator.Client">
+      <HintPath>..\packages\cf-dotnet-sdk.1.0.0.148\lib\Net45\CloudFoundry.Loggregator.Client.dll</HintPath>
     </Reference>
-    <Reference Include="CloudFoundry.Logyard.Client, Version=1.0.0.132, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\cf-dotnet-sdk.1.0.0.132\lib\Net45\CloudFoundry.Logyard.Client.dll</HintPath>
+    <Reference Include="CloudFoundry.Logyard.Client">
+      <HintPath>..\packages\cf-dotnet-sdk.1.0.0.148\lib\Net45\CloudFoundry.Logyard.Client.dll</HintPath>
     </Reference>
-    <Reference Include="CloudFoundry.UAA.Client, Version=1.0.0.132, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\cf-dotnet-sdk.1.0.0.132\lib\Net45\CloudFoundry.UAA.Client.dll</HintPath>
+    <Reference Include="CloudFoundry.UAA.Client">
+      <HintPath>..\packages\cf-dotnet-sdk.1.0.0.148\lib\Net45\CloudFoundry.UAA.Client.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Build.Framework" />
     <Reference Include="Microsoft.Build.Utilities.v4.0" />
@@ -116,29 +113,61 @@
     <Compile Include="src\Utils.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="tools\cf-dotnet-sdk-msbuild-tasks.props" />
+    <None Include="tools\cf-dotnet-sdk-msbuild-tasks.targets" />
+    <None Include="tools\cf.proj" />
+    <None Include="tools\install.ps1" />
   </ItemGroup>
   <ItemGroup>
     <CodeAnalysisDictionary Include="cf-build-tasks.xml" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" />
-  <Target Name="EnsureBclBuildImported" BeforeTargets="BeforeBuild" Condition="'$(BclBuildImported)' == ''">
-    <Error Condition="!Exists('..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" Text="This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=317567." HelpKeyword="BCLBUILD2001" />
-    <Error Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" Text="The build restored NuGet packages. Build the project again to include these packages in the build. For more information, see http://go.microsoft.com/fwlink/?LinkID=317568." HelpKeyword="BCLBUILD2002" />
-  </Target>
   <Import Project="..\packages\StyleCop.MSBuild.4.7.49.1\build\StyleCop.MSBuild.Targets" Condition="Exists('..\packages\StyleCop.MSBuild.4.7.49.1\build\StyleCop.MSBuild.Targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\StyleCop.MSBuild.4.7.49.1\build\StyleCop.MSBuild.Targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\StyleCop.MSBuild.4.7.49.1\build\StyleCop.MSBuild.Targets'))" />
+    <Error Condition="!Exists('$(SolutionDir)\.nuget\NuGet.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\.nuget\NuGet.targets'))" />
+    <Error Condition="!Exists('..\packages\ILRepack.MSBuild.Task.1.0.9\build\ILRepack.MSBuild.Task.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\ILRepack.MSBuild.Task.1.0.9\build\ILRepack.MSBuild.Task.targets'))" />
   </Target>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
+  <!--To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
-  </Target>
+  </Target>-->
   <Target Name="AfterBuild">
+    <Copy SourceFiles="$(OutputPath)\CloudFoundry.Build.Tasks.dll" DestinationFiles="$(OutputPath)\CloudFoundry.Build.Tasks.Temp.dll" />
+    <ItemGroup>
+      <MergeAssemblies Include="$(OutputPath)\CloudFoundry.Build.Tasks.Temp.dll" />
+      <MergeAssemblies Include="$(OutputPath)\CloudFoundry.CloudController.Common.dll" />
+      <MergeAssemblies Include="$(OutputPath)\CloudFoundry.Logyard.Client.dll" />
+      <MergeAssemblies Include="$(OutputPath)\CloudFoundry.Loggregator.Client.dll" />
+      <MergeAssemblies Include="$(OutputPath)\CloudFoundry.UAA.Client.dll" />
+      <MergeAssemblies Include="$(OutputPath)\Newtonsoft.Json.dll" />
+      <MergeAssemblies Include="$(OutputPath)\protobuf-net.dll" />
+      <MergeAssemblies Include="$(OutputPath)\System.Net.Http.Extensions.dll" />
+      <MergeAssemblies Include="$(OutputPath)\System.Net.Http.Primitives.dll" />
+      <MergeAssemblies Include="$(OutputPath)\Thinktecture.IdentityModel.Client.Net45.dll" />
+      <MergeAssemblies Include="$(OutputPath)\WebSocket4Net.dll" />
+      <MergeAssemblies Include="$(OutputPath)\YamlDotNet.dll" />
+    </ItemGroup>
+    <ILRepack InputAssemblies="@(MergeAssemblies)" Internalize="true" OutputFile="$(OutputPath)\CloudFoundry.Build.Tasks.dll" />
+    <ItemGroup>
+      <CleanupFiles Include="$(OutputPath)\*.dll" Exclude="$(OutputPath)\CloudFoundry.Build.Tasks.dll" />
+      <CleanupFiles Include="$(OutputPath)\*.x*l" Exclude="$(OutputPath)\CloudFoundry.Build.Tasks.xml" />
+      <CleanupFiles Include="$(OutputPath)\*.pdb" Exclude="$(OutputPath)\CloudFoundry.Build.Tasks.pdb" />
+    </ItemGroup>
+    <Delete Files="@(CleanupFiles)" />
   </Target>
-  -->
+  <Import Project="..\packages\ILRepack.MSBuild.Task.1.0.9\build\ILRepack.MSBuild.Task.targets" Condition="Exists('..\packages\ILRepack.MSBuild.Task.1.0.9\build\ILRepack.MSBuild.Task.targets')" />
+  <Import Project="..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" />
+  <Target Name="EnsureBclBuildImported" BeforeTargets="BeforeBuild" Condition="'$(BclBuildImported)' == ''">
+    <Error Condition="!Exists('..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" Text="This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=317567." HelpKeyword="BCLBUILD2001" />
+    <Error Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" Text="The build restored NuGet packages. Build the project again to include these packages in the build. For more information, see http://go.microsoft.com/fwlink/?LinkID=317568." HelpKeyword="BCLBUILD2002" />
+  </Target>
 </Project>

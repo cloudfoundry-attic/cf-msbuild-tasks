@@ -3,3 +3,5 @@
 *.Build.v12.suo
 /lib/
 */obj/
+*.nupkg
+FakesAssemblies/*.messages
