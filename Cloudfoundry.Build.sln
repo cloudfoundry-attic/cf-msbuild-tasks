@@ -3,16 +3,22 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudFoundry.Build.Tasks", "CloudFoundry.Build.Tasks\CloudFoundry.Build.Tasks.csproj", "{C53D0A90-12ED-470D-AB2F-E440DC02E509}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudFoundry.Build.Tasks", "src\CloudFoundry.Build.Tasks\CloudFoundry.Build.Tasks.csproj", "{C53D0A90-12ED-470D-AB2F-E440DC02E509}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudFoundry.Build.Tasks.Test", "CloudFoundry.Build.Tasks.Test\CloudFoundry.Build.Tasks.Test.csproj", "{30B57F81-4D58-4FF8-B131-075EF7ED9A7F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudFoundry.Build.Tasks.Test", "src\CloudFoundry.Build.Tasks.Test\CloudFoundry.Build.Tasks.Test.csproj", "{30B57F81-4D58-4FF8-B131-075EF7ED9A7F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudFoundry.Build.Tasks.IntegrationTests", "CloudFoundry.Build.Tasks.IntegrationTests\CloudFoundry.Build.Tasks.IntegrationTests.csproj", "{F7B6E157-42CA-40A7-A40C-2D3C8D8C1D30}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudFoundry.Build.Tasks.IntegrationTests", "src\CloudFoundry.Build.Tasks.IntegrationTests\CloudFoundry.Build.Tasks.IntegrationTests.csproj", "{F7B6E157-42CA-40A7-A40C-2D3C8D8C1D30}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{E4BF3D8A-E77C-4D38-A221-164E524FE6E2}"
 	ProjectSection(SolutionItems) = preProject
 		.nuget\NuGet.Config = .nuget\NuGet.Config
 		.nuget\NuGet.exe = .nuget\NuGet.exe
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{30CAFED7-9BD3-4023-8D72-EC61BFBC5E66}"
+	ProjectSection(SolutionItems) = preProject
+		build.proj = build.proj
+		CodeCoverage.runsettings = CodeCoverage.runsettings
 	EndProjectSection
 EndProject
 Global
