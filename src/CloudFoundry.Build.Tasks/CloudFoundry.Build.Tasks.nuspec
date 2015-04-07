@@ -23,7 +23,7 @@
 	<files>
 		<file src ="tools\*.*" target="tools"/>
 
-
+    <file src="..\..\lib\CloudFoundry.Build.Tasks.dll"                            target="lib\net45\CloudFoundry.Build.Tasks.dll" />
     <file src="..\..\lib\CloudFoundry.Build.Tasks.dll.config"                     target="lib\net45\CloudFoundry.Build.Tasks.dll.config" />
     <file src="..\..\lib\CloudFoundry.CloudController.V2.Client.dll"              target="lib\net45\CloudFoundry.CloudController.V2.Client.dll" />
     <file src="..\..\lib\CloudFoundry.CloudController.V2.Client.xml"              target="lib\net45\CloudFoundry.CloudController.V2.Client.xml" />
