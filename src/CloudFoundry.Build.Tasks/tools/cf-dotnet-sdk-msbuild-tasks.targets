@@ -1,0 +1,82 @@
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <UsingTask AssemblyFile="Cloudfoundry.Build.Tasks.dll" TaskName="CreateApp" />
+  <UsingTask AssemblyFile="Cloudfoundry.Build.Tasks.dll" TaskName="PushApp" />
+  <UsingTask AssemblyFile="Cloudfoundry.Build.Tasks.dll" TaskName="CreateRoutes" />
+  <UsingTask AssemblyFile="Cloudfoundry.Build.Tasks.dll" TaskName="BindRoutes" />
+  <UsingTask AssemblyFile="Cloudfoundry.Build.Tasks.dll" TaskName="CreateService" />
+  <UsingTask AssemblyFile="Cloudfoundry.Build.Tasks.dll" TaskName="BindServices" />
+  <UsingTask AssemblyFile="Cloudfoundry.Build.Tasks.dll" TaskName="LoadYaml" />
+  <UsingTask AssemblyFile="Cloudfoundry.Build.Tasks.dll" TaskName="SaveYaml" />
+  <UsingTask AssemblyFile="Cloudfoundry.Build.Tasks.dll" TaskName="DeleteApp" />
+  <UsingTask AssemblyFile="Cloudfoundry.Build.Tasks.dll" TaskName="RestartApp" />
+
+  <Target Name="PublishToCF">
+    <ItemGroup>
+      <Routes Include="$(AppName).$(Domain)"></Routes>
+    </ItemGroup>
+    
+    <CreateApp Name="$(AppName)" Stack="$(Stack)" Space="$(Space)" User="$(User)" Password="$(Password)" ServerUri="$(Server)">
+      <Output TaskParameter="AppGuid" PropertyName="AppGuid"/>
+    </CreateApp>
+    
+    <PushApp AppGuid="$(AppGuid)" AppPath="$(AppPath)" Start="false" User="$(User)" Password="$(Password)" ServerUri="$(Server)"></PushApp>
+    
+    <CreateRoutes User="$(User)" Password="$(Password)" ServerUri="$(Server)" Space="$(Space)" Routes="@(Routes)">
+      <Output TaskParameter="RouteGuids" PropertyName="RouteGuids"></Output>
+    </CreateRoutes>
+    
+    <BindRoutes User="$(User)" Password="$(Password)" ServerUri="$(Server)" AppGuid="$(AppGuid)" RouteGuids="$(RouteGuids)"></BindRoutes>
+    
+    <CreateService User="$(User)" Password="$(Password)" ServerUri="$(Server)" Name="$(ServiceName)" ServiceType="$(ServiceType)" ServicePlan="$(ServicePlan)" Space="$(Space)">
+      <Output TaskParameter="ServiceGuid" PropertyName="ServiceGuid"></Output>
+    </CreateService>
+    
+    <ItemGroup>
+      <ServicesGuids Include="$(ServiceGuid)"></ServicesGuids>
+    </ItemGroup>
+    
+    <BindServices User="$(User)" Password="$(Password)" ServerUri="$(Server)" AppGuid="$(AppGuid)" ServicesGuids="@(ServicesGuids)"></BindServices>
+
+    <RestartApp AppGuid="$(AppGuid)" User="$(User)" Password="$(Password)" ServerUri="$(Server)"></RestartApp>
+    
+    <SaveYaml AppPath="$(AppPath)" AppName="$(AppName)" ConfigurationFile="$(ManifestPath)" InstancesNumber ="$(Instances)" Memory="$(Memory)" Route="@(Routes)" Stack="$(Stack)" ServiceName="$(ServiceName)"  ServiceType="$(ServiceType)" ServicePlan="$(ServicePlan)"></SaveYaml>
+  </Target>
+
+
+  <Target Name="PublishToCFWithManifest">
+
+    <LoadYaml ConfigurationFile="$(ManifestPath)">
+      <Output TaskParameter="Stack" PropertyName="Stack"/>
+      <Output TaskParameter="AppName" PropertyName="AppName"/>
+      <Output TaskParameter="AppPath" PropertyName="AppPath"/>
+      <Output TaskParameter="Routes" PropertyName="Routes"/>
+      <Output TaskParameter="Memory" PropertyName="Memory"/>
+      <Output TaskParameter="Instances" PropertyName="Instances"/>
+      <Output TaskParameter="Services" PropertyName="Services"/>
+    </LoadYaml>
+
+    <CreateApp Name="$(AppName)" Stack="$(Stack)" Space="$(Space)" User="$(User)" Password="$(Password)" ServerUri="$(Server)">
+      <Output TaskParameter="AppGuid" PropertyName="AppGuid"/>
+    </CreateApp>
+
+    <PushApp AppGuid="$(AppGuid)" AppPath="$(AppPath)" Start="true" User="$(User)" Password="$(Password)" ServerUri="$(Server)"></PushApp>
+
+    <CreateRoutes User="$(User)" Password="$(Password)" ServerUri="$(Server)" Space="$(Space)" Routes="$(Routes)">
+      <Output TaskParameter="RouteGuids" PropertyName="RouteGuids"></Output>
+    </CreateRoutes>
+
+    <BindRoutes User="$(User)" Password="$(Password)" ServerUri="$(Server)" AppGuid="$(AppGuid)" RouteGuids="$(RouteGuids)"></BindRoutes>
+
+    <CreateServices User="$(User)" Password="$(Password)" ServerUri="$(Server)" Space="$(Space)" Services="$(Services)">
+      <Output TaskParameter="ServicesGuids" PropertyName="ServicesGuids"></Output>
+    </CreateServices>
+
+    <BindServices User="$(User)" Password="$(Password)" ServerUri="$(Server)" AppGuid="$(AppGuid)" ServicesGuids="$(ServiceGuid)"></BindServices>
+  </Target>
+
+  <Target Name="CleanUp">
+    <!-- This task will remove the application, bound routes and bound provisioned service instances -->
+    <DeleteApp User="$(User)" Password="$(Password)" ServerUri="$(Server)" AppName="testApp" Space="$(Space)" DeleteRoutes="true" DeleteServices="true"></DeleteApp>
+  </Target>
+  
+</Project>
