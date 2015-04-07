@@ -23,6 +23,30 @@
 	<files>
 		<file src ="tools\*.*" target="tools"/>
 
-    <file src="..\..\lib\CloudFoundry.Build.Tasks.dll.config"                            target="lib\net45\CloudFoundry.Build.Tasks.dll.config" />
+
+    <file src="..\..\lib\CloudFoundry.Build.Tasks.dll.config"                     target="lib\net45\CloudFoundry.Build.Tasks.dll.config" />
+    <file src="..\..\lib\CloudFoundry.CloudController.V2.Client.dll"              target="lib\net45\CloudFoundry.CloudController.V2.Client.dll" />
+    <file src="..\..\lib\CloudFoundry.CloudController.V2.Client.xml"              target="lib\net45\CloudFoundry.CloudController.V2.Client.xml" />
+    <file src="..\..\lib\CloudFoundry.CloudController.Common.dll"                 target="lib\net45\CloudFoundry.CloudController.Common.dll" />
+    <file src="..\..\lib\CloudFoundry.CloudController.Common.xml"                 target="lib\net45\CloudFoundry.CloudController.Common.xml" />
+    <file src="..\..\lib\CloudFoundry.Logyard.Client.dll"                         target="lib\net45\CloudFoundry.Logyard.Client.dll" />
+    <file src="..\..\lib\CloudFoundry.Logyard.Client.XML"                         target="lib\net45\CloudFoundry.Logyard.Client.XML" />
+    <file src="..\..\lib\CloudFoundry.Loggregator.Client.dll"                     target="lib\net45\CloudFoundry.Loggregator.Client.dll" />
+    <file src="..\..\lib\CloudFoundry.Loggregator.Client.XML"                     target="lib\net45\CloudFoundry.Loggregator.Client.XML" />
+    <file src="..\..\lib\CloudFoundry.UAA.Client.dll"                             target="lib\net45\CloudFoundry.UAA.Client.dll" />
+    <file src="..\..\lib\CloudFoundry.UAA.Client.xml"                             target="lib\net45\CloudFoundry.UAA.Client.XML" />
+
+    <file src="..\..\lib\Newtonsoft.Json.dll"                                     target="lib\net45\Newtonsoft.Json.dll" />
+    <file src="..\..\lib\Newtonsoft.Json.xml"                                     target="lib\net45\Newtonsoft.Json.xml" />
+    <file src="..\..\lib\protobuf-net.dll"                                        target="lib\net45\protobuf-net.dll" />
+    <file src="..\..\lib\protobuf-net.xml"                                        target="lib\net45\protobuf-net.xml" />
+    <file src="..\..\lib\System.Net.Http.Extensions.dll"                          target="lib\net45\System.Net.Http.Extensions.dll" />
+    <file src="..\..\lib\System.Net.Http.Extensions.xml"                          target="lib\net45\System.Net.Http.Extensions.xml" />
+    <file src="..\..\lib\System.Net.Http.Primitives.dll"                          target="lib\net45\System.Net.Http.Primitives.dll" />
+    <file src="..\..\lib\System.Net.Http.Primitives.xml"                          target="lib\net45\System.Net.Http.Primitives.xml" />
+    <file src="..\..\lib\Thinktecture.IdentityModel.Client.Net45.dll"             target="lib\net45\Thinktecture.IdentityModel.Client.Net45.dll" />
+    <file src="..\..\lib\WebSocket4Net.dll"                                       target="lib\net45\WebSocket4Net.dll" />
+    <file src="..\..\lib\YamlDotNet.dll"                                          target="lib\net45\YamlDotNet.dll" />
+    <file src="..\..\lib\YamlDotNet.xml"                                          target="lib\net45\YamlDotNet.xml" />
 	</files>  
 </package>
