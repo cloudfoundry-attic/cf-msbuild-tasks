@@ -3,13 +3,13 @@
     <User>admin</User>
     <Password>admin</Password>
     <Server>http://api.1.2.3.4.xip.io</Server>
-    <Domain>1.2.3.4.xip.io</Domain>
     <AppName>test</AppName>
     <Space>testSpace</Space>
     <AppPath>C:\test\</AppPath>
     <Memory>512</Memory>
     <Instances>1</Instances>
     <Stack>win2012</Stack>
+    <Routes>test.1.2.3.4.xip.io</Routes>
     <ServiceName>test</ServiceName>
     <ServicePlan>free</ServicePlan>
     <ServiceType>mysql</ServiceType>

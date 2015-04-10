@@ -1,0 +1,127 @@
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <UsingTask AssemblyFile="Cloudfoundry.Build.Tasks.dll" TaskName="CreateApp" />
+  <UsingTask AssemblyFile="Cloudfoundry.Build.Tasks.dll" TaskName="PushApp" />
+  <UsingTask AssemblyFile="Cloudfoundry.Build.Tasks.dll" TaskName="CreateRoutes" />
+  <UsingTask AssemblyFile="Cloudfoundry.Build.Tasks.dll" TaskName="BindRoutes" />
+  <UsingTask AssemblyFile="Cloudfoundry.Build.Tasks.dll" TaskName="CreateService" />
+  <UsingTask AssemblyFile="Cloudfoundry.Build.Tasks.dll" TaskName="BindServices" />
+  <UsingTask AssemblyFile="Cloudfoundry.Build.Tasks.dll" TaskName="LoadYaml" />
+  <UsingTask AssemblyFile="Cloudfoundry.Build.Tasks.dll" TaskName="SaveYaml" />
+  <UsingTask AssemblyFile="Cloudfoundry.Build.Tasks.dll" TaskName="DeleteApp" />
+  <UsingTask AssemblyFile="Cloudfoundry.Build.Tasks.dll" TaskName="RestartApp" />
+
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v12.0\Web\Microsoft.Web.Publishing.targets" Condition="false" />
+
+  <!-- Generate a GUID which is the name of the temp folder where the app will be published-->
+  <UsingTask TaskName="GenerateGuid" TaskFactory="CodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll">
+    <ParameterGroup>
+      <NewGuid ParameterType="System.String" Output="True" />
+    </ParameterGroup>
+    <Task>
+      <Using Namespace="System"/>
+      <Code Type="Fragment" Language="cs">
+        <![CDATA[
+          NewGuid = System.Guid.NewGuid().ToString().ToUpper(); 
+        ]]>
+      </Code>
+    </Task>
+  </UsingTask>
+
+  <!-- Publish application to TEMP location -->
+  <Target Name="PublishToTemp" DependsOnTargets="PipelinePreDeployCopyAllFilesToOneFolder">
+    <GenerateGuid>
+      <Output PropertyName="NewGuid" TaskParameter="NewGuid"/>
+    </GenerateGuid>
+
+    <PropertyGroup>
+      <PublishTempAppPath>$(TEMP)\$(NewGuid)</PublishTempAppPath>
+    </PropertyGroup>
+
+    <Error Condition="'$(PublishTempAppPath)'==''" Text="The PublishTempAppPath property must be set to the intended publishing destination." />
+    <MakeDir Condition="!Exists($(PublishTempAppPath))" Directories="$(PublishTempAppPath)" />
+    <ItemGroup>
+      <PublishFiles Include="$(_PackageTempDir)\**\*.*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(PublishFiles)" DestinationFiles="@(PublishFiles->'$(PublishTempAppPath)\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="True" />
+  </Target>
+
+  <!-- Publish application to cf deployment: create app, push app, create routes, bind routes, create services, bind services, start app, save manifest file -->
+  <Target Name="Publish" DependsOnTargets="PublishToTemp">
+    <ItemGroup>
+      <Routes Include="$(Routes)"></Routes>
+    </ItemGroup>
+
+    <CreateApp Name="$(AppName)" Stack="$(Stack)" Space="$(Space)" User="$(User)" Password="$(Password)" ServerUri="$(Server)">
+      <Output TaskParameter="AppGuid" PropertyName="AppGuid"/>
+    </CreateApp>
+
+    <PushApp AppGuid="$(AppGuid)" AppPath="$(PublishTempAppPath)" Start="false" User="$(User)" Password="$(Password)" ServerUri="$(Server)"></PushApp>
+
+    <CreateRoutes Condition="Exists('$(Routes)')" User="$(User)" Password="$(Password)" ServerUri="$(Server)" Space="$(Space)" Routes="@(Routes)">
+      <Output TaskParameter="RouteGuids" PropertyName="RouteGuids"></Output>
+    </CreateRoutes>
+
+    <BindRoutes User="$(User)" Password="$(Password)" ServerUri="$(Server)" AppGuid="$(AppGuid)" RouteGuids="$(RouteGuids)"></BindRoutes>
+
+    <CreateService Condition="Exists('$(ServiceName)') And Exists('$(ServiceType)') And Exists('$(ServicePlan)')" User="$(User)" Password="$(Password)" ServerUri="$(Server)" Name="$(ServiceName)" ServiceType="$(ServiceType)" ServicePlan="$(ServicePlan)" Space="$(Space)">
+      <Output TaskParameter="ServiceGuid" PropertyName="ServiceGuid"></Output>
+    </CreateService>
+
+    <ItemGroup>
+      <ServicesGuids Include="$(ServiceGuid)"></ServicesGuids>
+    </ItemGroup>
+
+    <BindServices User="$(User)" Password="$(Password)" ServerUri="$(Server)" AppGuid="$(AppGuid)" ServicesGuids="@(ServicesGuids)"></BindServices>
+
+    <RestartApp AppGuid="$(AppGuid)" User="$(User)" Password="$(Password)" ServerUri="$(Server)"></RestartApp>
+
+    <SaveYaml AppPath="$(AppPath)" AppName="$(AppName)" ConfigurationFile="$(ManifestPath)" InstancesNumber ="$(Instances)" Memory="$(Memory)" Route="@(Routes)" Stack="$(Stack)" ServiceName="$(ServiceName)"  ServiceType="$(ServiceType)" ServicePlan="$(ServicePlan)"></SaveYaml>
+
+    <!-- Remove previously created temp directory -->
+    <RemoveDir Directories="$(PublishTempAppPath)" />
+    <Message Text="Removed application files from temp location: '$(PublishTempAppPath)'"/>
+  </Target>
+
+  <!-- Publish application with manifest to cf deployment: create app, push app, create routes, bind routes, create services, bind services, start app -->
+  <Target Name="PublishWithManifest" DependsOnTargets="PublishToTemp">
+
+    <LoadYaml ConfigurationFile="$(ManifestPath)">
+      <Output TaskParameter="Stack" PropertyName="Stack"/>
+      <Output TaskParameter="AppName" PropertyName="AppName"/>
+      <Output TaskParameter="AppPath" PropertyName="AppPath"/>
+      <Output TaskParameter="Routes" PropertyName="Routes"/>
+      <Output TaskParameter="Memory" PropertyName="Memory"/>
+      <Output TaskParameter="Instances" PropertyName="Instances"/>
+      <Output TaskParameter="Services" PropertyName="Services"/>
+    </LoadYaml>
+
+    <CreateApp Name="$(AppName)" Stack="$(Stack)" Space="$(Space)" User="$(User)" Password="$(Password)" ServerUri="$(Server)">
+      <Output TaskParameter="AppGuid" PropertyName="AppGuid"/>
+    </CreateApp>
+
+    <PushApp AppGuid="$(AppGuid)" AppPath="$(PublishTempAppPath)" Start="true" User="$(User)" Password="$(Password)" ServerUri="$(Server)"></PushApp>
+
+    <CreateRoutes Condition="Exists('$(Routes)')" User="$(User)" Password="$(Password)" ServerUri="$(Server)" Space="$(Space)" Routes="$(Routes)">
+      <Output TaskParameter="RouteGuids" PropertyName="RouteGuids"></Output>
+    </CreateRoutes>
+
+    <BindRoutes User="$(User)" Password="$(Password)" ServerUri="$(Server)" AppGuid="$(AppGuid)" RouteGuids="$(RouteGuids)"></BindRoutes>
+
+    <CreateServices Condition="Exists('$(Services)')" User="$(User)" Password="$(Password)" ServerUri="$(Server)" Space="$(Space)" Services="$(Services)">
+      <Output TaskParameter="ServicesGuids" PropertyName="ServicesGuids"></Output>
+    </CreateServices>
+
+    <BindServices User="$(User)" Password="$(Password)" ServerUri="$(Server)" AppGuid="$(AppGuid)" ServicesGuids="$(ServiceGuid)"></BindServices>
+
+    <RestartApp AppGuid="$(AppGuid)" User="$(User)" Password="$(Password)" ServerUri="$(Server)"></RestartApp>
+
+    <!-- Remove previously created temp directory -->
+    <RemoveDir Directories="$(PublishTempAppPath)" />
+  </Target>
+
+  <!-- This task will remove the application, bound routes and bound provisioned service instances -->
+  <Target Name="CleanUp">
+    <DeleteApp User="$(User)" Password="$(Password)" ServerUri="$(Server)" AppName="$(AppName)" Space="$(Space)" DeleteRoutes="true" DeleteServices="true"></DeleteApp>
+  </Target>
+
+</Project>
