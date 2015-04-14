@@ -128,32 +128,4 @@
       AssemblyFileVersion="$(version)" />
   </Target>
 
-  <!-- Import ILRepack extensions -->
-  <Import Project="$(LibraryRoot)\packages\ILRepack.MSBuild.Task.1.0.9\build\ILRepack.MSBuild.Task.targets" Condition="Exists('$(LibraryRoot)\packages\ILRepack.MSBuild.Task.1.0.9\build\ILRepack.MSBuild.Task.targets')" />
-
-  <Target Name="Merge">
-    <Copy SourceFiles="$(OutputPath)\CloudFoundry.Build.Tasks.dll" DestinationFiles="$(OutputPath)\CloudFoundry.Build.Tasks.Temp.dll" />
-    <ItemGroup>
-      <MergeAssemblies Include="$(OutputPath)\CloudFoundry.Build.Tasks.Temp.dll" />
-      <MergeAssemblies Include="$(OutputPath)\CloudFoundry.CloudController.Common.dll" />
-      <MergeAssemblies Include="$(OutputPath)\CloudFoundry.Logyard.Client.dll" />
-      <MergeAssemblies Include="$(OutputPath)\CloudFoundry.Loggregator.Client.dll" />
-      <MergeAssemblies Include="$(OutputPath)\CloudFoundry.UAA.Client.dll" />
-      <MergeAssemblies Include="$(OutputPath)\Newtonsoft.Json.dll" />
-      <MergeAssemblies Include="$(OutputPath)\protobuf-net.dll" />
-      <MergeAssemblies Include="$(OutputPath)\System.Net.Http.Extensions.dll" />
-      <MergeAssemblies Include="$(OutputPath)\System.Net.Http.Primitives.dll" />
-      <MergeAssemblies Include="$(OutputPath)\Thinktecture.IdentityModel.Client.Net45.dll" />
-      <MergeAssemblies Include="$(OutputPath)\WebSocket4Net.dll" />
-      <MergeAssemblies Include="$(OutputPath)\YamlDotNet.dll" />
-    </ItemGroup>
-
-    <ILRepack InputAssemblies="@(MergeAssemblies)" Internalize="true" OutputFile="$(OutputPath)\CloudFoundry.Build.Tasks.dll" />
-    <ItemGroup>
-      <CleanupFiles Include="$(OutputPath)\*.dll" Exclude="$(OutputPath)\CloudFoundry.Build.Tasks.dll" />
-      <CleanupFiles Include="$(OutputPath)\*.x*l" Exclude="$(OutputPath)\CloudFoundry.Build.Tasks.xml" />
-      <CleanupFiles Include="$(OutputPath)\*.pdb" Exclude="$(OutputPath)\CloudFoundry.Build.Tasks.pdb" />
-    </ItemGroup>
-    <Delete Files="@(CleanupFiles)" />
-  </Target>
 </Project>

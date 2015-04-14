@@ -116,8 +116,7 @@
       <SubType>Designer</SubType>
     </None>
     <None Include="tools\cf-dotnet-sdk-msbuild-tasks.props" />
-    <None Include="tools\cf-dotnet-sdk-msbuild-tasks.targets" />
-    <None Include="tools\cf.proj" />
+    <None Include="build\cf-dotnet-sdk-msbuild-tasks.targets" />
     <None Include="tools\install.ps1" />
   </ItemGroup>
   <ItemGroup>

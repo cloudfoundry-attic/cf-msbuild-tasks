@@ -30,32 +30,32 @@ function Get-MSBuildProject {
     }
 }
 
-function Add-Import {
+function Remove-Import {
     param(
         [parameter(Position = 0, Mandatory = $true)]
-        [string]$Path,
+        [string]$Name,
         [parameter(Position = 1, ValueFromPipelineByPropertyName = $true)]
         [string[]]$ProjectName
     )
     Process {
         (Resolve-ProjectName $ProjectName) | %{
             $buildProject = $_ | Get-MSBuildProject
-            $buildProject.Xml.AddImport($Path)
+			$importToRemove = $buildProject.Xml.Imports | Where-Object { $_.Project.Endswith($Name) }
+			$buildProject.Xml.RemoveChild($importToRemove) | out-null
             $_.Save()
         }
     }
 }
 
-function Copy-Resources($project) {
-	Copy-Item "$toolsPath\cf-dotnet-sdk-msbuild-tasks.props" $project.Name -Force | Out-Null
-	Add-Import "cf-dotnet-sdk-msbuild-tasks.props" $project.Name
-
-	Write-Host "Copying cf-dotnet-sdk-msbuild-tasks.props file to project folder."
+function Remove-Resources($project) {
+	$projectName = $project.Name
+	Remove-Item "$projectName\cf-dotnet-sdk-msbuild-tasks.props" -Force | Out-Null
+	Remove-Import "cf-dotnet-sdk-msbuild-tasks.props" $project.Name
 }
 
 function Main 
 {
-	Copy-Resources $project
+	Remove-Resources $project
 }
 
 Main
