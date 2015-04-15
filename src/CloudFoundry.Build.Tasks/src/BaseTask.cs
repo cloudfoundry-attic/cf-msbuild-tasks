@@ -27,11 +27,11 @@ namespace CloudFoundry.Build.Tasks
             set;
         }
 
-        [Required]
         public string User { get; set; }
 
-        [Required]
         public string Password { get; set; }
+
+        public string RefreshToken { get; set; }
 
         [Required]
         public string ServerUri { get; set; }
@@ -47,13 +47,23 @@ namespace CloudFoundry.Build.Tasks
             //skip ssl
             System.Net.ServicePointManager.ServerCertificateValidationCallback = ((sender, certificate, chain, sslPolicyErrors) => true);
 
-            CloudCredentials creds = new CloudCredentials();
-            creds.User = User;
-            creds.Password = Password;
-
             CloudFoundryClient client = new CloudFoundryClient(new Uri(ServerUri), new System.Threading.CancellationToken());
 
-            client.Login(creds).Wait();
+            if (User.Length > 0 && Password.Length > 0)
+            {
+                CloudCredentials creds = new CloudCredentials();
+                creds.User = User;
+                creds.Password = Password;
+                client.Login(creds).Wait();
+            }
+            else if (RefreshToken.Length > 0)
+            {
+                client.Login(RefreshToken).Wait();
+            }
+            else
+            {
+                throw new System.Security.Authentication.AuthenticationException("Could not authenticate client without refresh token or credentials!");
+            }
 
             return client;
         }
