@@ -118,6 +118,7 @@
     <None Include="tools\cf-dotnet-sdk-msbuild-tasks.props" />
     <None Include="build\cf-dotnet-sdk-msbuild-tasks.targets" />
     <None Include="tools\install.ps1" />
+    <None Include="tools\uninstall.ps1" />
   </ItemGroup>
   <ItemGroup>
     <CodeAnalysisDictionary Include="cf-build-tasks.xml" />

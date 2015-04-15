@@ -51,19 +51,19 @@
       <Routes Include="$(Routes)"></Routes>
     </ItemGroup>
 
-    <CreateApp Name="$(AppName)" Stack="$(Stack)" Space="$(Space)" User="$(User)" Password="$(Password)" ServerUri="$(Server)">
+    <CreateApp Name="$(AppName)" Stack="$(Stack)" Space="$(Space)" User="$(User)" Password="$(Password)" ServerUri="$(Server)" RefreshToken="$(RefreshToken)">
       <Output TaskParameter="AppGuid" PropertyName="AppGuid"/>
     </CreateApp>
 
-    <PushApp AppGuid="$(AppGuid)" AppPath="$(PublishTempAppPath)" Start="false" User="$(User)" Password="$(Password)" ServerUri="$(Server)"></PushApp>
+    <PushApp AppGuid="$(AppGuid)" AppPath="$(PublishTempAppPath)" Start="false" User="$(User)" Password="$(Password)" ServerUri="$(Server)" RefreshToken="$(RefreshToken)"></PushApp>
 
-    <CreateRoutes Condition="Exists('$(Routes)')" User="$(User)" Password="$(Password)" ServerUri="$(Server)" Space="$(Space)" Routes="@(Routes)">
+    <CreateRoutes Condition="'%(Routes.Identity)' != ''" User="$(User)" Password="$(Password)" ServerUri="$(Server)" RefreshToken="$(RefreshToken)" Space="$(Space)" Routes="@(Routes)">
       <Output TaskParameter="RouteGuids" PropertyName="RouteGuids"></Output>
     </CreateRoutes>
 
-    <BindRoutes User="$(User)" Password="$(Password)" ServerUri="$(Server)" AppGuid="$(AppGuid)" RouteGuids="$(RouteGuids)"></BindRoutes>
+    <BindRoutes User="$(User)" Password="$(Password)" ServerUri="$(Server)" RefreshToken="$(RefreshToken)" AppGuid="$(AppGuid)" RouteGuids="$(RouteGuids)"></BindRoutes>
 
-    <CreateService Condition="Exists('$(ServiceName)') And Exists('$(ServiceType)') And Exists('$(ServicePlan)')" User="$(User)" Password="$(Password)" ServerUri="$(Server)" Name="$(ServiceName)" ServiceType="$(ServiceType)" ServicePlan="$(ServicePlan)" Space="$(Space)">
+    <CreateService Condition="Exists('$(ServiceName)') And Exists('$(ServiceType)') And Exists('$(ServicePlan)')" User="$(User)" Password="$(Password)" ServerUri="$(Server)" RefreshToken="$(RefreshToken)" Name="$(ServiceName)" ServiceType="$(ServiceType)" ServicePlan="$(ServicePlan)" Space="$(Space)">
       <Output TaskParameter="ServiceGuid" PropertyName="ServiceGuid"></Output>
     </CreateService>
 
@@ -71,9 +71,9 @@
       <ServicesGuids Include="$(ServiceGuid)"></ServicesGuids>
     </ItemGroup>
 
-    <BindServices User="$(User)" Password="$(Password)" ServerUri="$(Server)" AppGuid="$(AppGuid)" ServicesGuids="@(ServicesGuids)"></BindServices>
+    <BindServices User="$(User)" Password="$(Password)" ServerUri="$(Server)" RefreshToken="$(RefreshToken)" AppGuid="$(AppGuid)" ServicesGuids="@(ServicesGuids)"></BindServices>
 
-    <RestartApp AppGuid="$(AppGuid)" User="$(User)" Password="$(Password)" ServerUri="$(Server)"></RestartApp>
+    <RestartApp AppGuid="$(AppGuid)" User="$(User)" Password="$(Password)" ServerUri="$(Server)" RefreshToken="$(RefreshToken)"></RestartApp>
 
     <SaveYaml AppPath="$(AppPath)" AppName="$(AppName)" ConfigurationFile="$(ManifestPath)" InstancesNumber ="$(Instances)" Memory="$(Memory)" Route="@(Routes)" Stack="$(Stack)" ServiceName="$(ServiceName)"  ServiceType="$(ServiceType)" ServicePlan="$(ServicePlan)"></SaveYaml>
 
@@ -95,25 +95,25 @@
       <Output TaskParameter="Services" PropertyName="Services"/>
     </LoadYaml>
 
-    <CreateApp Name="$(AppName)" Stack="$(Stack)" Space="$(Space)" User="$(User)" Password="$(Password)" ServerUri="$(Server)">
+    <CreateApp Name="$(AppName)" Stack="$(Stack)" Space="$(Space)" User="$(User)" Password="$(Password)" ServerUri="$(Server)" RefreshToken="$(RefreshToken)">
       <Output TaskParameter="AppGuid" PropertyName="AppGuid"/>
     </CreateApp>
 
-    <PushApp AppGuid="$(AppGuid)" AppPath="$(PublishTempAppPath)" Start="true" User="$(User)" Password="$(Password)" ServerUri="$(Server)"></PushApp>
+    <PushApp AppGuid="$(AppGuid)" AppPath="$(PublishTempAppPath)" Start="true" User="$(User)" Password="$(Password)" ServerUri="$(Server)" RefreshToken="$(RefreshToken)"></PushApp>
 
-    <CreateRoutes Condition="Exists('$(Routes)')" User="$(User)" Password="$(Password)" ServerUri="$(Server)" Space="$(Space)" Routes="$(Routes)">
+    <CreateRoutes Condition="'%(Routes.Identity)' != ''" User="$(User)" Password="$(Password)" ServerUri="$(Server)" RefreshToken="$(RefreshToken)" Space="$(Space)" Routes="$(Routes)">
       <Output TaskParameter="RouteGuids" PropertyName="RouteGuids"></Output>
     </CreateRoutes>
 
-    <BindRoutes User="$(User)" Password="$(Password)" ServerUri="$(Server)" AppGuid="$(AppGuid)" RouteGuids="$(RouteGuids)"></BindRoutes>
+    <BindRoutes User="$(User)" Password="$(Password)" ServerUri="$(Server)" RefreshToken="$(RefreshToken)" AppGuid="$(AppGuid)" RouteGuids="$(RouteGuids)"></BindRoutes>
 
-    <CreateServices Condition="Exists('$(Services)')" User="$(User)" Password="$(Password)" ServerUri="$(Server)" Space="$(Space)" Services="$(Services)">
+    <CreateServices Condition="Exists('$(Services)')" User="$(User)" Password="$(Password)" ServerUri="$(Server)" RefreshToken="$(RefreshToken)" Space="$(Space)" Services="$(Services)">
       <Output TaskParameter="ServicesGuids" PropertyName="ServicesGuids"></Output>
     </CreateServices>
 
-    <BindServices User="$(User)" Password="$(Password)" ServerUri="$(Server)" AppGuid="$(AppGuid)" ServicesGuids="$(ServiceGuid)"></BindServices>
+    <BindServices User="$(User)" Password="$(Password)" ServerUri="$(Server)" RefreshToken="$(RefreshToken)" AppGuid="$(AppGuid)" ServicesGuids="$(ServiceGuid)"></BindServices>
 
-    <RestartApp AppGuid="$(AppGuid)" User="$(User)" Password="$(Password)" ServerUri="$(Server)"></RestartApp>
+    <RestartApp AppGuid="$(AppGuid)" User="$(User)" Password="$(Password)" ServerUri="$(Server)" RefreshToken="$(RefreshToken)"></RestartApp>
 
     <!-- Remove previously created temp directory -->
     <RemoveDir Directories="$(PublishTempAppPath)" />
@@ -121,7 +121,7 @@
 
   <!-- This task will remove the application, bound routes and bound provisioned service instances -->
   <Target Name="CleanUp">
-    <DeleteApp User="$(User)" Password="$(Password)" ServerUri="$(Server)" AppName="$(AppName)" Space="$(Space)" DeleteRoutes="true" DeleteServices="true"></DeleteApp>
+    <DeleteApp User="$(User)" Password="$(Password)" ServerUri="$(Server)" RefreshToken="$(RefreshToken)" AppName="$(AppName)" Space="$(Space)" DeleteRoutes="true" DeleteServices="true"></DeleteApp>
   </Target>
 
 </Project>
