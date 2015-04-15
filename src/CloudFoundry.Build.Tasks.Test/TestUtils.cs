@@ -157,6 +157,12 @@ namespace CloudFoundry.Build.Tasks.Test
             });
         }
 
+
+        internal static List<ListAllAppsForSpaceResponse> CusomListAllAppsForSpacePagedResponseCreate(PagedResponseCollection<ListAllAppsForSpaceResponse> arg1)
+        {
+            return new List<ListAllAppsForSpaceResponse>();
+        }
+
         internal static List<ListAllAppsForSpaceResponse> CusomListAllAppsForSpacePagedResponse(PagedResponseCollection<ListAllAppsForSpaceResponse> arg1)
         {
             return new List<ListAllAppsForSpaceResponse>() { new ListAllAppsForSpaceResponse() { Name = "testApp", EntityMetadata = new Metadata() } };
