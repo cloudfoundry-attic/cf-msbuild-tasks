@@ -57,13 +57,13 @@
 
     <PushApp AppGuid="$(AppGuid)" AppPath="$(PublishTempAppPath)" Start="false" User="$(User)" Password="$(Password)" ServerUri="$(Server)" RefreshToken="$(RefreshToken)"></PushApp>
 
-    <CreateRoutes Condition="'%(Routes.Identity)' != ''" User="$(User)" Password="$(Password)" ServerUri="$(Server)" RefreshToken="$(RefreshToken)" Space="$(Space)" Routes="@(Routes)">
+    <CreateRoutes Condition="'$(Routes)' != ''" User="$(User)" Password="$(Password)" ServerUri="$(Server)" RefreshToken="$(RefreshToken)" Space="$(Space)" Routes="@(Routes)">
       <Output TaskParameter="RouteGuids" PropertyName="RouteGuids"></Output>
     </CreateRoutes>
 
     <BindRoutes User="$(User)" Password="$(Password)" ServerUri="$(Server)" RefreshToken="$(RefreshToken)" AppGuid="$(AppGuid)" RouteGuids="$(RouteGuids)"></BindRoutes>
 
-    <CreateService Condition="Exists('$(ServiceName)') And Exists('$(ServiceType)') And Exists('$(ServicePlan)')" User="$(User)" Password="$(Password)" ServerUri="$(Server)" RefreshToken="$(RefreshToken)" Name="$(ServiceName)" ServiceType="$(ServiceType)" ServicePlan="$(ServicePlan)" Space="$(Space)">
+    <CreateService Condition="'$(ServiceName)' != '' And '$(ServiceType)' != '' And '$(ServicePlan)' != ''" User="$(User)" Password="$(Password)" ServerUri="$(Server)" RefreshToken="$(RefreshToken)" Name="$(ServiceName)" ServiceType="$(ServiceType)" ServicePlan="$(ServicePlan)" Space="$(Space)">
       <Output TaskParameter="ServiceGuid" PropertyName="ServiceGuid"></Output>
     </CreateService>
 
@@ -101,13 +101,13 @@
 
     <PushApp AppGuid="$(AppGuid)" AppPath="$(PublishTempAppPath)" Start="true" User="$(User)" Password="$(Password)" ServerUri="$(Server)" RefreshToken="$(RefreshToken)"></PushApp>
 
-    <CreateRoutes Condition="'%(Routes.Identity)' != ''" User="$(User)" Password="$(Password)" ServerUri="$(Server)" RefreshToken="$(RefreshToken)" Space="$(Space)" Routes="$(Routes)">
+    <CreateRoutes Condition="'$(Routes)' != ''" User="$(User)" Password="$(Password)" ServerUri="$(Server)" RefreshToken="$(RefreshToken)" Space="$(Space)" Routes="$(Routes)">
       <Output TaskParameter="RouteGuids" PropertyName="RouteGuids"></Output>
     </CreateRoutes>
 
     <BindRoutes User="$(User)" Password="$(Password)" ServerUri="$(Server)" RefreshToken="$(RefreshToken)" AppGuid="$(AppGuid)" RouteGuids="$(RouteGuids)"></BindRoutes>
 
-    <CreateServices Condition="Exists('$(Services)')" User="$(User)" Password="$(Password)" ServerUri="$(Server)" RefreshToken="$(RefreshToken)" Space="$(Space)" Services="$(Services)">
+    <CreateServices Condition="'$(ServiceName)' != '' And '$(ServiceType)' != '' And '$(ServicePlan)' != ''" User="$(User)" Password="$(Password)" ServerUri="$(Server)" RefreshToken="$(RefreshToken)" Space="$(Space)" Services="$(Services)">
       <Output TaskParameter="ServicesGuids" PropertyName="ServicesGuids"></Output>
     </CreateServices>
 
