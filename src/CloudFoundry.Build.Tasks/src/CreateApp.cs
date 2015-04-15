@@ -66,26 +66,56 @@ namespace CloudFoundry.Build.Tasks
 
             if (stackGuid.HasValue && spaceGuid.HasValue)
             {
-                CreateAppRequest request = new CreateAppRequest();
-                request.Name = Name;
-                request.SpaceGuid = spaceGuid;
-                request.StackGuid = stackGuid;
-                if (Memory > 0)
-                {
-                    request.Memory = Memory;
-                }
-                if (Instances > 0)
-                {
-                    request.Instances = Instances;
-                }
-                if (Buildpack != null)
-                {
-                    request.Buildpack = Buildpack;
-                }
+                PagedResponseCollection<ListAllAppsForSpaceResponse> apps = client.Spaces.ListAllAppsForSpace(spaceGuid, new RequestOptions() { Query = "name:" + Name }).Result;
 
-                CreateAppResponse response = client.Apps.CreateApp(request).Result;
-                AppGuid = response.EntityMetadata.Guid;
-                logger.LogMessage("Created app {0} with guid {1}", Name, AppGuid);
+                if (apps.Count() > 0)
+                {
+                    AppGuid = apps.FirstOrDefault().EntityMetadata.Guid;
+
+                    UpdateAppRequest request = new UpdateAppRequest();
+                    request.SpaceGuid = spaceGuid;
+                    request.StackGuid = stackGuid;
+                   
+                    if (Memory > 0)
+                    {
+                        request.Memory = Memory;
+                    }
+                    if (Instances > 0)
+                    {
+                        request.Instances = Instances;
+                    }
+                    if (Buildpack != null)
+                    {
+                        request.Buildpack = Buildpack;
+                    }
+
+                    UpdateAppResponse response = client.Apps.UpdateApp(new Guid(AppGuid), request).Result;
+                    logger.LogMessage("Updated app {0} with guid {1}", response.Name, response.EntityMetadata.Guid);
+                }
+                else
+                {
+
+                    CreateAppRequest request = new CreateAppRequest();
+                    request.Name = Name;
+                    request.SpaceGuid = spaceGuid;
+                    request.StackGuid = stackGuid;
+                    if (Memory > 0)
+                    {
+                        request.Memory = Memory;
+                    }
+                    if (Instances > 0)
+                    {
+                        request.Instances = Instances;
+                    }
+                    if (Buildpack != null)
+                    {
+                        request.Buildpack = Buildpack;
+                    }
+
+                    CreateAppResponse response = client.Apps.CreateApp(request).Result;
+                    AppGuid = response.EntityMetadata.Guid;
+                    logger.LogMessage("Created app {0} with guid {1}", Name, AppGuid);
+                }
             }
 
             return true;
