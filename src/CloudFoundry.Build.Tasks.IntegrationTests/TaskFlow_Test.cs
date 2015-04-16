@@ -11,10 +11,17 @@ namespace CloudFoundry.Build.Tasks.IntegrationTests
         [TestMethod]
         public void Flow_IntegrationTest()
         {
+            LoginTask login = new LoginTask();
+            login.BuildEngine = new FakeBuildEngine();
+            login.CFUser = Settings.Default.User;
+            login.CFPassword = Settings.Default.Password;
+            login.CFServerUri = Settings.Default.ServerUri;
+
+            login.Execute();
+
             CreateApp task = new CreateApp();
 
-            task.CFUser = Settings.Default.User;
-            task.CFPassword = Settings.Default.Password;
+            task.CFRefreshToken = login.CFRefreshToken;
             task.CFServerUri = Settings.Default.ServerUri;
 
             task.CFAppName = "testIntegration";
