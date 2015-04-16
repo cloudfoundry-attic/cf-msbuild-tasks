@@ -94,13 +94,16 @@ namespace CloudFoundry.Build.Tasks
                 CFAutoscale = Utils.Serialize<Autoscale>(Configuration.AutoscaleInfo);
                 CFDisk = Configuration.Disk;
 
-                List<ProvisionedService> servicesList = new List<ProvisionedService>();
-                foreach (var service in Configuration.Services)
+                if (Configuration.Services != null)
                 {
-                    servicesList.Add(new ProvisionedService() { Name = service.Key, Plan = service.Value.Plan, Type = service.Value.Type });
-                }
+                    List<ProvisionedService> servicesList = new List<ProvisionedService>();
+                    foreach (var service in Configuration.Services)
+                    {
+                        servicesList.Add(new ProvisionedService() { Name = service.Key, Plan = service.Value.Plan, Type = service.Value.Type });
+                    }
 
-                CFServices = Utils.Serialize<List<ProvisionedService>>(servicesList);
+                    CFServices = Utils.Serialize<List<ProvisionedService>>(servicesList);
+                }
                 CFPlacementZone = Configuration.PlacementZone;
                 CFSsoEnabled = Configuration.SsoEnabled;
 
