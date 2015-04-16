@@ -1,4 +1,9 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <!--Append WebFTPPublish to the supported list.-->
+  <PropertyGroup>
+    <_WPPWebPublishMethodSupports>$(_WPPWebPublishMethodSupports);WebCloudFoundryPublish</_WPPWebPublishMethodSupports>
+  </PropertyGroup>
+  
   <UsingTask AssemblyFile="Cloudfoundry.Build.Tasks.dll" TaskName="LoginTask" />
   <UsingTask AssemblyFile="Cloudfoundry.Build.Tasks.dll" TaskName="CreateApp" />
   <UsingTask AssemblyFile="Cloudfoundry.Build.Tasks.dll" TaskName="PushApp" />
@@ -13,21 +18,13 @@
 
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v12.0\Web\Microsoft.Web.Publishing.targets" Condition="false" />
 
-  <!--Append WebFTPPublish to the supported list.-->
   <PropertyGroup>
-    <_WPPWebPublishMethodSupports>$(_WPPWebPublishMethodSupports);WebCloudFoundryPublish</_WPPWebPublishMethodSupports>
+    <NewGuid>$([System.Guid]::NewGuid())</NewGuid>
+    <PublishTempAppPath>$(TEMP)\$(NewGuid)</PublishTempAppPath>
   </PropertyGroup>
-
+  
   <!-- Publish application to TEMP location -->
-  <Target Name="PublishToTemp" DependsOnTargets="PipelinePreDeployCopyAllFilesToOneFolder">
-    <PropertyGroup>
-      <NewGuid>$([System.Guid]::NewGuid())</NewGuid>
-    </PropertyGroup>
-    
-    <PropertyGroup>
-      <PublishTempAppPath>$(TEMP)\$(NewGuid)</PublishTempAppPath>
-    </PropertyGroup>
-
+  <Target Name="PublishToTemp" DependsOnTargets="PipelinePreDeployCopyAllFilesToOneFolder">  
     <Error Condition="'$(PublishTempAppPath)'==''" Text="The PublishTempAppPath property must be set to the intended publishing destination." />
     <MakeDir Condition="!Exists($(PublishTempAppPath))" Directories="$(PublishTempAppPath)" />
     <ItemGroup>
@@ -36,18 +33,35 @@
     <Copy SourceFiles="@(PublishFiles)" DestinationFiles="@(PublishFiles->'$(PublishTempAppPath)\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="True" />
   </Target>
 
+  <!-- Copy solution files to TEMP location -->
+  <Target Name="CopySolutionFiles">
+    <Error Condition="'$(PublishTempAppPath)'==''" Text="The PublishTempAppPath property must be set to the intended publishing destination." />
+    <MakeDir Condition="!Exists($(PublishTempAppPath))" Directories="$(PublishTempAppPath)" />
+    <ItemGroup>
+      <PublishFiles Include="$(CFAppPath)\**\*.*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(PublishFiles)" DestinationFiles="@(PublishFiles->'$(PublishTempAppPath)\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="True" />
+  </Target>
+  
   <!-- Publish application to cf deployment: create app, push app, create routes, bind routes, create services, bind services, start app -->
-  <Target Name="Publish" DependsOnTargets="PublishToTemp">
+  <Target Name="WebCloudFoundryPublish">
+    <Error Condition="'$(CFLocalBuild)'=='false' And '$(CFAppPath)'==''" Text="CFAppPath parameter must be set for not local build publish." />
+    
+    <CallTarget Condition="'$(CFLocalBuild)'=='true'" Targets="PublishToTemp"></CallTarget>
+    
+    <CallTarget Condition="'$(CFLocalBuild)'=='false'" Targets="CopySolutionFiles"></CallTarget>
+
     <ItemGroup>
       <CFRoutes Include="$(CFRoutes)"></CFRoutes>
       <CFRefreshToken Include="$(CFRefreshToken)"></CFRefreshToken>
+      <CFEnvironmentJson Condition="'$(CFLocalBuild)'=='false'" Include="{&quot;PUBLISH_WEBSITE&quot;: &quot;$(CFAppName)&quot;, &quot;MSBUILD_CONFIGURATION&quot;: &quot;$(CFMSBuildConfiguration)&quot;, &quot;MSBUILD_PLATFORM&quot;: &quot;$(CFMSBuildPlatform)&quot;}"></CFEnvironmentJson>
     </ItemGroup>
 
     <LoginTask CFUser="$(CFUser)" CFPassword="$(CFPassword)" CFServerUri="$(CFServerUri)">
       <Output TaskParameter="CFRefreshToken" PropertyName="CFRefreshToken"/>
     </LoginTask>
     
-    <CreateApp CFAppName="$(CFAppName)" CFStack="$(CFStack)" CFSpace="$(CFSpace)" CFServerUri="$(CFServerUri)" CFRefreshToken="$(CFRefreshToken)">
+    <CreateApp CFAppName="$(CFAppName)" CFStack="$(CFStack)" CFSpace="$(CFSpace)" CFServerUri="$(CFServerUri)" CFEnvironmentJson="$(CFEnvironmentJson)" CFRefreshToken="$(CFRefreshToken)">
       <Output TaskParameter="CFAppGuid" PropertyName="CFAppGuid"/>
     </CreateApp>
 
@@ -77,8 +91,13 @@
   </Target>
 
   <!-- Publish application with manifest to cf deployment: create app, push app, create routes, bind routes, create services, bind services, start app -->
-  <Target Name="PublishWithManifest" DependsOnTargets="PublishToTemp">
+  <Target Name="PublishWithManifest">
+    <Error Condition="'$(CFLocalBuild)'=='false' And '$(CFAppPath)'==''" Text="CFAppPath parameter must be set for not local build publish." />
 
+    <CallTarget Condition="'$(CFLocalBuild)'=='true'" Targets="PublishToTemp"></CallTarget>
+
+    <CallTarget Condition="'$(CFLocalBuild)'=='false'" Targets="CopySolutionFiles"></CallTarget>
+    
     <LoadYaml ConfigurationFile="$(CFConfigurationFile)">
       <Output TaskParameter="CFStack" PropertyName="CFStack"/>
       <Output TaskParameter="CFAppName" PropertyName="CFAppName"/>
@@ -91,13 +110,15 @@
 
     <ItemGroup>
       <CFRefreshToken Include="$(CFRefreshToken)"></CFRefreshToken>
+      <CFEnvironmentJson Condition="'$(CFLocalBuild)'=='false'" Include="{&quot;PUBLISH_WEBSITE&quot;: &quot;$(CFAppName)&quot;, &quot;MSBUILD_CONFIGURATION&quot;: &quot;$(CFMSBuildConfiguration)&quot;, &quot;MSBUILD_PLATFORM&quot;: &quot;$(CFMSBuildPlatform)&quot;}"></CFEnvironmentJson>
+
     </ItemGroup>
 
     <LoginTask CFUser="$(CFUser)" CFPassword="$(CFPassword)" CFServerUri="$(CFServerUri)">
       <Output TaskParameter="CFRefreshToken" PropertyName="CFRefreshToken"/>
     </LoginTask>
     
-    <CreateApp CFAppName="$(CFAppName)" CFStack="$(CFStack)" CFSpace="$(CFSpace)" CFServerUri="$(CFServerUri)" CFRefreshToken="$(CFRefreshToken)">
+    <CreateApp CFAppName="$(CFAppName)" CFStack="$(CFStack)" CFSpace="$(CFSpace)" CFServerUri="$(CFServerUri)" CFEnvironmentJson="$(CFEnvironmentJson)" CFRefreshToken="$(CFRefreshToken)">
       <Output TaskParameter="CFAppGuid" PropertyName="CFAppGuid"/>
     </CreateApp>
 
