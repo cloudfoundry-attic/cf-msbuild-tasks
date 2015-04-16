@@ -47,10 +47,18 @@ function Add-Import {
 }
 
 function Copy-Resources($project) {
-	Copy-Item "$toolsPath\cf-dotnet-sdk-msbuild-tasks.props" $project.Name -Force | Out-Null
-	Add-Import "cf-dotnet-sdk-msbuild-tasks.props" $project.Name
+	$publishProfilePath = (Join-Path $project.Name "Properties\PublishProfiles")
 
-	Write-Host "Copying cf-dotnet-sdk-msbuild-tasks.props file to project folder."
+	# Create PublishProfiles folder in project Properties folder.
+	if(!(Test-Path $publishProfilePath)) {
+		mkdir $publishProfilePath | Out-Null
+	}
+	
+	Add-Import "Properties\PublishProfiles\cf-push.pubxml" $project.Name
+
+	Copy-Item "$toolsPath\cf-push.pubxml" $publishProfilePath -Force | Out-Null	
+
+	Write-Host "Copying cf-push.pubxml file to project folder."
 }
 
 function Main 

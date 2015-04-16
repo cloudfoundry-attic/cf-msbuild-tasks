@@ -12,27 +12,17 @@
 
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v12.0\Web\Microsoft.Web.Publishing.targets" Condition="false" />
 
-  <!-- Generate a GUID which is the name of the temp folder where the app will be published-->
-  <UsingTask TaskName="GenerateGuid" TaskFactory="CodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll">
-    <ParameterGroup>
-      <NewGuid ParameterType="System.String" Output="True" />
-    </ParameterGroup>
-    <Task>
-      <Using Namespace="System"/>
-      <Code Type="Fragment" Language="cs">
-        <![CDATA[
-          NewGuid = System.Guid.NewGuid().ToString().ToUpper(); 
-        ]]>
-      </Code>
-    </Task>
-  </UsingTask>
+  <!--Append WebFTPPublish to the supported list.-->
+  <PropertyGroup>
+    <_WPPWebPublishMethodSupports>$(_WPPWebPublishMethodSupports);WebCloudFoundryPublish</_WPPWebPublishMethodSupports>
+  </PropertyGroup>
 
   <!-- Publish application to TEMP location -->
   <Target Name="PublishToTemp" DependsOnTargets="PipelinePreDeployCopyAllFilesToOneFolder">
-    <GenerateGuid>
-      <Output PropertyName="NewGuid" TaskParameter="NewGuid"/>
-    </GenerateGuid>
-
+    <PropertyGroup>
+      <NewGuid>$([System.Guid]::NewGuid())</NewGuid>
+    </PropertyGroup>
+    
     <PropertyGroup>
       <PublishTempAppPath>$(TEMP)\$(NewGuid)</PublishTempAppPath>
     </PropertyGroup>
@@ -45,37 +35,40 @@
     <Copy SourceFiles="@(PublishFiles)" DestinationFiles="@(PublishFiles->'$(PublishTempAppPath)\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="True" />
   </Target>
 
-  <!-- Publish application to cf deployment: create app, push app, create routes, bind routes, create services, bind services, start app, save manifest file -->
-  <Target Name="Publish" DependsOnTargets="PublishToTemp">
+  <!-- Publish application to cf deployment: create app, push app, create routes, bind routes, create services, bind services, start app -->
+  <Target Name="Publish" DependsOnTargets="PublishToTemp" Configuration="$(Configuration)" Platform="$(Platform)">
     <ItemGroup>
-      <Routes Include="$(Routes)"></Routes>
+      <CFRoutes Include="$(CFRoutes)"></CFRoutes>
+      <CFRefreshToken Include="$(CFRefreshToken)"></CFRefreshToken>
     </ItemGroup>
 
-    <CreateApp Name="$(AppName)" Stack="$(Stack)" Space="$(Space)" User="$(User)" Password="$(Password)" ServerUri="$(Server)" RefreshToken="$(RefreshToken)">
-      <Output TaskParameter="AppGuid" PropertyName="AppGuid"/>
+    <LoginTask CFUser="$(CFUser)" CFPassword="$(CFPassword)" CFServerUri="$(CFServerUri)">
+      <Output TaskParameter="CFRefreshToken" PropertyName="CFRefreshToken"/>
+    </LoginTask>
+    
+    <CreateApp CFAppName="$(CFAppName)" CFStack="$(CFStack)" CFSpace="$(CFSpace)" CFRefreshToken="$(CFRefreshToken)">
+      <Output TaskParameter="CFAppGuid" PropertyName="CFAppGuid"/>
     </CreateApp>
 
-    <PushApp AppGuid="$(AppGuid)" AppPath="$(PublishTempAppPath)" Start="false" User="$(User)" Password="$(Password)" ServerUri="$(Server)" RefreshToken="$(RefreshToken)"></PushApp>
+    <PushApp CFAppGuid="$(CFAppGuid)" CFAppPath="$(PublishTempAppPath)" CFStart="false" CFRefreshToken="$(CFRefreshToken)"></PushApp>
 
-    <CreateRoutes Condition="'$(Routes)' != ''" User="$(User)" Password="$(Password)" ServerUri="$(Server)" RefreshToken="$(RefreshToken)" Space="$(Space)" Routes="@(Routes)">
-      <Output TaskParameter="RouteGuids" PropertyName="RouteGuids"></Output>
+    <CreateRoutes Condition="'$(CFRoutes)' != ''" CFRefreshToken="$(CFRefreshToken)" CFSpace="$(CFSpace)" CFRoutes="@(CFRoutes)">
+      <Output TaskParameter="CFRouteGuids" PropertyName="CFRouteGuids"></Output>
     </CreateRoutes>
 
-    <BindRoutes User="$(User)" Password="$(Password)" ServerUri="$(Server)" RefreshToken="$(RefreshToken)" AppGuid="$(AppGuid)" RouteGuids="$(RouteGuids)"></BindRoutes>
+    <BindRoutes CFRefreshToken="$(CFRefreshToken)" CFAppGuid="$(CFAppGuid)" CFRouteGuids="$(CFRouteGuids)"></BindRoutes>
 
-    <CreateService Condition="'$(ServiceName)' != '' And '$(ServiceType)' != '' And '$(ServicePlan)' != ''" User="$(User)" Password="$(Password)" ServerUri="$(Server)" RefreshToken="$(RefreshToken)" Name="$(ServiceName)" ServiceType="$(ServiceType)" ServicePlan="$(ServicePlan)" Space="$(Space)">
-      <Output TaskParameter="ServiceGuid" PropertyName="ServiceGuid"></Output>
+    <CreateService Condition="'$(CFServiceName)' != '' And '$(CFServiceType)' != '' And '$(CFServicePlan)' != ''" CFRefreshToken="$(CFRefreshToken)" CFServiceName="$(CFServiceName)" CFServiceType="$(CFServiceType)" CFServicePlan="$(CFServicePlan)" CFSpace="$(CFSpace)">
+      <Output TaskParameter="CFServiceGuid" PropertyName="CFServiceGuid"></Output>
     </CreateService>
 
     <ItemGroup>
-      <ServicesGuids Include="$(ServiceGuid)"></ServicesGuids>
+      <ServicesGuids Include="$(CFServiceGuid)"></ServicesGuids>
     </ItemGroup>
 
-    <BindServices User="$(User)" Password="$(Password)" ServerUri="$(Server)" RefreshToken="$(RefreshToken)" AppGuid="$(AppGuid)" ServicesGuids="@(ServicesGuids)"></BindServices>
+    <BindServices CFRefreshToken="$(CFRefreshToken)" CFAppGuid="$(CFAppGuid)" CFServicesGuids="@(CFServicesGuids)"></BindServices>
 
-    <RestartApp AppGuid="$(AppGuid)" User="$(User)" Password="$(Password)" ServerUri="$(Server)" RefreshToken="$(RefreshToken)"></RestartApp>
-
-    <SaveYaml AppPath="$(AppPath)" AppName="$(AppName)" ConfigurationFile="$(ManifestPath)" InstancesNumber ="$(Instances)" Memory="$(Memory)" Route="@(Routes)" Stack="$(Stack)" ServiceName="$(ServiceName)"  ServiceType="$(ServiceType)" ServicePlan="$(ServicePlan)"></SaveYaml>
+    <RestartApp CFAppGuid="$(CFAppGuid)" CFRefreshToken="$(CFRefreshToken)"></RestartApp>
 
     <!-- Remove previously created temp directory -->
     <RemoveDir Directories="$(PublishTempAppPath)" />
@@ -83,37 +76,45 @@
   </Target>
 
   <!-- Publish application with manifest to cf deployment: create app, push app, create routes, bind routes, create services, bind services, start app -->
-  <Target Name="PublishWithManifest" DependsOnTargets="PublishToTemp">
+  <Target Name="PublishWithManifest" DependsOnTargets="PublishToTemp" Configuration="$(Configuration)" Platform="$(Platform)">
 
-    <LoadYaml ConfigurationFile="$(ManifestPath)">
-      <Output TaskParameter="Stack" PropertyName="Stack"/>
-      <Output TaskParameter="AppName" PropertyName="AppName"/>
-      <Output TaskParameter="AppPath" PropertyName="AppPath"/>
-      <Output TaskParameter="Routes" PropertyName="Routes"/>
-      <Output TaskParameter="Memory" PropertyName="Memory"/>
-      <Output TaskParameter="Instances" PropertyName="Instances"/>
-      <Output TaskParameter="Services" PropertyName="Services"/>
+    <LoadYaml ConfigurationFile="$(CFConfigurationFile)">
+      <Output TaskParameter="CFStack" PropertyName="CFStack"/>
+      <Output TaskParameter="CFAppName" PropertyName="CFAppName"/>
+      <Output TaskParameter="CFAppPath" PropertyName="CFAppPath"/>
+      <Output TaskParameter="CFRoutes" PropertyName="CFRoutes"/>
+      <Output TaskParameter="CFMemory" PropertyName="CFMemory"/>
+      <Output TaskParameter="CFInstancesNumber" PropertyName="CFInstancesNumber"/>
+      <Output TaskParameter="CFServices" PropertyName="CFServices"/>
     </LoadYaml>
 
-    <CreateApp Name="$(AppName)" Stack="$(Stack)" Space="$(Space)" User="$(User)" Password="$(Password)" ServerUri="$(Server)" RefreshToken="$(RefreshToken)">
-      <Output TaskParameter="AppGuid" PropertyName="AppGuid"/>
+    <ItemGroup>
+      <CFRefreshToken Include="$(CFRefreshToken)"></CFRefreshToken>
+    </ItemGroup>
+
+    <LoginTask CFUser="$(CFUser)" CFPassword="$(CFPassword)" CFServerUri="$(CFServerUri)">
+      <Output TaskParameter="CFRefreshToken" PropertyName="CFRefreshToken"/>
+    </LoginTask>
+    
+    <CreateApp CFAppName="$(CFAppName)" CFStack="$(CFStack)" CFSpace="$(CFSpace)" CFRefreshToken="$(CFRefreshToken)">
+      <Output TaskParameter="CFAppGuid" PropertyName="CFAppGuid"/>
     </CreateApp>
 
-    <PushApp AppGuid="$(AppGuid)" AppPath="$(PublishTempAppPath)" Start="true" User="$(User)" Password="$(Password)" ServerUri="$(Server)" RefreshToken="$(RefreshToken)"></PushApp>
+    <PushApp CFAppGuid="$(CFAppGuid)" CFAppPath="$(PublishTempAppPath)" CFStart="true" CFRefreshToken="$(CFRefreshToken)"></PushApp>
 
-    <CreateRoutes Condition="'$(Routes)' != ''" User="$(User)" Password="$(Password)" ServerUri="$(Server)" RefreshToken="$(RefreshToken)" Space="$(Space)" Routes="$(Routes)">
-      <Output TaskParameter="RouteGuids" PropertyName="RouteGuids"></Output>
+    <CreateRoutes Condition="'$(CFRoutes)' != ''" CFRefreshToken="$(CFRefreshToken)" CFSpace="$(CFSpace)" CFRoutes="$(CFRoutes)">
+      <Output TaskParameter="CFRouteGuids" PropertyName="CFRouteGuids"></Output>
     </CreateRoutes>
 
-    <BindRoutes User="$(User)" Password="$(Password)" ServerUri="$(Server)" RefreshToken="$(RefreshToken)" AppGuid="$(AppGuid)" RouteGuids="$(RouteGuids)"></BindRoutes>
+    <BindRoutes CFRefreshToken="$(CFRefreshToken)" CFAppGuid="$(CFAppGuid)" CFRouteGuids="$(CFRouteGuids)"></BindRoutes>
 
-    <CreateServices Condition="'$(ServiceName)' != '' And '$(ServiceType)' != '' And '$(ServicePlan)' != ''" User="$(User)" Password="$(Password)" ServerUri="$(Server)" RefreshToken="$(RefreshToken)" Space="$(Space)" Services="$(Services)">
-      <Output TaskParameter="ServicesGuids" PropertyName="ServicesGuids"></Output>
+    <CreateServices Condition="'$(CFServiceName)' != '' And '$(CFServiceType)' != '' And '$(CFServicePlan)' != ''" CFRefreshToken="$(CFRefreshToken)" CFSpace="$(CFSpace)" CFServices="$(CFServices)">
+      <Output TaskParameter="CFServicesGuids" PropertyName="CFServicesGuids"></Output>
     </CreateServices>
 
-    <BindServices User="$(User)" Password="$(Password)" ServerUri="$(Server)" RefreshToken="$(RefreshToken)" AppGuid="$(AppGuid)" ServicesGuids="$(ServiceGuid)"></BindServices>
+    <BindServices CFRefreshToken="$(CFRefreshToken)" CFAppGuid="$(CFAppGuid)" CFServicesGuids="$(CFServiceGuid)"></BindServices>
 
-    <RestartApp AppGuid="$(AppGuid)" User="$(User)" Password="$(Password)" ServerUri="$(Server)" RefreshToken="$(RefreshToken)"></RestartApp>
+    <RestartApp CFAppGuid="$(CFAppGuid)" CFRefreshToken="$(CFRefreshToken)"></RestartApp>
 
     <!-- Remove previously created temp directory -->
     <RemoveDir Directories="$(PublishTempAppPath)" />
@@ -121,7 +122,15 @@
 
   <!-- This task will remove the application, bound routes and bound provisioned service instances -->
   <Target Name="CleanUp">
-    <DeleteApp User="$(User)" Password="$(Password)" ServerUri="$(Server)" RefreshToken="$(RefreshToken)" AppName="$(AppName)" Space="$(Space)" DeleteRoutes="true" DeleteServices="true"></DeleteApp>
+    <ItemGroup>
+      <CFRefreshToken Include="$(CFRefreshToken)"></CFRefreshToken>
+    </ItemGroup>
+
+    <LoginTask CFUser="$(CFUser)" CFPassword="$(CFPassword)" CFServerUri="$(CFServerUri)">
+      <Output TaskParameter="CFRefreshToken" PropertyName="CFRefreshToken"/>
+    </LoginTask>
+    
+    <DeleteApp CFRefreshToken="$(CFRefreshToken)" CFAppName="$(CFAppName)" CFSpace="$(CFSpace)" CFDeleteRoutes="true" CFDeleteServices="true"></DeleteApp>
   </Target>
 
 </Project>
