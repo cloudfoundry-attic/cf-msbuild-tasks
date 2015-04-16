@@ -1,4 +1,5 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <UsingTask AssemblyFile="Cloudfoundry.Build.Tasks.dll" TaskName="LoginTask" />
   <UsingTask AssemblyFile="Cloudfoundry.Build.Tasks.dll" TaskName="CreateApp" />
   <UsingTask AssemblyFile="Cloudfoundry.Build.Tasks.dll" TaskName="PushApp" />
   <UsingTask AssemblyFile="Cloudfoundry.Build.Tasks.dll" TaskName="CreateRoutes" />
@@ -46,19 +47,19 @@
       <Output TaskParameter="CFRefreshToken" PropertyName="CFRefreshToken"/>
     </LoginTask>
     
-    <CreateApp CFAppName="$(CFAppName)" CFStack="$(CFStack)" CFSpace="$(CFSpace)" CFRefreshToken="$(CFRefreshToken)">
+    <CreateApp CFAppName="$(CFAppName)" CFStack="$(CFStack)" CFSpace="$(CFSpace)" CFServerUri="$(CFServerUri)" CFRefreshToken="$(CFRefreshToken)">
       <Output TaskParameter="CFAppGuid" PropertyName="CFAppGuid"/>
     </CreateApp>
 
-    <PushApp CFAppGuid="$(CFAppGuid)" CFAppPath="$(PublishTempAppPath)" CFStart="false" CFRefreshToken="$(CFRefreshToken)"></PushApp>
+    <PushApp CFAppGuid="$(CFAppGuid)" CFAppPath="$(PublishTempAppPath)" CFStart="false" CFServerUri="$(CFServerUri)" CFRefreshToken="$(CFRefreshToken)"></PushApp>
 
-    <CreateRoutes Condition="'$(CFRoutes)' != ''" CFRefreshToken="$(CFRefreshToken)" CFSpace="$(CFSpace)" CFRoutes="@(CFRoutes)">
+    <CreateRoutes Condition="'$(CFRoutes)' != ''" CFServerUri="$(CFServerUri)" CFRefreshToken="$(CFRefreshToken)" CFSpace="$(CFSpace)" CFRoutes="@(CFRoutes)">
       <Output TaskParameter="CFRouteGuids" PropertyName="CFRouteGuids"></Output>
     </CreateRoutes>
 
-    <BindRoutes CFRefreshToken="$(CFRefreshToken)" CFAppGuid="$(CFAppGuid)" CFRouteGuids="$(CFRouteGuids)"></BindRoutes>
+    <BindRoutes CFServerUri="$(CFServerUri)" CFRefreshToken="$(CFRefreshToken)" CFAppGuid="$(CFAppGuid)" CFRouteGuids="$(CFRouteGuids)"></BindRoutes>
 
-    <CreateService Condition="'$(CFServiceName)' != '' And '$(CFServiceType)' != '' And '$(CFServicePlan)' != ''" CFRefreshToken="$(CFRefreshToken)" CFServiceName="$(CFServiceName)" CFServiceType="$(CFServiceType)" CFServicePlan="$(CFServicePlan)" CFSpace="$(CFSpace)">
+    <CreateService Condition="'$(CFServiceName)' != '' And '$(CFServiceType)' != '' And '$(CFServicePlan)' != ''" CFServerUri="$(CFServerUri)" CFRefreshToken="$(CFRefreshToken)" CFServiceName="$(CFServiceName)" CFServiceType="$(CFServiceType)" CFServicePlan="$(CFServicePlan)" CFSpace="$(CFSpace)">
       <Output TaskParameter="CFServiceGuid" PropertyName="CFServiceGuid"></Output>
     </CreateService>
 
@@ -66,9 +67,9 @@
       <ServicesGuids Include="$(CFServiceGuid)"></ServicesGuids>
     </ItemGroup>
 
-    <BindServices CFRefreshToken="$(CFRefreshToken)" CFAppGuid="$(CFAppGuid)" CFServicesGuids="@(CFServicesGuids)"></BindServices>
+    <BindServices CFServerUri="$(CFServerUri)" CFRefreshToken="$(CFRefreshToken)" CFAppGuid="$(CFAppGuid)" CFServicesGuids="@(CFServicesGuids)"></BindServices>
 
-    <RestartApp CFAppGuid="$(CFAppGuid)" CFRefreshToken="$(CFRefreshToken)"></RestartApp>
+    <RestartApp CFAppGuid="$(CFAppGuid)" CFServerUri="$(CFServerUri)" CFRefreshToken="$(CFRefreshToken)"></RestartApp>
 
     <!-- Remove previously created temp directory -->
     <RemoveDir Directories="$(PublishTempAppPath)" />
@@ -96,25 +97,25 @@
       <Output TaskParameter="CFRefreshToken" PropertyName="CFRefreshToken"/>
     </LoginTask>
     
-    <CreateApp CFAppName="$(CFAppName)" CFStack="$(CFStack)" CFSpace="$(CFSpace)" CFRefreshToken="$(CFRefreshToken)">
+    <CreateApp CFAppName="$(CFAppName)" CFStack="$(CFStack)" CFSpace="$(CFSpace)" CFServerUri="$(CFServerUri)" CFRefreshToken="$(CFRefreshToken)">
       <Output TaskParameter="CFAppGuid" PropertyName="CFAppGuid"/>
     </CreateApp>
 
-    <PushApp CFAppGuid="$(CFAppGuid)" CFAppPath="$(PublishTempAppPath)" CFStart="true" CFRefreshToken="$(CFRefreshToken)"></PushApp>
+    <PushApp CFAppGuid="$(CFAppGuid)" CFAppPath="$(PublishTempAppPath)" CFStart="true" CFServerUri="$(CFServerUri)" CFRefreshToken="$(CFRefreshToken)"></PushApp>
 
-    <CreateRoutes Condition="'$(CFRoutes)' != ''" CFRefreshToken="$(CFRefreshToken)" CFSpace="$(CFSpace)" CFRoutes="$(CFRoutes)">
+    <CreateRoutes Condition="'$(CFRoutes)' != ''" CFServerUri="$(CFServerUri)" CFRefreshToken="$(CFRefreshToken)" CFSpace="$(CFSpace)" CFRoutes="$(CFRoutes)">
       <Output TaskParameter="CFRouteGuids" PropertyName="CFRouteGuids"></Output>
     </CreateRoutes>
 
-    <BindRoutes CFRefreshToken="$(CFRefreshToken)" CFAppGuid="$(CFAppGuid)" CFRouteGuids="$(CFRouteGuids)"></BindRoutes>
+    <BindRoutes CFServerUri="$(CFServerUri)" CFRefreshToken="$(CFRefreshToken)" CFAppGuid="$(CFAppGuid)" CFRouteGuids="$(CFRouteGuids)"></BindRoutes>
 
-    <CreateServices Condition="'$(CFServiceName)' != '' And '$(CFServiceType)' != '' And '$(CFServicePlan)' != ''" CFRefreshToken="$(CFRefreshToken)" CFSpace="$(CFSpace)" CFServices="$(CFServices)">
+    <CreateServices Condition="'$(CFServiceName)' != '' And '$(CFServiceType)' != '' And '$(CFServicePlan)' != ''" CFServerUri="$(CFServerUri)" CFRefreshToken="$(CFRefreshToken)" CFSpace="$(CFSpace)" CFServices="$(CFServices)">
       <Output TaskParameter="CFServicesGuids" PropertyName="CFServicesGuids"></Output>
     </CreateServices>
 
-    <BindServices CFRefreshToken="$(CFRefreshToken)" CFAppGuid="$(CFAppGuid)" CFServicesGuids="$(CFServiceGuid)"></BindServices>
+    <BindServices CFServerUri="$(CFServerUri)" CFRefreshToken="$(CFRefreshToken)" CFAppGuid="$(CFAppGuid)" CFServicesGuids="$(CFServiceGuid)"></BindServices>
 
-    <RestartApp CFAppGuid="$(CFAppGuid)" CFRefreshToken="$(CFRefreshToken)"></RestartApp>
+    <RestartApp CFAppGuid="$(CFAppGuid)" CFServerUri="$(CFServerUri)" CFRefreshToken="$(CFRefreshToken)"></RestartApp>
 
     <!-- Remove previously created temp directory -->
     <RemoveDir Directories="$(PublishTempAppPath)" />
@@ -130,7 +131,7 @@
       <Output TaskParameter="CFRefreshToken" PropertyName="CFRefreshToken"/>
     </LoginTask>
     
-    <DeleteApp CFRefreshToken="$(CFRefreshToken)" CFAppName="$(CFAppName)" CFSpace="$(CFSpace)" CFDeleteRoutes="true" CFDeleteServices="true"></DeleteApp>
+    <DeleteApp CFServerUri="$(CFServerUri)" CFRefreshToken="$(CFRefreshToken)" CFAppName="$(CFAppName)" CFSpace="$(CFSpace)" CFDeleteRoutes="true" CFDeleteServices="true"></DeleteApp>
   </Target>
 
 </Project>
