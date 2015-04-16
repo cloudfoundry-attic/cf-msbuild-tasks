@@ -33,7 +33,7 @@ namespace CloudFoundry.Build.Tasks.Test
                 TestUtils.InitTestMetadata();
 
                 CreateRoutes task = new CreateRoutes();
-                task.CFRoutes = new string[2] { "test.domain.com" ,"test2.domain.com" };
+                task.CFRoutes = new string[2] { "test.domain.com;test3.domain.com" ,"test2.domain.com" };
                 task.CFSpace = "TestSpace";
                 task.CFUser = Settings.Default.User;
                 task.CFPassword = Settings.Default.Password;
@@ -42,7 +42,7 @@ namespace CloudFoundry.Build.Tasks.Test
 
                 task.Execute();
 
-                Assert.AreEqual(task.CFRouteGuids.Length, 2);
+                Assert.AreEqual(task.CFRouteGuids.Length, 3);
             }
 
         }

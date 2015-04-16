@@ -33,7 +33,7 @@ namespace CloudFoundry.Build.Tasks
         public string CFAppPath { get; set; }
 
         [Output]
-        public string[] CFRoutes { get; set; }
+        public string CFRoutes { get; set; }
 
         [Output]
         public int CFAppMemory { get; set; }
@@ -68,7 +68,27 @@ namespace CloudFoundry.Build.Tasks
                 CFStack = Configuration.Stack;
                 CFAppName = Configuration.Name;
                 CFAppPath = Configuration.AppDir;
-                CFRoutes = Configuration.Applications.Values.Select(o => o.Url).ToArray();
+
+                List<string> urlList = new List<string>();
+                foreach (var app in Configuration.Applications)
+                {
+                    if (app.Value.Url.Contains(";"))
+                    {
+                        string[] appurls = app.Value.Url.Split(';');
+                        urlList.AddRange(appurls);
+                    }
+                    else
+                    {
+                        urlList.Add(app.Value.Url);
+                    }
+                }
+                foreach (string s in urlList)
+                {
+                    logger.LogMessage("Loaded url {0}", s);
+                }
+
+                CFRoutes = string.Join(";",urlList);
+                
                 CFAppMemory = Configuration.Memory;
                 CFAppInstances = Configuration.Instances;
                 CFAutoscale = Utils.Serialize<Autoscale>(Configuration.AutoscaleInfo);
