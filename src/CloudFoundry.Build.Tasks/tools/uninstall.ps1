@@ -49,8 +49,8 @@ function Remove-Import {
 
 function Remove-Resources($project) {
 	$projectName = $project.Name
-	Remove-Item "$projectName\cf-dotnet-sdk-msbuild-tasks.props" -Force | Out-Null
-	Remove-Import "cf-dotnet-sdk-msbuild-tasks.props" $project.Name
+	Remove-Item "$projectName\cf-msbuild-tasks.props" -Force | Out-Null
+	Remove-Import "cf-msbuild-tasks.props" $project.Name
 }
 
 function Main 
