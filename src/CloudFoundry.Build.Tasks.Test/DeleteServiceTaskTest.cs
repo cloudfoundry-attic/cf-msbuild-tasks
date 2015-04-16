@@ -29,11 +29,11 @@ namespace CloudFoundry.Build.Tasks.Test
                 TestUtils.InitTestMetadata();
 
                 DeleteService task = new DeleteService();
-                task.User = Settings.Default.User;
-                task.Password = Settings.Default.Password;
-                task.ServerUri = Settings.Default.ServerUri;
-                task.Space = "TestSpace";
-                task.ServiceName = "service1";
+                task.CFUser = Settings.Default.User;
+                task.CFPassword = Settings.Default.Password;
+                task.CFServerUri = Settings.Default.ServerUri;
+                task.CFSpace = "TestSpace";
+                task.CFServiceName = "service1";
 
                 task.BuildEngine = new FakeBuildEngine();
                 Assert.IsTrue(task.Execute());

@@ -24,16 +24,16 @@ namespace CloudFoundry.Build.Tasks.Test
                 TestUtils.InitTestMetadata();
 
                 BindServices task = new BindServices();
-                task.AppGuid = Guid.NewGuid().ToString();
-                task.ServicesGuids = new string[2] { Guid.NewGuid().ToString(), Guid.NewGuid().ToString() };
-                task.User = Settings.Default.User;
-                task.Password = Settings.Default.Password;
-                task.ServerUri = Settings.Default.ServerUri;
+                task.CFAppGuid = Guid.NewGuid().ToString();
+                task.CFServicesGuids = new string[2] { Guid.NewGuid().ToString(), Guid.NewGuid().ToString() };
+                task.CFUser = Settings.Default.User;
+                task.CFPassword = Settings.Default.Password;
+                task.CFServerUri = Settings.Default.ServerUri;
                 task.BuildEngine = new FakeBuildEngine();
 
                 task.Execute();
 
-                Assert.AreEqual(task.BindingGuids.Length, 2);
+                Assert.AreEqual(task.CFBindingGuids.Length, 2);
             }
 
         }

@@ -21,75 +21,75 @@ namespace CloudFoundry.Build.Tasks
         }
 
         [Required]
-        public string AppPath { get; set; }
+        public string CFAppPath { get; set; }
 
         [Required]
-        public string AppName { get; set; }
+        public string CFAppName { get; set; }
 
         [Required]
-        public string Route { get; set; }
+        public string CFRoute { get; set; }
 
-        public int MaxCpu { get; set; }
+        public int CFMaxCpu { get; set; }
 
-        public int MinCpu { get; set; }
+        public int CFMinCpu { get; set; }
 
-        public string Enabled { get; set; }
+        public string CFEnabled { get; set; }
 
-        public int MaxInstances { get; set; }
+        public int CFMaxInstances { get; set; }
 
-        public int MinInstances { get; set; }
+        public int CFMinInstances { get; set; }
 
-        public int Disk { get; set; }
+        public int CFDisk { get; set; }
 
         [Required]
-        public int InstancesNumber { get; set; }
+        public int CFInstancesNumber { get; set; }
         
         [Required]
-        public int Memory { get; set; }
+        public int CFAppMemory { get; set; }
 
-        public string PlacementZone { get; set; }
+        public string CFPlacementZone { get; set; }
 
-        public string ServiceName { get; set; }
+        public string CFServiceName { get; set; }
 
-        public string ServicePlan { get; set; }
+        public string CFServicePlan { get; set; }
 
-        public string ServiceType { get; set; }
+        public string CFServiceType { get; set; }
 
-        public string SsoEnabled { get; set; }
-
-        [Required]
-        public string Stack { get; set; }
+        public string CFSsoEnabled { get; set; }
 
         [Required]
-        public string ConfigurationFile { get; set; }
+        public string CFStack { get; set; }
+
+        [Required]
+        public string CFConfigurationFile { get; set; }
 
         private Microsoft.Build.Utilities.TaskLoggingHelper logger;
       
         public bool Execute()
         {
             logger = new Microsoft.Build.Utilities.TaskLoggingHelper(this);
-            logger.LogMessage("Saving configuration to {0}", ConfigurationFile);
+            logger.LogMessage("Saving configuration to {0}", CFConfigurationFile);
             
             PushProperties Configuration = new PushProperties();
-            Configuration.AppDir = AppPath;
+            Configuration.AppDir = CFAppPath;
             Configuration.Applications = new Dictionary<string, AppDetails>();
-            Configuration.Applications.Add(AppPath, new AppDetails() { Name = AppName, Url = Route });
-            Configuration.AutoscaleInfo = new Autoscale() { Cpu = new Cpu() { MaxCpu = MaxCpu, MinCpu = MinCpu }, Enabled = Enabled !=null ? Enabled: "no", InstancesInfo = new Instances() { MaxInstances = MaxInstances !=0 ? MaxInstances : 1, MinInstances = MinInstances != 0 ? MinInstances : 1 } };
-            Configuration.Disk = Disk!=0 ? Disk : 1024;
-            Configuration.Instances = InstancesNumber;
-            Configuration.Memory = Memory;
-            Configuration.Name = AppName;
-            Configuration.PlacementZone = PlacementZone !=null ? PlacementZone : "default";
-            if (ServiceName != null)
+            Configuration.Applications.Add(CFAppPath, new AppDetails() { Name = CFAppName, Url = CFRoute });
+            Configuration.AutoscaleInfo = new Autoscale() { Cpu = new Cpu() { MaxCpu = CFMaxCpu, MinCpu = CFMinCpu }, Enabled = CFEnabled !=null ? CFEnabled: "no", InstancesInfo = new Instances() { MaxInstances = CFMaxInstances !=0 ? CFMaxInstances : 1, MinInstances = CFMinInstances != 0 ? CFMinInstances : 1 } };
+            Configuration.Disk = CFDisk!=0 ? CFDisk : 1024;
+            Configuration.Instances = CFInstancesNumber;
+            Configuration.Memory = CFAppMemory;
+            Configuration.Name = CFAppName;
+            Configuration.PlacementZone = CFPlacementZone !=null ? CFPlacementZone : "default";
+            if (CFServiceName != null)
             {
                 Configuration.Services = new Dictionary<string, ServiceDetails>();
-                Configuration.Services.Add(ServiceName, new ServiceDetails() { Plan = ServicePlan, Type = ServiceType });
+                Configuration.Services.Add(CFServiceName, new ServiceDetails() { Plan = CFServicePlan, Type = CFServiceType });
             }
             
-            Configuration.SsoEnabled = SsoEnabled!=null ? SsoEnabled : "no";
-            Configuration.Stack = Stack;
+            Configuration.SsoEnabled = CFSsoEnabled!=null ? CFSsoEnabled : "no";
+            Configuration.Stack = CFStack;
 
-            Utils.SerializeToFile(Configuration, ConfigurationFile);
+            Utils.SerializeToFile(Configuration, CFConfigurationFile);
 
             return true;
         }

@@ -33,7 +33,7 @@ namespace CloudFoundry.Build.Tasks.Test
                 TestUtils.InitTestMetadata();
 
                 CreateServices task = new CreateServices();
-                task.Services = @"<ArrayOfProvisionedService>   
+                task.CFServices = @"<ArrayOfProvisionedService>   
    <ProvisionedService>
       <Name>service1</Name>
       <Plan>free</Plan>
@@ -46,10 +46,10 @@ namespace CloudFoundry.Build.Tasks.Test
    </ProvisionedService>
 </ArrayOfProvisionedService>";
 
-                task.Space = "TestSpace";
-                task.User = Settings.Default.User;
-                task.Password = Settings.Default.Password;
-                task.ServerUri = Settings.Default.ServerUri;
+                task.CFSpace = "TestSpace";
+                task.CFUser = Settings.Default.User;
+                task.CFPassword = Settings.Default.Password;
+                task.CFServerUri = Settings.Default.ServerUri;
                 task.BuildEngine = new FakeBuildEngine();
 
                 task.Execute();

@@ -29,10 +29,10 @@ namespace CloudFoundry.Build.Tasks.Test
                 TestUtils.InitTestMetadata();
 
                 DeleteRoute task = new DeleteRoute();
-                task.User = Settings.Default.User;
-                task.Password = Settings.Default.Password;
-                task.ServerUri = Settings.Default.ServerUri;
-                task.Route = "test.domain.com";
+                task.CFUser = Settings.Default.User;
+                task.CFPassword = Settings.Default.Password;
+                task.CFServerUri = Settings.Default.ServerUri;
+                task.CFRoute = "test.domain.com";
 
                 task.BuildEngine = new FakeBuildEngine();
                 Assert.IsTrue(task.Execute());

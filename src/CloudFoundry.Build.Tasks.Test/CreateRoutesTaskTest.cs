@@ -33,16 +33,16 @@ namespace CloudFoundry.Build.Tasks.Test
                 TestUtils.InitTestMetadata();
 
                 CreateRoutes task = new CreateRoutes();
-                task.Routes = new string[2] { "test.domain.com" ,"test2.domain.com" };
-                task.Space = "TestSpace";
-                task.User = Settings.Default.User;
-                task.Password = Settings.Default.Password;
-                task.ServerUri = Settings.Default.ServerUri;
+                task.CFRoutes = new string[2] { "test.domain.com" ,"test2.domain.com" };
+                task.CFSpace = "TestSpace";
+                task.CFUser = Settings.Default.User;
+                task.CFPassword = Settings.Default.Password;
+                task.CFServerUri = Settings.Default.ServerUri;
                 task.BuildEngine = new FakeBuildEngine();
 
                 task.Execute();
 
-                Assert.AreEqual(task.RouteGuids.Length, 2);
+                Assert.AreEqual(task.CFRouteGuids.Length, 2);
             }
 
         }

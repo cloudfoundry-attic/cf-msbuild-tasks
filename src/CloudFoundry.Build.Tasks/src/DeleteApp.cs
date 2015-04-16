@@ -13,14 +13,14 @@ namespace CloudFoundry.Build.Tasks
     public class DeleteApp : BaseTask
     {
         [Required]
-        public string AppName { get; set; }
+        public string CFAppName { get; set; }
 
         [Required]
-        public string Space { get; set; }
+        public string CFSpace { get; set; }
 
-        public bool DeleteRoutes { get; set; }
+        public bool CFDeleteRoutes { get; set; }
 
-        public bool DeleteServices { get; set; }
+        public bool CFDeleteServices { get; set; }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling")]
         public override bool Execute()
@@ -30,31 +30,31 @@ namespace CloudFoundry.Build.Tasks
 
             CloudFoundryClient client = InitClient();
 
-            logger.LogMessage("Deleting application {0} from space {1}", AppName, Space);
+            logger.LogMessage("Deleting application {0} from space {1}", CFAppName, CFSpace);
 
-            PagedResponseCollection<ListAllSpacesResponse> spaceList = client.Spaces.ListAllSpaces(new RequestOptions() { Query = "name:" + Space }).Result;
+            PagedResponseCollection<ListAllSpacesResponse> spaceList = client.Spaces.ListAllSpaces(new RequestOptions() { Query = "name:" + CFSpace }).Result;
 
             Guid? spaceGuid = null;
             spaceGuid= new Guid(spaceList.FirstOrDefault().EntityMetadata.Guid);
 
             if (spaceGuid == null)
             {
-                logger.LogError("Space {0} not found", Space);
+                logger.LogError("Space {0} not found", CFSpace);
                 return false;
             }
 
-            PagedResponseCollection<ListAllAppsForSpaceResponse> appList = client.Spaces.ListAllAppsForSpace(spaceGuid, new RequestOptions() { Query = "name:" + AppName }).Result;
+            PagedResponseCollection<ListAllAppsForSpaceResponse> appList = client.Spaces.ListAllAppsForSpace(spaceGuid, new RequestOptions() { Query = "name:" + CFAppName }).Result;
             if (appList.Count() > 1)
             {
-                logger.LogError("There are more applications named {0} in space {1}", AppName, Space);
+                logger.LogError("There are more applications named {0} in space {1}", CFAppName, CFSpace);
                 return false;
             }
 
             Guid appGuid = new Guid(appList.FirstOrDefault().EntityMetadata.Guid);
 
-            if (DeleteRoutes == true)
+            if (CFDeleteRoutes == true)
             {
-                logger.LogMessage("Deleting routes associated with {0}", AppName);
+                logger.LogMessage("Deleting routes associated with {0}", CFAppName);
                 var routeList = client.Apps.ListAllRoutesForApp(appGuid).Result;
                 foreach (var route in routeList)
                 {
@@ -62,9 +62,9 @@ namespace CloudFoundry.Build.Tasks
                 }
             }
 
-            if (DeleteServices == true)
+            if (CFDeleteServices == true)
             {
-                logger.LogMessage("Deleting services bound to {0}", AppName);
+                logger.LogMessage("Deleting services bound to {0}", CFAppName);
              
                 var serviceBindingList = client.Apps.ListAllServiceBindingsForApp(appGuid).Result;
 

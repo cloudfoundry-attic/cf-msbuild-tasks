@@ -1,5 +1,4 @@
 ﻿using CloudFoundry.CloudController.V2.Client;
-using CloudFoundry.CloudController.V2.Client;
 using CloudFoundry.UAA;
 using Microsoft.Build.Framework;
 using System;
@@ -8,10 +7,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-[assembly:CLSCompliant(true)]
 namespace CloudFoundry.Build.Tasks
 {
-    public class BaseTask : ITask
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1726:UsePreferredTerms", MessageId = "Login", Justification="Using login name preferred")]
+    public class LoginTask : ITask
     {
         internal Microsoft.Build.Utilities.TaskLoggingHelper logger;
 
@@ -27,45 +26,40 @@ namespace CloudFoundry.Build.Tasks
             set;
         }
 
+        [Required]
         public string CFUser { get; set; }
-
+        [Required]
         public string CFPassword { get; set; }
-
-        public string CFRefreshToken { get; set; }
-
         [Required]
         public string CFServerUri { get; set; }
+        [Output]
+        public string CFRefreshToken { get; set; }
 
-        public virtual bool Execute()
+        public bool Execute()
         {
-            return true;
-        }
-
-        internal CloudFoundryClient InitClient()
-        {
-
             //skip ssl
             System.Net.ServicePointManager.ServerCertificateValidationCallback = ((sender, certificate, chain, sslPolicyErrors) => true);
 
+            logger = new Microsoft.Build.Utilities.TaskLoggingHelper(this);
+
             CloudFoundryClient client = new CloudFoundryClient(new Uri(CFServerUri), new System.Threading.CancellationToken());
 
-            if (CFUser.Length > 0 && CFPassword.Length > 0)
+            CloudCredentials creds = new CloudCredentials();
+            creds.User = CFUser;
+            creds.Password = CFPassword;
+            AuthenticationContext context = client.Login(creds).Result;
+
+            if (context.Token != null)
             {
-                CloudCredentials creds = new CloudCredentials();
-                creds.User = CFUser;
-                creds.Password = CFPassword;
-                client.Login(creds).Wait();
-            }
-            else if (CFRefreshToken.Length > 0)
-            {
-                client.Login(CFRefreshToken).Wait();
+                CFRefreshToken = context.Token.RefreshToken;
+                logger.LogMessage("Login success - Refresh token: {0}", CFRefreshToken);
             }
             else
             {
-                throw new System.Security.Authentication.AuthenticationException("Could not authenticate client without refresh token or credentials!");
+                logger.LogError("Login failed, please check parameters");
+                return false;
             }
-
-            return client;
+            return true;
         }
 
     }

@@ -12,24 +12,24 @@ namespace CloudFoundry.Build.Tasks
 {
     public class UpdateApp : BaseTask
     {
-        public string Name { get; set; }
+        public string CFAppName { get; set; }
 
-        public int Memory { get; set; }
+        public int CFAppMemory { get; set; }
 
-        public int Instances { get; set; }
+        public int CFAppInstances { get; set; }
 
-        public string Buildpack { get; set; }
+        public string CFAppBuildpack { get; set; }
 
-        public string State { get; set; }
+        public string CFAppState { get; set; }
 
         [Required]
-        public string AppGuid { get; set; }
+        public string CFAppGuid { get; set; }
 
         public override bool Execute()
         {
             logger = new Microsoft.Build.Utilities.TaskLoggingHelper(this);
 
-            if (AppGuid.Length == 0)
+            if (CFAppGuid.Length == 0)
             {
                 logger.LogError("Application guid must be specified");
                 return false;
@@ -39,15 +39,15 @@ namespace CloudFoundry.Build.Tasks
 
             UpdateAppRequest request = new UpdateAppRequest();
 
-            request.Name = Name;
-            request.Memory = Memory;
-            request.Instances = Instances;
-            request.Buildpack = Buildpack;
-            request.State = State;
+            request.Name = CFAppName;
+            request.Memory = CFAppMemory;
+            request.Instances = CFAppInstances;
+            request.Buildpack = CFAppBuildpack;
+            request.State = CFAppState;
 
-            UpdateAppResponse response = client.Apps.UpdateApp(new Guid(AppGuid), request).Result;
+            UpdateAppResponse response = client.Apps.UpdateApp(new Guid(CFAppGuid), request).Result;
 
-            logger.LogMessage("Updated app {0} with guid {1}", response.Name, AppGuid);
+            logger.LogMessage("Updated app {0} with guid {1}", response.Name, CFAppGuid);
 
 
             return true;

@@ -52,7 +52,7 @@
     <Reference Include="CloudFoundry.Logyard.Client">
       <HintPath>..\..\packages\cf-dotnet-sdk.1.0.0.148\lib\Net45\CloudFoundry.Logyard.Client.dll</HintPath>
     </Reference>
-    <Reference Include="CloudFoundry.Logyard.Client.1.0.0.132.Fakes">
+	<Reference Include="CloudFoundry.Logyard.Client.1.0.0.132.Fakes">
       <HintPath>FakesAssemblies\CloudFoundry.Logyard.Client.1.0.0.132.Fakes.dll</HintPath>
     </Reference>
     <Reference Include="CloudFoundry.Logyard.Client.1.0.0.148.Fakes">
@@ -102,6 +102,7 @@
   <ItemGroup>
     <Compile Include="BindRoutesTaskTest.cs" />
     <Compile Include="FakeEngine.cs" />
+    <Compile Include="LoginTaskTest.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>

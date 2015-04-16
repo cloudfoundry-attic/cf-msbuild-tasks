@@ -8,57 +8,60 @@ Tasks implemented in this library:
 
  - LoadYaml
 	 - allows loading the settings for a manifest yaml file (http://docs.cloudfoundry.org/devguide/deploy-apps/manifest.html )
-	 - required parameter: path to the manifest file (ConfigurationFile)
-	 - output: application name (AppName), path to application's folder (AppPath), an array of routes (Routes), application's stack (Stack), memory limit (Memory), instances number (Instances), autoscale information as xml (Autoscale) , disk limit (Disk), provisioned services information xml (Services), placement zone (PlacementZone) and single sign on enabled information (SsoEnabled)
- 
+	 - required parameter: path to the manifest file (CFConfigurationFile)
+	 - output: application name (CFAppName), path to application's folder (CFAppPath), an array of routes (CFRoutes), application's stack (CFStack), memory limit (CFAppMemory), instances number (CFAppInstances), autoscale information as xml (CFAutoscale) , disk limit (CFDisk), provisioned services information xml (CFServices), placement zone (CFPlacementZone) and single sign on enabled information (CFSsoEnabled)
+ - Login 
+	 - allows the user to obtain a refresh token from the cloud
+	 - required parameters: cloud credentials (CFUser, CFPassword and CFServerUri)
+	 - output: refresh token (CFRefreshToken)
  - CreateApp 
 	 - allows the user to create a new application in the cloud
-	 - required parameters: cloud credentials (User, Password and ServerUri), application name (AppName), space name (Space) and application's stack (Stack)
-	 - optional parameters: memory limit (Memory), instances number (Instances) and buildpack name (Buildpack)
-	 - output: created application's guid (AppGuid)
+	 - required parameters: cloud credentials (CFUser, CFPassword or CFRefreshToken and CFServerUri), application name (CFAppName), space name (CFSpace) and application's stack (CFStack)
+	 - optional parameters: memory limit (CFAppMemory), instances number (CFAppInstances) and buildpack name (CFAppBuildpack)
+	 - output: created application's guid (CFAppGuid)
  - PushApp
 	 - allows the user to push an application to the cloud
-	 - required parameters: cloud credentials, application's guid (AppGuid) and the path to the application's folder (AppPath)
-	 - optional parameters: allow application to start (Start - default value is false) 
+	 - required parameters: cloud credentials, application's guid (CFAppGuid) and the path to the application's folder (CFAppPath)
+	 - optional parameters: allow application to start (CFStart - default value is false) 
  - CreateRoutes
 	 - allow users to create routes that can be later mapped to an application
-	 - required parameters: cloud credentials, an array of routes (Routes) and the space name (Space)
+	 - required parameters: cloud credentials, an array of routes (CFRoutes) and the space name (CFSpace)
 	 - output: returns a list of route guids
  - BindRoutes
 	 - allow users to bind routes to an application
-	 - required parameters: cloud credentials, application's guid(AppGuid) and an array of route guids (RouteGuids)
+	 - required parameters: cloud credentials, application's guid(CFAppGuid) and an array of route guids (CFRouteGuids)
  - CreateService
 	 - allow users to provision a service
-	 - required parameters: cloud credentials, service name (Name), space name (Space), service plan (ServicePlan) and service type (ServiceType)
-	 - output: returns the provisioned service's guid (ServiceGuid)
+	 - required parameters: cloud credentials, service name (CFServiceName), space name (CFSpace), service plan (CFServicePlan) and service type (CFServiceType)
+	 - output: returns the provisioned service's guid (CFServiceGuid)
  - CreateServices
 	 - allow users to provision a collection of services
-	 - required parameters: cloud credentials, services information provided as xml (Services) and space name (Space)
-	 - output: returns an array of the provisioned services guids (ServicesGuids)
+	 - required parameters: cloud credentials, services information provided as xml (CFServices) and space name (CFSpace)
+	 - output: returns an array of the provisioned services guids (CFServicesGuids)
  - BindServices
 	 - allows users to bind an array of provisioned services to an application
-	 - required parameters: cloud credentials, application's guid (AppGuid) and an array of service guids (ServicesGuids)
+	 - required parameters: cloud credentials, application's guid (CFAppGuid) and an array of service guids (CFServicesGuids)
 	 - output: returns an array of binding guids (BindingGuids)
  - DeleteApp
 	 - allows user to remove an application from the cloud
-	 - required parameters: cloud credentials, application name (AppName) and space name (Space)
-	 - optional parameters: allow task to delete routes bound to the application (DeleteRoutes) and allow task to delete provisioned services bound to the application (DeleteServices)
+	 - required parameters: cloud credentials, application name (CFAppName) and space name (CFSpace)
+	 - optional parameters: allow task to delete routes bound to the application (CFDeleteRoutes) and allow task to delete provisioned services bound to the application (CFDeleteServices)
  - DeleteService
 	 - allows user to remove a provisioned service instance
-	 - required parameters: cloud credentials, provisioned service name (ServiceName) and space name (Space)
+	 - required parameters: cloud credentials, provisioned service name (CFServiceName) and space name (CFSpace)
  - DeleteRoute
 	 - allows user to remove an unbound route
-	 - required parameters: cloud credentials and route (Route)
+	 - required parameters: cloud credentials and route (CFRoute)
  - UnbindRoute
 	 - allows user to remove a route binding from an application
-	 - required parameters: cloud credentials, application name (AppName), space name (Space) and route (Route) 
+	 - required parameters: cloud credentials, application name (CFAppName), space name (CFSpace) and route (CFRoute) 
  - UnbindService
 	 - allows user to remove a provisioned service binding from an application
-	 - required parameters: cloud credentials, application name (AppName), space name (Space) and service name (ServiceName)
+	 - required parameters: cloud credentials, application name (CFAppName), space name (CFSpace) and service name (CFServiceName)
  - SaveYaml
 	 - allows user to create a manifest yaml file
-	 - required parameters: application path (AppPath), application name (AppName), application's route (Route), instances number (Instances), memory limit (Memory), application's stack (Stack) and configuration file path (ConfigurationFile)
-	 - optional parameters: autoscale information (MaxCpu, MinCpu, Enabled, MaxInstances and MinInstances), disk limit (Disk), placement zone (PlacementZone), single sign on enabled (SsoEnabled) and service information (ServiceName, ServicePlan, ServiceType)
+	 - required parameters: application path (CFAppPath), application name (CFAppName), application's route (CFRoute), instances number (CFAppInstances), memory limit (CFAppMemory), application's stack (CFStack) and configuration file path (CFConfigurationFile)
+	 - optional parameters: autoscale information (CFMaxCpu, CFMinCpu, CFEnabled, CFMaxInstances and CFMinInstances), disk limit (CFDisk), placement zone (CFPlacementZone), single sign on enabled (CFSsoEnabled) and service information (CFServiceName, CFServicePlan, CFServiceType)
  
 #**Prerequisites**
  - Microsoft Visual Studio 2013
@@ -99,13 +102,13 @@ Sample integration of the create application task in a target of the project fil
 `<Target Name="sampleCreate">
 	<UsingTask AssemblyFile="$(SolutionDir)\packages\Cloudfoundry.Build.Tasks.dll" TaskName="CreateApp">
 	</UsingTask>
-	<CreateApp Name="sampleApp" Stack="win2012r2" Space="SampleSpace" User="sampleUser" Password="samplePass" ServerUri="api.1.2.3.4.xip.io">
-    			<Output TaskParameter="AppGuid" PropertyName="AppGuid"/>
+	        <CreateApp CFAppName="sampleApp" CFStack="win2012r2" CFSpace="SampleSpace" CFUser="sampleUser" CFPassword="samplePass" CFServerUri="api.1.2.3.4.xip.io">
+    			<Output TaskParameter="CFAppGuid" PropertyName="CFAppGuid"/>
     		</CreateApp>
     </Target>
 `
 
 This target can be called using: `msbuild myproject.csproj /t:sampleCreate`
 
-Later AppGuid can be used as a parameter for binding tasks. 
+Later CFAppGuid can be used as a parameter for binding tasks. 
 

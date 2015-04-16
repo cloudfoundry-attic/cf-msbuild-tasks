@@ -12,13 +12,13 @@ namespace CloudFoundry.Build.Tasks
     public class UnbindService : BaseTask
     {
         [Required]
-        public string AppName { get; set; }
+        public string CFAppName { get; set; }
 
         [Required]
-        public string ServiceName { get; set; }
+        public string CFServiceName { get; set; }
 
         [Required]
-        public string Space { get; set; }
+        public string CFSpace { get; set; }
 
         public override bool Execute()
         {
@@ -27,37 +27,37 @@ namespace CloudFoundry.Build.Tasks
 
             CloudFoundryClient client = InitClient();
 
-            logger.LogMessage("Unbinding service {0} from app {1}", ServiceName, AppName);
+            logger.LogMessage("Unbinding service {0} from app {1}", CFServiceName, CFAppName);
 
             Guid? spaceGuid = null;
 
-            if (Space.Length > 0)
+            if (CFSpace.Length > 0)
             {
-                PagedResponseCollection<ListAllSpacesResponse> spaceList = client.Spaces.ListAllSpaces(new RequestOptions() { Query = "name:" + Space }).Result;
+                PagedResponseCollection<ListAllSpacesResponse> spaceList = client.Spaces.ListAllSpaces(new RequestOptions() { Query = "name:" + CFSpace }).Result;
 
                 spaceGuid = new Guid(spaceList.FirstOrDefault().EntityMetadata.Guid);
             
                 if (spaceGuid == null)
                 {
-                    logger.LogError("Space {0} not found", Space);
+                    logger.LogError("Space {0} not found", CFSpace);
                     return false;
                 }
             }
 
-            var servicesList = client.Spaces.ListAllServiceInstancesForSpace(spaceGuid, new RequestOptions() { Query = "name:" + ServiceName }).Result;
+            var servicesList = client.Spaces.ListAllServiceInstancesForSpace(spaceGuid, new RequestOptions() { Query = "name:" + CFServiceName }).Result;
 
             if (servicesList.Count() > 1)
             {
-                logger.LogError("There are more services named {0} in space {1}", ServiceName, Space);
+                logger.LogError("There are more services named {0} in space {1}", CFServiceName, CFSpace);
                 return false;
             }
 
             Guid serviceGuid=new Guid(servicesList.FirstOrDefault().EntityMetadata.Guid);
 
-            PagedResponseCollection<ListAllAppsForSpaceResponse> appList = client.Spaces.ListAllAppsForSpace(spaceGuid, new RequestOptions() { Query = "name:" + AppName }).Result;
+            PagedResponseCollection<ListAllAppsForSpaceResponse> appList = client.Spaces.ListAllAppsForSpace(spaceGuid, new RequestOptions() { Query = "name:" + CFAppName }).Result;
             if (appList.Count() > 1)
             {
-                logger.LogError("There are more applications named {0} in space {1}", AppName, Space);
+                logger.LogError("There are more applications named {0} in space {1}", CFAppName, CFSpace);
                 return false;
             }
 

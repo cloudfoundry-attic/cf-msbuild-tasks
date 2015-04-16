@@ -79,11 +79,10 @@ namespace CloudFoundry.Build.Tasks.Test
               ));
         }
 
-
+        // { Token = new UAA.Authentication.Token() { RefreshToken = "mytoken" } } - Token is read-only and cannot be assigned to from shim context without fakeing uaa
         internal static Task<AuthenticationContext> CustomLogin(CloudController.V2.Client.CloudFoundryClient arg1, CloudCredentials arg2)
         {
-            var task = Task.Run(() => { return new AuthenticationContext(); });
-            return task;
+            return Task.Factory.StartNew<AuthenticationContext>(() => { return new AuthenticationContext(); });
         }
 
 

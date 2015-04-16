@@ -23,11 +23,11 @@ namespace CloudFoundry.Build.Tasks.Test
                 CloudFoundry.CloudController.V2.Client.Base.Fakes.ShimAbstractAppsEndpoint.AllInstances.AssociateRouteWithAppNullableOfGuidNullableOfGuid = CustomAssociate;
 
                 BindRoutes task = new BindRoutes();
-                task.AppGuid = Guid.NewGuid().ToString();
-                task.RouteGuids = new string[1] { Guid.NewGuid().ToString() };
-                task.User = Settings.Default.User;
-                task.Password = Settings.Default.Password;
-                task.ServerUri = Settings.Default.ServerUri;
+                task.CFAppGuid = Guid.NewGuid().ToString();
+                task.CFRouteGuids = new string[1] { Guid.NewGuid().ToString() };
+                task.CFUser = Settings.Default.User;
+                task.CFPassword = Settings.Default.Password;
+                task.CFServerUri = Settings.Default.ServerUri;
                 task.BuildEngine = new FakeBuildEngine();
 
                 Assert.IsTrue(task.Execute());

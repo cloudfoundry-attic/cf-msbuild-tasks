@@ -37,11 +37,11 @@ namespace CloudFoundry.Build.Tasks.Test
                 TestUtils.InitTestMetadata();
 
                 CreateApp task = new CreateApp();
-                task.User = Settings.Default.User;
-                task.Password = Settings.Default.Password;
-                task.ServerUri = Settings.Default.ServerUri;
-                task.Space= "TestSpace";
-                task.Stack = "testStack";
+                task.CFUser = Settings.Default.User;
+                task.CFPassword = Settings.Default.Password;
+                task.CFServerUri = Settings.Default.ServerUri;
+                task.CFSpace= "TestSpace";
+                task.CFStack = "testStack";
 
                 task.BuildEngine = new FakeBuildEngine();
                 Assert.IsTrue(task.Execute());

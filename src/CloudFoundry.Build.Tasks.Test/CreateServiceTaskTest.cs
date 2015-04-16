@@ -37,18 +37,18 @@ namespace CloudFoundry.Build.Tasks.Test
                 TestUtils.InitTestMetadata();
 
                 CreateService task = new CreateService();
-                task.Name = "testService";
-                task.ServicePlan = "myPlan";
-                task.ServiceType = "myType";
-                task.Space = "TestSpace";
-                task.User = Settings.Default.User;
-                task.Password = Settings.Default.Password;
-                task.ServerUri = Settings.Default.ServerUri;
+                task.CFServiceName = "testService";
+                task.CFServicePlan = "myPlan";
+                task.CFServiceType = "myType";
+                task.CFSpace = "TestSpace";
+                task.CFUser = Settings.Default.User;
+                task.CFPassword = Settings.Default.Password;
+                task.CFServerUri = Settings.Default.ServerUri;
                 task.BuildEngine = new FakeBuildEngine();
 
                 task.Execute();
 
-                Assert.IsNotNull(task.ServiceGuid);
+                Assert.IsNotNull(task.CFServiceGuid);
             }
         }
 

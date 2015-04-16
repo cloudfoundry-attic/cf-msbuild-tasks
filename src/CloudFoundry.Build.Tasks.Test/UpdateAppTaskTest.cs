@@ -20,10 +20,10 @@ namespace CloudFoundry.Build.Tasks.Test
                 TestUtils.InitTestMetadata();
 
                 UpdateApp task = new UpdateApp();
-                task.AppGuid = Guid.NewGuid().ToString();
-                task.User = Settings.Default.User;
-                task.Password = Settings.Default.Password;
-                task.ServerUri = Settings.Default.ServerUri;
+                task.CFAppGuid = Guid.NewGuid().ToString();
+                task.CFUser = Settings.Default.User;
+                task.CFPassword = Settings.Default.Password;
+                task.CFServerUri = Settings.Default.ServerUri;
                 task.BuildEngine = new FakeBuildEngine();
 
                 Assert.IsTrue(task.Execute());

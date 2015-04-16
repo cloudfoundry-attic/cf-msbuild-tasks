@@ -13,12 +13,12 @@ namespace CloudFoundry.Build.Tasks
     public class PushApp : BaseTask
     {
         [Required]
-        public string AppGuid { get; set; }
+        public string CFAppGuid { get; set; }
 
         [Required]
-        public string AppPath { get; set; }
+        public string CFAppPath { get; set; }
 
-        public bool Start { get; set; }
+        public bool CFStart { get; set; }
         public override bool Execute()
         {
             
@@ -26,15 +26,15 @@ namespace CloudFoundry.Build.Tasks
 
             CloudFoundryClient client = InitClient();
 
-            if (!Directory.Exists(AppPath))
+            if (!Directory.Exists(CFAppPath))
             {
-                logger.LogError("Directory {0} not found", AppPath);
+                logger.LogError("Directory {0} not found", CFAppPath);
                 return false;
             }
 
             client.Apps.PushProgress += Apps_PushProgress;
             
-            client.Apps.Push(new Guid(AppGuid), AppPath, Start).Wait();
+            client.Apps.Push(new Guid(CFAppGuid), CFAppPath, CFStart).Wait();
             return true;
         }
 
