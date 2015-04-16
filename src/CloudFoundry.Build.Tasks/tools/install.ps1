@@ -47,10 +47,10 @@ function Add-Import {
 }
 
 function Copy-Resources($project) {
-	Copy-Item "$toolsPath\cf-dotnet-sdk-msbuild-tasks.props" $project.Name -Force | Out-Null
-	Add-Import "cf-dotnet-sdk-msbuild-tasks.props" $project.Name
+	Copy-Item "$toolsPath\cf-msbuild-tasks.props" $project.Name -Force | Out-Null
+	Add-Import "cf-msbuild-tasks.props" $project.Name
 
-	Write-Host "Copying cf-dotnet-sdk-msbuild-tasks.props file to project folder."
+	Write-Host "Copying cf-msbuild-tasks.props file to project folder."
 }
 
 function Main 
