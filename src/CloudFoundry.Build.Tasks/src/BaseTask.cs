@@ -49,14 +49,14 @@ namespace CloudFoundry.Build.Tasks
 
             CloudFoundryClient client = new CloudFoundryClient(new Uri(CFServerUri), new System.Threading.CancellationToken());
 
-            if (CFUser.Length > 0 && CFPassword.Length > 0)
+            if (CFUser != null && CFPassword != null)
             {
                 CloudCredentials creds = new CloudCredentials();
                 creds.User = CFUser;
                 creds.Password = CFPassword;
                 client.Login(creds).Wait();
             }
-            else if (CFRefreshToken.Length > 0)
+            else if (CFRefreshToken != null)
             {
                 client.Login(CFRefreshToken).Wait();
             }
