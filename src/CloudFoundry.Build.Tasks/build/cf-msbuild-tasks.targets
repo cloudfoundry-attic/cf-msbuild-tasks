@@ -36,7 +36,7 @@
   </Target>
 
   <!-- Publish application to cf deployment: create app, push app, create routes, bind routes, create services, bind services, start app -->
-  <Target Name="Publish" DependsOnTargets="PublishToTemp" Configuration="$(Configuration)" Platform="$(Platform)">
+  <Target Name="Publish" DependsOnTargets="PublishToTemp">
     <ItemGroup>
       <CFRoutes Include="$(CFRoutes)"></CFRoutes>
       <CFRefreshToken Include="$(CFRefreshToken)"></CFRefreshToken>
@@ -76,7 +76,7 @@
   </Target>
 
   <!-- Publish application with manifest to cf deployment: create app, push app, create routes, bind routes, create services, bind services, start app -->
-  <Target Name="PublishWithManifest" DependsOnTargets="PublishToTemp" Configuration="$(Configuration)" Platform="$(Platform)">
+  <Target Name="PublishWithManifest" DependsOnTargets="PublishToTemp">
 
     <LoadYaml ConfigurationFile="$(CFConfigurationFile)">
       <Output TaskParameter="CFStack" PropertyName="CFStack"/>
