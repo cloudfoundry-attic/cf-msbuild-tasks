@@ -13,19 +13,19 @@ namespace CloudFoundry.Build.Tasks
     public class CreateService : BaseTask
     {
         [Required]
-        public string Space { get; set; }
+        public string CFSpace { get; set; }
 
         [Required]
-        public string Name { get; set; }
+        public string CFServiceName { get; set; }
 
         [Required]
-        public string ServicePlan { get; set; }
+        public string CFServicePlan { get; set; }
 
         [Required]
-        public string ServiceType { get; set; }
+        public string CFServiceType { get; set; }
 
         [Output]
-        public string ServiceGuid { get; set; }
+        public string CFServiceGuid { get; set; }
 
         public override bool Execute()
         {
@@ -36,27 +36,27 @@ namespace CloudFoundry.Build.Tasks
 
             Guid? spaceGuid = null;
 
-            if (Space.Length > 0)
+            if (CFSpace.Length > 0)
             {
-                PagedResponseCollection<ListAllSpacesResponse> spaceList = client.Spaces.ListAllSpaces(new RequestOptions() { Query = "name:" + Space }).Result;
+                PagedResponseCollection<ListAllSpacesResponse> spaceList = client.Spaces.ListAllSpaces(new RequestOptions() { Query = "name:" + CFSpace }).Result;
 
                 spaceGuid = new Guid(spaceList.FirstOrDefault().EntityMetadata.Guid);
             
                 if (spaceGuid == null)
                 {
-                    logger.LogError("Space {0} not found", Space);
+                    logger.LogError("Space {0} not found", CFSpace);
                     return false;
                 }
             }
 
             Guid? planGuid = null;
-            PagedResponseCollection<ListAllServicesResponse> servicesList = client.Services.ListAllServices(new RequestOptions() { Query = "label:" + ServiceType }).Result;
+            PagedResponseCollection<ListAllServicesResponse> servicesList = client.Services.ListAllServices(new RequestOptions() { Query = "label:" + CFServiceType }).Result;
 
             foreach (var service in servicesList)
             {
                var planList = client.Services.ListAllServicePlansForService(new Guid(service.EntityMetadata.Guid)).Result;
 
-               var plan = planList.Where(o => o.Name == ServicePlan).FirstOrDefault();
+               var plan = planList.Where(o => o.Name == CFServicePlan).FirstOrDefault();
 
                if (plan != null)
                {
@@ -67,15 +67,15 @@ namespace CloudFoundry.Build.Tasks
 
             CreateServiceInstanceRequest request = new CreateServiceInstanceRequest();
 
-            request.Name = Name;
+            request.Name = CFServiceName;
             request.ServicePlanGuid = planGuid;
             request.SpaceGuid = spaceGuid;
 
             CreateServiceInstanceResponse result = client.ServiceInstances.CreateServiceInstance(request).Result;
 
-            ServiceGuid = result.EntityMetadata.Guid;
+            CFServiceGuid = result.EntityMetadata.Guid;
 
-            logger.LogMessage("Created {0} service {1}", ServiceType, result.Name);
+            logger.LogMessage("Created {0} service {1}", CFServiceType, result.Name);
             return true;
         }
     }

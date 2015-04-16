@@ -12,10 +12,10 @@ namespace CloudFoundry.Build.Tasks
     public class DeleteService : BaseTask
     {
         [Required]
-        public string ServiceName { get; set; }
+        public string CFServiceName { get; set; }
 
         [Required]
-        public string Space { get; set; }
+        public string CFSpace { get; set; }
 
         public override bool Execute()
         {
@@ -24,28 +24,28 @@ namespace CloudFoundry.Build.Tasks
 
             CloudFoundryClient client = InitClient();
             
-            logger.LogMessage("Deleting service {0} from space {1}", ServiceName, Space);
+            logger.LogMessage("Deleting service {0} from space {1}", CFServiceName, CFSpace);
 
             Guid? spaceGuid = null;
 
-            if (Space.Length > 0)
+            if (CFSpace.Length > 0)
             {
-                PagedResponseCollection<ListAllSpacesResponse> spaceList = client.Spaces.ListAllSpaces(new RequestOptions() { Query = "name:" + Space }).Result;
+                PagedResponseCollection<ListAllSpacesResponse> spaceList = client.Spaces.ListAllSpaces(new RequestOptions() { Query = "name:" + CFSpace }).Result;
 
                 spaceGuid = new Guid(spaceList.FirstOrDefault().EntityMetadata.Guid);
             
                 if (spaceGuid == null)
                 {
-                    logger.LogError("Space {0} not found", Space);
+                    logger.LogError("Space {0} not found", CFSpace);
                     return false;
                 }
             }
 
-            var servicesList = client.Spaces.ListAllServiceInstancesForSpace(spaceGuid, new RequestOptions() { Query = "name:" + ServiceName }).Result;
+            var servicesList = client.Spaces.ListAllServiceInstancesForSpace(spaceGuid, new RequestOptions() { Query = "name:" + CFServiceName }).Result;
 
             if (servicesList.Count() > 1)
             {
-                logger.LogError("There are more services named {0} in space {1}", ServiceName, Space);
+                logger.LogError("There are more services named {0} in space {1}", CFServiceName, CFSpace);
                 return false;
             }
 

@@ -15,14 +15,14 @@ namespace CloudFoundry.Build.Tasks
     public class RestartApp : BaseTask
     {
         [Required]
-        public String AppGuid { get; set; }
+        public String CFAppGuid { get; set; }
         public override bool Execute()
         {
 
             logger = new Microsoft.Build.Utilities.TaskLoggingHelper(this);
-            logger.LogMessage("Restarting application {0}", AppGuid);
+            logger.LogMessage("Restarting application {0}", CFAppGuid);
 
-            if (AppGuid.Length == 0)
+            if (CFAppGuid.Length == 0)
             {
                 logger.LogError("Application Guid must be specified");
                 return false;
@@ -59,26 +59,26 @@ namespace CloudFoundry.Build.Tasks
                     logger.LogMessage("[{0}] - {1}: {2}", message.Message.Value.Source, message.Message.Value.HumanTime, message.Message.Value.Text);
                 };
 
-                logyard.StartLogStream(AppGuid, 0, true);
+                logyard.StartLogStream(CFAppGuid, 0, true);
 
 
-                GetAppSummaryResponse response = client.Apps.GetAppSummary(new Guid(AppGuid)).Result;
+                GetAppSummaryResponse response = client.Apps.GetAppSummary(new Guid(CFAppGuid)).Result;
 
                 if (response.State != "STOPPED")
                 {
                     UpdateAppRequest stopReq = new UpdateAppRequest();
                     stopReq.State = "STOPPED";
-                    client.Apps.UpdateApp(new Guid(AppGuid), stopReq).Wait();
+                    client.Apps.UpdateApp(new Guid(CFAppGuid), stopReq).Wait();
                 }
 
                 UpdateAppRequest startReq = new UpdateAppRequest();
                 startReq.State = "STARTED";
-                client.Apps.UpdateApp(new Guid(AppGuid), startReq).Wait();
+                client.Apps.UpdateApp(new Guid(CFAppGuid), startReq).Wait();
 
                 // ======= WAIT FOR APP TO COME ONLINE =======
                 while (true)
                 {
-                    GetAppSummaryResponse appSummary = client.Apps.GetAppSummary(new Guid(AppGuid)).Result;
+                    GetAppSummaryResponse appSummary = client.Apps.GetAppSummary(new Guid(CFAppGuid)).Result;
 
                     if (appSummary.RunningInstances > 0)
                     {

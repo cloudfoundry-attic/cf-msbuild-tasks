@@ -13,90 +13,90 @@ namespace CloudFoundry.Build.Tasks.IntegrationTests
         {
             CreateApp task = new CreateApp();
 
-            task.User = Settings.Default.User;
-            task.Password = Settings.Default.Password;
-            task.ServerUri = Settings.Default.ServerUri;
+            task.CFUser = Settings.Default.User;
+            task.CFPassword = Settings.Default.Password;
+            task.CFServerUri = Settings.Default.ServerUri;
 
-            task.Name = "testIntegration";
-            task.Memory = 512;
-            task.Instances = 1;
-            task.Space = "TestSpace";
-            task.Stack = "win2012";
+            task.CFAppName = "testIntegration";
+            task.CFAppMemory = 512;
+            task.CFAppInstances = 1;
+            task.CFSpace = "TestSpace";
+            task.CFStack = "win2012";
 
             task.BuildEngine = new FakeBuildEngine();
             task.Execute();
 
             PushApp pushTask = new PushApp();
-            pushTask.User = Settings.Default.User;
-            pushTask.Password = Settings.Default.Password;
-            pushTask.ServerUri = Settings.Default.ServerUri;
+            pushTask.CFUser = Settings.Default.User;
+            pushTask.CFPassword = Settings.Default.Password;
+            pushTask.CFServerUri = Settings.Default.ServerUri;
 
-            pushTask.AppGuid = task.AppGuid;
-            pushTask.AppPath = Settings.Default.AppPath;
-            pushTask.Start = true;
+            pushTask.CFAppGuid = task.CFAppGuid;
+            pushTask.CFAppPath = Settings.Default.AppPath;
+            pushTask.CFStart = true;
 
             pushTask.BuildEngine = new FakeBuildEngine();
             
             pushTask.Execute();
 
             CreateRoutes routeTask = new CreateRoutes();
-            routeTask.User = Settings.Default.User;
-            routeTask.Password = Settings.Default.Password;
-            routeTask.ServerUri = Settings.Default.ServerUri;
+            routeTask.CFUser = Settings.Default.User;
+            routeTask.CFPassword = Settings.Default.Password;
+            routeTask.CFServerUri = Settings.Default.ServerUri;
 
-            routeTask.Routes = new string[1] { "testRoute.15.126.213.170.xip.io" };
-            routeTask.Space = "TestSpace";
+            routeTask.CFRoutes = new string[1] { "testRoute.15.126.213.170.xip.io" };
+            routeTask.CFSpace = "TestSpace";
             routeTask.BuildEngine=new FakeBuildEngine();
 
             routeTask.Execute();
 
             BindRoutes bindTask = new BindRoutes();
-            bindTask.User = Settings.Default.User;
-            bindTask.Password = Settings.Default.Password;
-            bindTask.ServerUri = Settings.Default.ServerUri;
+            bindTask.CFUser = Settings.Default.User;
+            bindTask.CFPassword = Settings.Default.Password;
+            bindTask.CFServerUri = Settings.Default.ServerUri;
             bindTask.BuildEngine = new FakeBuildEngine();
 
 
-            bindTask.AppGuid = task.AppGuid;
-            bindTask.RouteGuids = routeTask.RouteGuids;
+            bindTask.CFAppGuid = task.CFAppGuid;
+            bindTask.CFRouteGuids = routeTask.CFRouteGuids;
 
             bindTask.Execute();
            
             CreateService serviceTask = new CreateService();
-            serviceTask.User = Settings.Default.User;
-            serviceTask.Password = Settings.Default.Password;
-            serviceTask.ServerUri = Settings.Default.ServerUri;
+            serviceTask.CFUser = Settings.Default.User;
+            serviceTask.CFPassword = Settings.Default.Password;
+            serviceTask.CFServerUri = Settings.Default.ServerUri;
             serviceTask.BuildEngine = new FakeBuildEngine();
 
-            serviceTask.Name = "testService";
-            serviceTask.ServicePlan = "free";
-            serviceTask.ServiceType = "mysql";
-            serviceTask.Space = "TestSpace";
+            serviceTask.CFServiceName = "testService";
+            serviceTask.CFServicePlan = "free";
+            serviceTask.CFServiceType = "mysql";
+            serviceTask.CFSpace = "TestSpace";
 
             serviceTask.Execute();
 
             BindServices bindServiceTask = new BindServices();
-            bindServiceTask.User = Settings.Default.User;
-            bindServiceTask.Password = Settings.Default.Password;
-            bindServiceTask.ServerUri = Settings.Default.ServerUri;
+            bindServiceTask.CFUser = Settings.Default.User;
+            bindServiceTask.CFPassword = Settings.Default.Password;
+            bindServiceTask.CFServerUri = Settings.Default.ServerUri;
             bindServiceTask.BuildEngine = new FakeBuildEngine();
 
-            bindServiceTask.AppGuid = task.AppGuid;
-            bindServiceTask.ServicesGuids = new string[1] { serviceTask.ServiceGuid };
+            bindServiceTask.CFAppGuid = task.CFAppGuid;
+            bindServiceTask.CFServicesGuids = new string[1] { serviceTask.CFServiceGuid };
             bindServiceTask.Execute();
 
-            if (CheckIfAppIsWorking(routeTask.Routes[0], 3) == true)
+            if (CheckIfAppIsWorking(routeTask.CFRoutes[0], 3) == true)
             {
 
                 DeleteApp delTask = new DeleteApp();
-                delTask.User = Settings.Default.User;
-                delTask.Password = Settings.Default.Password;
-                delTask.ServerUri = Settings.Default.ServerUri;
+                delTask.CFUser = Settings.Default.User;
+                delTask.CFPassword = Settings.Default.Password;
+                delTask.CFServerUri = Settings.Default.ServerUri;
 
-                delTask.Space = "TestSpace";
-                delTask.AppName = "testIntegration";
-                delTask.DeleteServices = true;
-                delTask.DeleteRoutes = true;
+                delTask.CFSpace = "TestSpace";
+                delTask.CFAppName = "testIntegration";
+                delTask.CFDeleteServices = true;
+                delTask.CFDeleteRoutes = true;
                 delTask.BuildEngine = new FakeBuildEngine();
 
                 Assert.IsTrue(delTask.Execute());

@@ -101,6 +101,7 @@
     <Compile Include="src\DeleteService.cs" />
     <Compile Include="src\LoadYaml.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="src\LoginTask.cs" />
     <Compile Include="src\ProvisionedService.cs" />
     <Compile Include="src\PushApp.cs" />
     <Compile Include="src\PushProperties.cs" />

@@ -15,13 +15,13 @@ namespace CloudFoundry.Build.Tasks
     public class CreateRoutes : BaseTask
     {
         [Required]
-        public String[] Routes { get; set; }
+        public String[] CFRoutes { get; set; }
 
         [Required]
-        public String Space { get; set; }
+        public String CFSpace { get; set; }
 
         [Output]
-        public String[] RouteGuids { get; set; }
+        public String[] CFRouteGuids { get; set; }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling")]
         public override bool Execute()
@@ -32,9 +32,9 @@ namespace CloudFoundry.Build.Tasks
 
             Guid? spaceGuid = null;
 
-            if (Space.Length > 0)
+            if (CFSpace.Length > 0)
             {
-                PagedResponseCollection<ListAllSpacesResponse> spaceList = client.Spaces.ListAllSpaces(new RequestOptions() { Query = "name:" + Space }).Result;
+                PagedResponseCollection<ListAllSpacesResponse> spaceList = client.Spaces.ListAllSpaces(new RequestOptions() { Query = "name:" + CFSpace }).Result;
 
                 spaceGuid = new Guid(spaceList.FirstOrDefault().EntityMetadata.Guid);
             }
@@ -44,7 +44,7 @@ namespace CloudFoundry.Build.Tasks
 
             if (spaceGuid.HasValue)
             {
-                foreach (String url in Routes)
+                foreach (String url in CFRoutes)
                 {
                     logger.LogMessage("Creating route {0}", url);
                     string domain = string.Empty;
@@ -89,11 +89,11 @@ namespace CloudFoundry.Build.Tasks
                         }
                     }
                 }
-                RouteGuids = createdGuid.ToArray();
+                CFRouteGuids = createdGuid.ToArray();
             }
             else
             {
-                logger.LogError("Space {0} not found", Space);
+                logger.LogError("Space {0} not found", CFSpace);
                 return false;
             }
 

@@ -20,12 +20,12 @@ namespace CloudFoundry.Build.Tasks.Test
                 CloudFoundry.CloudController.V2.Client.Fakes.ShimAppsEndpoint.AllInstances.PushGuidStringBoolean = CustomPushJob;
 
                 PushApp task = new PushApp();
-                task.AppGuid = Guid.NewGuid().ToString();
-                task.AppPath = Path.GetTempPath();
-                task.Start = true;
-                task.User = Settings.Default.User;
-                task.Password = Settings.Default.Password;
-                task.ServerUri = Settings.Default.ServerUri;
+                task.CFAppGuid = Guid.NewGuid().ToString();
+                task.CFAppPath = Path.GetTempPath();
+                task.CFStart = true;
+                task.CFUser = Settings.Default.User;
+                task.CFPassword = Settings.Default.Password;
+                task.CFServerUri = Settings.Default.ServerUri;
                 task.BuildEngine = new FakeBuildEngine();
 
                 Assert.IsTrue(task.Execute());

@@ -13,13 +13,13 @@ namespace CloudFoundry.Build.Tasks
     public class UnbindRoute:BaseTask
     {
         [Required]
-        public string Route { get; set; }
+        public string CFRoute { get; set; }
 
         [Required]
-        public string AppName { get; set; }
+        public string CFAppName { get; set; }
 
         [Required]
-        public string Space { get; set; }
+        public string CFSpace { get; set; }
 
         public override bool Execute()
         {
@@ -28,15 +28,15 @@ namespace CloudFoundry.Build.Tasks
 
             CloudFoundryClient client = InitClient();
 
-            logger.LogMessage("Unbinding route {0} from app {1}", Route, AppName);
+            logger.LogMessage("Unbinding route {0} from app {1}", CFRoute, CFAppName);
 
             string domain=string.Empty;
             string host = string.Empty;
-            Utils.ExtractDomainAndHost(Route, out domain, out host);
+            Utils.ExtractDomainAndHost(CFRoute, out domain, out host);
 
             if (domain.Length == 0 || host.Length == 0)
             {
-                logger.LogError("Error extracting domain and host information from route {0}", Route);
+                logger.LogError("Error extracting domain and host information from route {0}", CFRoute);
                 return false;
             }
 
@@ -45,23 +45,23 @@ namespace CloudFoundry.Build.Tasks
 
             Guid? spaceGuid = null;
 
-            if (Space.Length > 0)
+            if (CFSpace.Length > 0)
             {
-                PagedResponseCollection<ListAllSpacesResponse> spaceList = client.Spaces.ListAllSpaces(new RequestOptions() { Query = "name:" + Space }).Result;
+                PagedResponseCollection<ListAllSpacesResponse> spaceList = client.Spaces.ListAllSpaces(new RequestOptions() { Query = "name:" + CFSpace }).Result;
 
                 spaceGuid = new Guid(spaceList.FirstOrDefault().EntityMetadata.Guid);
             
                 if (spaceGuid == null)
                 {
-                    logger.LogError("Space {0} not found", Space);
+                    logger.LogError("Space {0} not found", CFSpace);
                     return false;
                 }
             }
 
-            PagedResponseCollection<ListAllAppsForSpaceResponse> appList = client.Spaces.ListAllAppsForSpace(spaceGuid, new RequestOptions() { Query = "name:" + AppName }).Result;
+            PagedResponseCollection<ListAllAppsForSpaceResponse> appList = client.Spaces.ListAllAppsForSpace(spaceGuid, new RequestOptions() { Query = "name:" + CFAppName }).Result;
             if (appList.Count() > 1)
             {
-                logger.LogError("There are more applications named {0} in space {1}", AppName, Space);
+                logger.LogError("There are more applications named {0} in space {1}", CFAppName, CFSpace);
                 return false;
             }
 
@@ -73,7 +73,7 @@ namespace CloudFoundry.Build.Tasks
 
             if (routeInfo == null)
             {
-                logger.LogError("Route {0} not found in {1}'s routes", Route, AppName);
+                logger.LogError("Route {0} not found in {1}'s routes", CFRoute, CFAppName);
                 return false;
             }
 

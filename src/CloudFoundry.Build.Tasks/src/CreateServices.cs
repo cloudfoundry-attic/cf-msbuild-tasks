@@ -12,10 +12,10 @@ namespace CloudFoundry.Build.Tasks
     public class CreateServices : BaseTask
     {
         [Required]
-        public string Services { get; set; }
+        public string CFServices { get; set; }
 
         [Required]
-        public string Space { get; set; }
+        public string CFSpace { get; set; }
 
         [Output]
         public string[] ServicesGuids { get; set; }
@@ -29,20 +29,20 @@ namespace CloudFoundry.Build.Tasks
 
             Guid? spaceGuid = null;
 
-            if (Space.Length > 0)
+            if (CFSpace.Length > 0)
             {
-                PagedResponseCollection<ListAllSpacesResponse> spaceList = client.Spaces.ListAllSpaces(new RequestOptions() { Query = "name:" + Space }).Result;
+                PagedResponseCollection<ListAllSpacesResponse> spaceList = client.Spaces.ListAllSpaces(new RequestOptions() { Query = "name:" + CFSpace }).Result;
 
                 spaceGuid = new Guid(spaceList.FirstOrDefault().EntityMetadata.Guid);
             
                 if (spaceGuid == null)
                 {
-                    logger.LogError("Space {0} not found", Space);
+                    logger.LogError("Space {0} not found", CFSpace);
                     return false;
                 }
             }
 
-            List<ProvisionedService> servicesList = Utils.Deserialize<List<ProvisionedService>>(Services);
+            List<ProvisionedService> servicesList = Utils.Deserialize<List<ProvisionedService>>(CFServices);
 
             List<string> serviceGuids = new List<string>();
 

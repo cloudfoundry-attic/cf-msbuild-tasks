@@ -13,13 +13,13 @@ namespace CloudFoundry.Build.Tasks
     public class BindServices : BaseTask
     {
         [Required]
-        public string AppGuid { get; set; }
+        public string CFAppGuid { get; set; }
 
         [Required]
-        public string[] ServicesGuids { get; set; }
+        public string[] CFServicesGuids { get; set; }
 
         [Output]
-        public string[] BindingGuids { get; set; }
+        public string[] CFBindingGuids { get; set; }
 
         public override bool Execute()
         {
@@ -27,14 +27,14 @@ namespace CloudFoundry.Build.Tasks
 
             CloudFoundryClient client = InitClient();
 
-            logger.LogMessage("Binding services to app {0}", AppGuid);
+            logger.LogMessage("Binding services to app {0}", CFAppGuid);
 
             List<string> bindingGuids = new List<string>();
 
-            foreach (string serviceGuid in ServicesGuids)
+            foreach (string serviceGuid in CFServicesGuids)
             {
                 CreateServiceBindingRequest request = new CreateServiceBindingRequest();
-                request.AppGuid = new Guid(AppGuid);
+                request.AppGuid = new Guid(CFAppGuid);
                 request.ServiceInstanceGuid = new Guid(serviceGuid);
 
                 try
@@ -58,7 +58,7 @@ namespace CloudFoundry.Build.Tasks
                 }
             }
 
-            BindingGuids = bindingGuids.ToArray();
+            CFBindingGuids = bindingGuids.ToArray();
 
             return true;
         }

@@ -13,7 +13,7 @@ namespace CloudFoundry.Build.Tasks
     public class DeleteRoute : BaseTask
     {
         [Required]
-        public string Route { get; set; }
+        public string CFRoute { get; set; }
 
         public override bool Execute()
         {
@@ -22,15 +22,15 @@ namespace CloudFoundry.Build.Tasks
 
             CloudFoundryClient client = InitClient();
 
-            logger.LogMessage("Deleting route {0}", Route);
+            logger.LogMessage("Deleting route {0}", CFRoute);
 
             string domain = string.Empty;
             string host = string.Empty;
-            Utils.ExtractDomainAndHost(Route, out domain, out host);
+            Utils.ExtractDomainAndHost(CFRoute, out domain, out host);
 
             if (domain.Length == 0 || host.Length == 0)
             {
-                logger.LogError("Error extracting domain and host information from route {0}", Route);
+                logger.LogError("Error extracting domain and host information from route {0}", CFRoute);
                 return false;
             }
 
@@ -41,7 +41,7 @@ namespace CloudFoundry.Build.Tasks
 
             if (routeList.Count() > 1)
             {
-                logger.LogError("There is more than one route that matches for deletion of route {0}", Route);
+                logger.LogError("There is more than one route that matches for deletion of route {0}", CFRoute);
                 return false;
             }
 

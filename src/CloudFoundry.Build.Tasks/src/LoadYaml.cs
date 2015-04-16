@@ -21,58 +21,58 @@ namespace CloudFoundry.Build.Tasks
         }
 
         [Required]
-        public string ConfigurationFile { get; set; }
+        public string CFConfigurationFile { get; set; }
 
         [Output]
-        public string Stack { get; set; }
+        public string CFStack { get; set; }
 
         [Output]
-        public string AppName { get; set; }
+        public string CFAppName { get; set; }
 
         [Output]
-        public string AppPath { get; set; }
+        public string CFAppPath { get; set; }
 
         [Output]
-        public string[] Routes { get; set; }
+        public string[] CFRoutes { get; set; }
 
         [Output]
-        public int Memory { get; set; }
+        public int CFAppMemory { get; set; }
 
         [Output]
-        public int Instances { get; set; }
+        public int CFAppInstances { get; set; }
 
         [Output]
-        public string Autoscale { get; set; }
+        public string CFAutoscale { get; set; }
 
         [Output]
-        public int Disk { get; set; }
+        public int CFDisk { get; set; }
 
         [Output]
-        public string Services { get; set; }
+        public string CFServices { get; set; }
 
         [Output]
-        public string PlacementZone { get; set; }
+        public string CFPlacementZone { get; set; }
 
         [Output]
-        public string SsoEnabled { get; set; }
+        public string CFSsoEnabled { get; set; }
 
         private PushProperties Configuration { get; set; }
 
         public bool Execute()
         {
             logger = new Microsoft.Build.Utilities.TaskLoggingHelper(this);
-            logger.LogMessage("Loading configuration from {0}", ConfigurationFile);
+            logger.LogMessage("Loading configuration from {0}", CFConfigurationFile);
             try
             {
-                Configuration = Utils.DeserializeFromFile(ConfigurationFile);
-                Stack = Configuration.Stack;
-                AppName = Configuration.Name;
-                AppPath = Configuration.AppDir;
-                Routes = Configuration.Applications.Values.Select(o => o.Url).ToArray();
-                Memory = Configuration.Memory;
-                Instances = Configuration.Instances;
-                Autoscale = Utils.Serialize<Autoscale>(Configuration.AutoscaleInfo);
-                Disk = Configuration.Disk;
+                Configuration = Utils.DeserializeFromFile(CFConfigurationFile);
+                CFStack = Configuration.Stack;
+                CFAppName = Configuration.Name;
+                CFAppPath = Configuration.AppDir;
+                CFRoutes = Configuration.Applications.Values.Select(o => o.Url).ToArray();
+                CFAppMemory = Configuration.Memory;
+                CFAppInstances = Configuration.Instances;
+                CFAutoscale = Utils.Serialize<Autoscale>(Configuration.AutoscaleInfo);
+                CFDisk = Configuration.Disk;
 
                 List<ProvisionedService> servicesList = new List<ProvisionedService>();
                 foreach (var service in Configuration.Services)
@@ -80,9 +80,9 @@ namespace CloudFoundry.Build.Tasks
                     servicesList.Add(new ProvisionedService() { Name = service.Key, Plan = service.Value.Plan, Type = service.Value.Type });
                 }
 
-                Services = Utils.Serialize<List<ProvisionedService>>(servicesList);
-                PlacementZone = Configuration.PlacementZone;
-                SsoEnabled = Configuration.SsoEnabled;
+                CFServices = Utils.Serialize<List<ProvisionedService>>(servicesList);
+                CFPlacementZone = Configuration.PlacementZone;
+                CFSsoEnabled = Configuration.SsoEnabled;
 
                 //logger.LogMessage("Autoscale settings: {0}", Autoscale);
                 //logger.LogMessage("Services configuration: {0}", Services);

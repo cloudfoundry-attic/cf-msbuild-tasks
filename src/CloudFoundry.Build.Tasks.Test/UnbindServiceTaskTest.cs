@@ -37,12 +37,12 @@ namespace CloudFoundry.Build.Tasks.Test
                 TestUtils.InitTestMetadata();
 
                 UnbindService task = new UnbindService();
-                task.User = Settings.Default.User;
-                task.Password = Settings.Default.Password;
-                task.ServerUri = Settings.Default.ServerUri;
-                task.Space = "TestSpace";
-                task.AppName = "testApp";
-                task.ServiceName = "service1";
+                task.CFUser = Settings.Default.User;
+                task.CFPassword = Settings.Default.Password;
+                task.CFServerUri = Settings.Default.ServerUri;
+                task.CFSpace = "TestSpace";
+                task.CFAppName = "testApp";
+                task.CFServiceName = "service1";
                 task.BuildEngine = new FakeBuildEngine();
                 Assert.IsTrue(task.Execute());
             }
