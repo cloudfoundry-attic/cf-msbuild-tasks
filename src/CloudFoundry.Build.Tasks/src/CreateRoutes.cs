@@ -44,49 +44,53 @@ namespace CloudFoundry.Build.Tasks
 
             if (spaceGuid.HasValue)
             {
-                foreach (String url in CFRoutes)
+                foreach (String Route in CFRoutes)
                 {
-                    logger.LogMessage("Creating route {0}", url);
-                    string domain = string.Empty;
-                    string host = string.Empty;
-                    Utils.ExtractDomainAndHost(url, out domain, out host);
-
-                    if (domain.Length == 0 || host.Length == 0)
+                    if (Route.Contains(';'))
                     {
-                        logger.LogError("Error extracting domain and host information from route {0}", url);
-                        continue;
-                    }
-
-                    ListAllDomainsDeprecatedResponse domainInfo = domainInfoList.Where(o => o.Name == domain).FirstOrDefault();
-
-                    if (domainInfo == null)
-                    {
-                        logger.LogError("Domain {0} not found", domain);
-                        continue;
-                    }
-
-                    CreateRouteRequest req = new CreateRouteRequest();
-                    req.DomainGuid = new Guid(domainInfo.EntityMetadata.Guid);
-                    req.SpaceGuid = spaceGuid;
-                    req.Host = host;
-                    try
-                    {
-                        CreateRouteResponse response = client.Routes.CreateRoute(req).Result;
-                        createdGuid.Add(response.EntityMetadata.Guid);
-                    }
-                    catch (AggregateException ex)
-                    {
-                        foreach (Exception e in ex.Flatten().InnerExceptions)
+                        foreach (var url in Route.Split(';'))
                         {
-                            if (e is CloudFoundryException)
+                            logger.LogMessage("Creating route {0}", url);
+                            string domain = string.Empty;
+                            string host = string.Empty;
+                            Utils.ExtractDomainAndHost(url, out domain, out host);
+
+                            if (domain.Length == 0 || host.Length == 0)
                             {
-                                logger.LogWarning(e.Message);
+                                logger.LogError("Error extracting domain and host information from route {0}", url);
+                                continue;
                             }
-                            else
+
+                            ListAllDomainsDeprecatedResponse domainInfo = domainInfoList.Where(o => o.Name == domain).FirstOrDefault();
+
+                            if (domainInfo == null)
                             {
-                                throw;
+                                logger.LogError("Domain {0} not found", domain);
+                                continue;
                             }
+
+                            CreateRoute(client, spaceGuid, createdGuid, host, domainInfo);
                         }
+                    }
+                    else
+                    {
+                        string domain = string.Empty;
+                        string host = string.Empty;
+                        Utils.ExtractDomainAndHost(Route, out domain, out host);
+
+                        if (domain.Length == 0 || host.Length == 0)
+                        {
+                            logger.LogError("Error extracting domain and host information from route {0}", Route);
+                            continue;
+                        }
+                        ListAllDomainsDeprecatedResponse domainInfo = domainInfoList.Where(o => o.Name == domain).FirstOrDefault();
+
+                        if (domainInfo == null)
+                        {
+                            logger.LogError("Domain {0} not found", domain);
+                            continue;
+                        }
+                        CreateRoute(client, spaceGuid, createdGuid, host, domainInfo);
                     }
                 }
                 CFRouteGuids = createdGuid.ToArray();
@@ -98,6 +102,33 @@ namespace CloudFoundry.Build.Tasks
             }
 
             return true;
+        }
+
+        private void CreateRoute(CloudFoundryClient client, Guid? spaceGuid, List<string> createdGuid, string host, ListAllDomainsDeprecatedResponse domainInfo)
+        {
+            CreateRouteRequest req = new CreateRouteRequest();
+            req.DomainGuid = new Guid(domainInfo.EntityMetadata.Guid);
+            req.SpaceGuid = spaceGuid;
+            req.Host = host;
+            try
+            {
+                CreateRouteResponse response = client.Routes.CreateRoute(req).Result;
+                createdGuid.Add(response.EntityMetadata.Guid);
+            }
+            catch (AggregateException ex)
+            {
+                foreach (Exception e in ex.Flatten().InnerExceptions)
+                {
+                    if (e is CloudFoundryException)
+                    {
+                        logger.LogWarning(e.Message);
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+            }
         }
     }
 }
