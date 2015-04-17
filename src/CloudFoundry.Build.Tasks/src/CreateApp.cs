@@ -2,6 +2,7 @@
 using CloudFoundry.CloudController.V2.Client.Data;
 using CloudFoundry.UAA;
 using Microsoft.Build.Framework;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,11 +25,14 @@ namespace CloudFoundry.Build.Tasks
         public int CFAppMemory { get; set; }
         public int CFAppInstances { get; set; }
 
+        public string CFEnvironmentJson { get; set; }
+
         public string CFAppBuildpack { get; set; }
 
         [Output]
         public string CFAppGuid { get; set; }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling")]
         public override bool Execute()
         {
             logger = new Microsoft.Build.Utilities.TaskLoggingHelper(this);
@@ -75,7 +79,12 @@ namespace CloudFoundry.Build.Tasks
                     UpdateAppRequest request = new UpdateAppRequest();
                     request.SpaceGuid = spaceGuid;
                     request.StackGuid = stackGuid;
-                   
+                    
+                    if (CFEnvironmentJson != null)
+                    {
+                        request.EnvironmentJson = JsonConvert.DeserializeObject<Dictionary<string,string>>(CFEnvironmentJson);
+                    }
+
                     if (CFAppMemory > 0)
                     {
                         request.Memory = CFAppMemory;
@@ -99,6 +108,11 @@ namespace CloudFoundry.Build.Tasks
                     request.Name = CFAppName;
                     request.SpaceGuid = spaceGuid;
                     request.StackGuid = stackGuid;
+
+                    if(CFEnvironmentJson !=null){
+                        request.EnvironmentJson = JsonConvert.DeserializeObject<Dictionary<string,string>>(CFEnvironmentJson);
+                    }
+                   
                     if (CFAppMemory > 0)
                     {
                         request.Memory = CFAppMemory;

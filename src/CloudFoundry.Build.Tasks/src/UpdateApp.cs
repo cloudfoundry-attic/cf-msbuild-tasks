@@ -2,6 +2,7 @@
 using CloudFoundry.CloudController.V2.Client.Data;
 using CloudFoundry.UAA;
 using Microsoft.Build.Framework;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,6 +22,8 @@ namespace CloudFoundry.Build.Tasks
         public string CFAppBuildpack { get; set; }
 
         public string CFAppState { get; set; }
+
+        public string CFEnvironmentJson { get; set; }
 
         [Required]
         public string CFAppGuid { get; set; }
@@ -44,6 +47,11 @@ namespace CloudFoundry.Build.Tasks
             request.Instances = CFAppInstances;
             request.Buildpack = CFAppBuildpack;
             request.State = CFAppState;
+
+            if (CFEnvironmentJson != null)
+            {
+                request.EnvironmentJson = JsonConvert.DeserializeObject<Dictionary<string,string>>(CFEnvironmentJson);
+            }
 
             UpdateAppResponse response = client.Apps.UpdateApp(new Guid(CFAppGuid), request).Result;
 
