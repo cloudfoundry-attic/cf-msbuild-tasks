@@ -29,6 +29,7 @@ namespace CloudFoundry.Build.Tasks.IntegrationTests
             task.CFAppInstances = 1;
             task.CFSpace = "TestSpace";
             task.CFStack = "win2012";
+            task.CFEnvironmentJson = "{\"mykey\":\"abcd\",\"secondkey\":\"efgh\"}";
 
             task.BuildEngine = new FakeBuildEngine();
             task.Execute();
