@@ -68,13 +68,14 @@ function Remove-Resources($project) {
 	$projectName = $project.Name
 
 	# Remove cf publish profile from Proprties location
-	Remove-Item "$projectName\Properties\PublishProfiles\cf-push.pubxml" -Force | Out-Null
+	Remove-Item "$projectName\Properties\PublishProfiles\cf.pushxml" -Force | Out-Null
 
+	$publishProfile = "Properties\PublishProfiles\cf.pushxml"
 	# Remove Import Project cf publish profile from .csproj destination file
-	Remove-Import "Properties\PublishProfiles\cf-push.pubxml" $project.Name
+	Remove-Import $publishProfile $project.Name
 
 	# Remove Item None Include cf publish profile from .csproj destination file
-	Remove-ItemNoneInclude "Properties\PublishProfiles\cf-push.pubxml" $project.Name
+	Remove-ItemNoneInclude $publishProfile $project.Name
 }
 
 function Main 
