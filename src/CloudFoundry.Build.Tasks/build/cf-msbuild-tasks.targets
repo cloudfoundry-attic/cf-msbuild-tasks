@@ -38,7 +38,9 @@
     <Error Condition="'$(PublishTempAppPath)'==''" Text="The PublishTempAppPath property must be set to the intended publishing destination." />
     <MakeDir Condition="!Exists($(PublishTempAppPath))" Directories="$(PublishTempAppPath)" />
     <ItemGroup>
-      <PublishFiles Include="$(CFAppPath)\**\*.*" />
+      <PublishFiles 
+        Include="$(CFAppPath)\**\*.*"
+        Exclude = "$(CFAppPath)\packages\**\*.*"/>
     </ItemGroup>
     <Copy SourceFiles="@(PublishFiles)" DestinationFiles="@(PublishFiles->'$(PublishTempAppPath)\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="True" />
   </Target>

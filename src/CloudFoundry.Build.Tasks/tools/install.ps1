@@ -26,6 +26,7 @@ function Get-MSBuildProject {
         (Resolve-ProjectName $ProjectName) | % {
             $path = $_.FullName
             @([Microsoft.Build.Evaluation.ProjectCollection]::GlobalProjectCollection.GetLoadedProjects($path))[0]
+            
         }
     }
 }
@@ -38,9 +39,28 @@ function Add-Import {
         [string[]]$ProjectName
     )
     Process {
+        
         (Resolve-ProjectName $ProjectName) | %{
             $buildProject = $_ | Get-MSBuildProject
-            $buildProject.Xml.AddImport($Path)
+            $importElement = $buildProject.Xml.AddImport($Path)
+			$importElement.Condition = "Exists(`'${path}`')"
+            $_.Save()
+        }
+    }
+}
+
+function Add-ItemNoneInclude {
+    param(
+        [parameter(Position = 0, Mandatory = $true)]
+        [string]$Path,
+        [parameter(Position = 1, ValueFromPipelineByPropertyName = $true)]
+        [string[]]$ProjectName
+    )
+    Process {
+        
+        (Resolve-ProjectName $ProjectName) | %{
+            $buildProject = $_ | Get-MSBuildProject
+            $buildProject.Xml.AddItem("None", $Path)
             $_.Save()
         }
     }
@@ -54,11 +74,16 @@ function Copy-Resources($project) {
 		mkdir $publishProfilePath | Out-Null
 	}
 	
-	Add-Import "Properties\PublishProfiles\cf-push.pubxml" $project.Name
-
+	# Copy cf publish profile to Proprties location
 	Copy-Item "$toolsPath\cf-push.pubxml" $publishProfilePath -Force | Out-Null	
 
-	Write-Host "Copying cf-push.pubxml file to project folder."
+	$publishProfile = "Properties\PublishProfiles\cf-push.pubxml"
+
+	# Add Import Project cf publish profile to .csproj destination file
+	Add-Import $publishProfile $project.Name
+
+	# Add Item None Include cf publish profile to .csproj destination file
+	Add-ItemNoneInclude $publishProfile $project.Name
 }
 
 function Main 
