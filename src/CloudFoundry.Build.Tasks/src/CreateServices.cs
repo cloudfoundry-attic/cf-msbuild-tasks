@@ -18,8 +18,9 @@ namespace CloudFoundry.Build.Tasks
         public string CFSpace { get; set; }
 
         [Output]
-        public string[] ServicesGuids { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling")]
+        public string[] CFServicesGuids { get; set; }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes"), System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling")]
         public override bool Execute()
         {
 
@@ -41,8 +42,29 @@ namespace CloudFoundry.Build.Tasks
                     return false;
                 }
             }
+            List<ProvisionedService> servicesList = new List<ProvisionedService>();
+            try
+            {
+               string[] provServs = CFServices.Split(';');
 
-            List<ProvisionedService> servicesList = Utils.Deserialize<List<ProvisionedService>>(CFServices);
+               foreach (string service in provServs)
+               {
+                   string[] serviceInfo=service.Split(',');
+                   ProvisionedService serviceDetails = new ProvisionedService();
+                   
+                   serviceDetails.Name = serviceInfo[0];
+                   serviceDetails.Type = serviceInfo[1];
+                   serviceDetails.Plan = serviceInfo[2];
+
+                   servicesList.Add(serviceDetails);
+               }
+            }
+            catch(Exception ex)
+            {
+                logger.LogErrorFromException(ex);
+                logger.LogWarning("Error trying to obtain service information, trying to deserialize as xml");
+                servicesList = Utils.Deserialize<List<ProvisionedService>>(CFServices);
+            }
 
             List<string> serviceGuids = new List<string>();
 
@@ -76,7 +98,7 @@ namespace CloudFoundry.Build.Tasks
                 serviceGuids.Add(result.EntityMetadata.Guid);
             }
 
-            ServicesGuids = serviceGuids.ToArray();
+            CFServicesGuids = serviceGuids.ToArray();
 
             return true;
         }
