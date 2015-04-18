@@ -47,10 +47,34 @@ function Remove-Import {
     }
 }
 
+function Remove-ItemNoneInclude {
+    param(
+        [parameter(Position = 0, Mandatory = $true)]
+        [string]$Name,
+        [parameter(Position = 1, ValueFromPipelineByPropertyName = $true)]
+        [string[]]$ProjectName
+    )
+    Process {
+        (Resolve-ProjectName $ProjectName) | %{
+            $buildProject = $_ | Get-MSBuildProject
+			$itemToRemove = $buildProject.Xml.Items | Where-Object { $_.Include.Endswith($Name) }
+			$itemToRemove.Parent.RemoveChild($itemToRemove) | out-null
+            $_.Save()
+        }
+    }
+}
+
 function Remove-Resources($project) {
 	$projectName = $project.Name
+
+	# Remove cf publish profile from Proprties location
 	Remove-Item "$projectName\Properties\PublishProfiles\cf-push.pubxml" -Force | Out-Null
+
+	# Remove Import Project cf publish profile from .csproj destination file
 	Remove-Import "Properties\PublishProfiles\cf-push.pubxml" $project.Name
+
+	# Remove Item None Include cf publish profile from .csproj destination file
+	Remove-ItemNoneInclude "Properties\PublishProfiles\cf-push.pubxml" $project.Name
 }
 
 function Main 
