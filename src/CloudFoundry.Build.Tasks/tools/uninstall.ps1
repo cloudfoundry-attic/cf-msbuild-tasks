@@ -49,8 +49,8 @@ function Remove-Import {
 
 function Remove-Resources($project) {
 	$projectName = $project.Name
-	Remove-Item "$projectName\Properties\PublishProfiles\cf-push.pubxml" -Force | Out-Null
-	Remove-Import "Properties\PublishProfiles\cf-push.pubxml" $project.Name
+	#Remove-Item "$projectName\Properties\PublishProfiles\cf-push.pubxml" -Force | Out-Null
+	#Remove-Import "Properties\PublishProfiles\cf-push.pubxml" $project.Name
 }
 
 function Main 
