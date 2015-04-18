@@ -103,9 +103,28 @@ function Add-FileItemToProject($project, $toolsPath, $path, $file) {
 	return
 }
 
+function UpdateDeployTargetFile($project, $xmlfile) {
+	
+	if ($project.DTE.Solution.IsOpen) {
+		$dir = Split-Path $project.DTE.Solution.FileName -Parent
+	}
+	else {
+		$dir = Split-Path $project.FileName -Parent
+	}
+
+	$tar = Get-ChildItem $dir -File "cf-msbuild-tasks.targets" -Recurse | Select-Object -First 1
+	$rel = Resolve-Path $target.FullName -Relative
+
+	$xml = [xml] (Get-Content $xmlfile)
+	$xml.Project.PropertyGroup.DeployTargetFile = [string]$rel
+	$xml.Save($xmlfile)
+}
+
 function Main 
 {
-	Add-FileItemToProject $project $toolsPath "Properties\PublishProfiles" "cf-push.pubxml"
+	Copy-Item -Path (Join-Path $toolsPath "cf-push.pubxml") -Destination (Join-Path $toolsPath "profile.cf.pubxml") -Force | Out-Null
+	UpdateDeployTargetFile $project (Join-Path $toolsPath "profile.cf.pubxml")
+	Add-FileItemToProject $project $toolsPath "Properties\PublishProfiles" "profile.cf.pubxml"
 }
 
 Main
