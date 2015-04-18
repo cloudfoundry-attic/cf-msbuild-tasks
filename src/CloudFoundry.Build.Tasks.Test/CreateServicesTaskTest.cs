@@ -54,7 +54,7 @@ namespace CloudFoundry.Build.Tasks.Test
 
                 task.Execute();
 
-                Assert.AreEqual(task.ServicesGuids.Length, 2);
+                Assert.AreEqual(task.CFServicesGuids.Length, 2);
             }
         }
     }
