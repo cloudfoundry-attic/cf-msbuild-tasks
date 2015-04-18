@@ -22,7 +22,7 @@
   
 	<files>
     <file src="build\cf-msbuild-tasks.targets"                                    target="build\net45\cf-msbuild-tasks.targets" />
-    <file src="tools\cf-push.pubxml"                                              target="tools\cf-push.pubxml" />
+    <file src="tools\cf.pushxml"                                                  target="tools\cf.pushxml" />
     <file src="tools\install.ps1"                                                 target="tools\install.ps1" />
     <file src="tools\uninstall.ps1"                                               target="tools\uninstall.ps1" />
     

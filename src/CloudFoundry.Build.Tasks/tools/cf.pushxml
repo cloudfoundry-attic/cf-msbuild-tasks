@@ -11,7 +11,7 @@
     <CFServiceName>test</CFServiceName>
     <CFServicePlan>free</CFServicePlan>
     <CFServiceType>mysql</CFServiceType>
-
+  
     <CFConfigurationFile>C:\test\manifest.yaml</CFConfigurationFile>
 
     <CFAppName>test</CFAppName>

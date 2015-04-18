@@ -75,9 +75,9 @@ function Copy-Resources($project) {
 	}
 	
 	# Copy cf publish profile to Proprties location
-	Copy-Item "$toolsPath\cf-push.pubxml" $publishProfilePath -Force | Out-Null	
+	Copy-Item "$toolsPath\cf.pushxml" $publishProfilePath -Force | Out-Null	
 
-	$publishProfile = "Properties\PublishProfiles\cf-push.pubxml"
+	$publishProfile = "Properties\PublishProfiles\cf.pushxml"
 
 	# Add Import Project cf publish profile to .csproj destination file
 	Add-Import $publishProfile $project.Name
