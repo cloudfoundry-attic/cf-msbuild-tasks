@@ -1,4 +1,6 @@
-﻿using System;
+﻿using CloudFoundry.CloudController.V2.Client;
+using CloudFoundry.CloudController.V2.Client.Data;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -94,6 +96,27 @@ namespace CloudFoundry.Build.Tasks
             Route = Route.Replace("http://", string.Empty).Replace("https://", string.Empty);
             domain = Route.Substring(Route.IndexOf('.') + 1);
             host = Route.Split('.').First().ToLower(CultureInfo.InvariantCulture);
+        }
+
+        internal static bool CheckForExistingService(string ServiceName, Guid? planGuid, CloudFoundryClient client)
+        {
+            bool exists = false;
+
+            PagedResponseCollection<ListAllServiceInstancesResponse> serviceInstances = client.ServiceInstances.ListAllServiceInstances().Result;
+
+            foreach (ListAllServiceInstancesResponse serviceInstanceDetails in serviceInstances)
+            {
+                if (serviceInstanceDetails.ServicePlanGuid.HasValue)
+                {
+                    if (serviceInstanceDetails.Name == ServiceName && serviceInstanceDetails.ServicePlanGuid.Value == planGuid)
+                    {
+                        exists = true;
+                        break;
+                    }
+                }
+            }
+
+            return exists;
         }
     }
 }

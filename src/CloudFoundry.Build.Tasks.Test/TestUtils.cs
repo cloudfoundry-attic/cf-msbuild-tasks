@@ -274,5 +274,15 @@ namespace CloudFoundry.Build.Tasks.Test
         {
          
         }
+
+        internal static Task<PagedResponseCollection<ListAllServiceInstancesResponse>> CustomListAllServiceInstancesPlain(CloudController.V2.Client.Base.AbstractServiceInstancesEndpoint arg1)
+        {
+            return Task.Factory.StartNew<PagedResponseCollection<ListAllServiceInstancesResponse>>(() => { return new PagedResponseCollection<ListAllServiceInstancesResponse>(); });
+        }
+
+        internal static List<ListAllServiceInstancesResponse> CustomListAllServiceInstancesPlainResponse(PagedResponseCollection<ListAllServiceInstancesResponse> arg1)
+        {
+            return new List<ListAllServiceInstancesResponse>();
+        }
     }
 }
