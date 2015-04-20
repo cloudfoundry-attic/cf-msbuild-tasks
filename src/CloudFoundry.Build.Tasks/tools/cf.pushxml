@@ -8,9 +8,7 @@
     <CFInstancesNumber>1</CFInstancesNumber>
     <CFStack>win2012</CFStack>
     <CFRoutes>test.1.2.3.4.xip.io</CFRoutes>
-    <CFServiceName>test</CFServiceName>
-    <CFServicePlan>free</CFServicePlan>
-    <CFServiceType>mysql</CFServiceType>
+    <CFServices>test,mysql,free</CFServices>
   
     <CFConfigurationFile>C:\test\manifest.yaml</CFConfigurationFile>
 
