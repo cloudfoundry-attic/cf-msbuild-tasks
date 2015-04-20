@@ -30,6 +30,10 @@ namespace CloudFoundry.Build.Tasks.Test
 
                 CloudFoundry.CloudController.V2.Client.Base.Fakes.ShimAbstractServiceInstancesEndpoint.AllInstances.CreateServiceInstanceCreateServiceInstanceRequest = TestUtils.CustomCreateServiceInstance;
 
+                CloudFoundry.CloudController.V2.Client.Base.Fakes.ShimAbstractServiceInstancesEndpoint.AllInstances.ListAllServiceInstances = TestUtils.CustomListAllServiceInstancesPlain;
+
+                CloudFoundry.CloudController.V2.Client.Fakes.ShimPagedResponseCollection<ListAllServiceInstancesResponse>.AllInstances.ResourcesGet = TestUtils.CustomListAllServiceInstancesPlainResponse;
+
                 TestUtils.InitTestMetadata();
 
                 CreateServices task = new CreateServices();

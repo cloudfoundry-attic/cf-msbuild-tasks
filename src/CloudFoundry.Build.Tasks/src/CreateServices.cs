@@ -87,6 +87,12 @@ namespace CloudFoundry.Build.Tasks
                     }
                 }
 
+                if (Utils.CheckForExistingService(service.Name, planGuid, client) == true)
+                {
+                    logger.LogMessage("Service {0} - {1} already exists -> skipping", service.Name, service.Type);
+                    continue;
+                }
+
                 CreateServiceInstanceRequest request = new CreateServiceInstanceRequest();
 
                 request.Name = service.Name;
