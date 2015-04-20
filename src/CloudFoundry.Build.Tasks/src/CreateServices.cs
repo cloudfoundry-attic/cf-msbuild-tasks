@@ -86,10 +86,11 @@ namespace CloudFoundry.Build.Tasks
                         break;
                     }
                 }
-
-                if (Utils.CheckForExistingService(service.Name, planGuid, client) == true)
+                Guid? serviceInstanceGuid=null;
+                if ((serviceInstanceGuid=Utils.CheckForExistingService(service.Name, planGuid, client)) != null)
                 {
                     logger.LogMessage("Service {0} - {1} already exists -> skipping", service.Name, service.Type);
+                    serviceGuids.Add(serviceInstanceGuid.Value.ToString());
                     continue;
                 }
 
