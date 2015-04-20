@@ -98,10 +98,8 @@ namespace CloudFoundry.Build.Tasks
             host = Route.Split('.').First().ToLower(CultureInfo.InvariantCulture);
         }
 
-        internal static bool CheckForExistingService(string ServiceName, Guid? planGuid, CloudFoundryClient client)
+        internal static Guid? CheckForExistingService(string ServiceName, Guid? planGuid, CloudFoundryClient client)
         {
-            bool exists = false;
-
             PagedResponseCollection<ListAllServiceInstancesResponse> serviceInstances = client.ServiceInstances.ListAllServiceInstances().Result;
 
             foreach (ListAllServiceInstancesResponse serviceInstanceDetails in serviceInstances)
@@ -110,13 +108,12 @@ namespace CloudFoundry.Build.Tasks
                 {
                     if (serviceInstanceDetails.Name == ServiceName && serviceInstanceDetails.ServicePlanGuid.Value == planGuid)
                     {
-                        exists = true;
-                        break;
+                        return serviceInstanceDetails.EntityMetadata.Guid.ToNullableGuid();
                     }
                 }
             }
 
-            return exists;
+            return null;
         }
     }
 }
