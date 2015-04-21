@@ -63,7 +63,7 @@
       <Output TaskParameter="CFRefreshToken" PropertyName="CFRefreshToken"/>
     </LoginTask>
 
-    <CreateApp CFAppName="$(CFAppName)" CFStack="$(CFStack)" CFSpace="$(CFSpace)" CFServerUri="$(CFServerUri)" CFEnvironmentJson="$(CFEnvironmentJson)" CFRefreshToken="$(CFRefreshToken)" CFAppMemory="$(CFMemory)" CFAppInstances="$(CFInstancesNumber)">
+    <CreateApp CFAppName="$(CFAppName)" CFStack="$(CFStack)" CFSpace="$(CFSpace)" CFServerUri="$(CFServerUri)" CFEnvironmentJson="$(CFEnvironmentJson)" CFRefreshToken="$(CFRefreshToken)" CFAppMemory="$(CFAppMemory)" CFAppInstances="$(CFAppInstances)">
       <Output TaskParameter="CFAppGuid" PropertyName="CFAppGuid"/>
     </CreateApp>
 
