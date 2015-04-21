@@ -15,6 +15,9 @@ namespace CloudFoundry.Build.Tasks
         public string CFServiceName { get; set; }
 
         [Required]
+        public string CFOrganization { get; set; }
+
+        [Required]
         public string CFSpace { get; set; }
 
         public override bool Execute()
@@ -28,15 +31,11 @@ namespace CloudFoundry.Build.Tasks
 
             Guid? spaceGuid = null;
 
-            if (CFSpace.Length > 0)
+            if (CFSpace.Length > 0 && CFOrganization.Length > 0)
             {
-                PagedResponseCollection<ListAllSpacesResponse> spaceList = client.Spaces.ListAllSpaces(new RequestOptions() { Query = "name:" + CFSpace }).Result;
-
-                spaceGuid = new Guid(spaceList.FirstOrDefault().EntityMetadata.Guid);
-            
+                spaceGuid = Utils.GetSpaceGuid(client, logger, CFOrganization, CFSpace);
                 if (spaceGuid == null)
                 {
-                    logger.LogError("Space {0} not found", CFSpace);
                     return false;
                 }
             }

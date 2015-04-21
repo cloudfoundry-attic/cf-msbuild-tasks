@@ -115,5 +115,40 @@ namespace CloudFoundry.Build.Tasks
 
             return null;
         }
+
+
+        internal static Guid? GetSpaceGuid(CloudFoundryClient client,Microsoft.Build.Utilities.TaskLoggingHelper logger, string CFOrganization, string CFSpace)
+        {
+            Guid? spaceGuid=null;
+            PagedResponseCollection<ListAllOrganizationsResponse> orgList = client.Organizations.ListAllOrganizations(new RequestOptions() { Query = "name:" + CFOrganization }).Result;
+
+            if (orgList.Count() > 1)
+            {
+                logger.LogError("There are more than one organization with name {0}, organization names need to be unique", CFOrganization);
+                return null;
+            }
+
+            ListAllOrganizationsResponse orgInfo = orgList.FirstOrDefault();
+            if (orgInfo != null)
+            {
+                PagedResponseCollection<ListAllSpacesForOrganizationResponse> spaceList = client.Organizations.ListAllSpacesForOrganization(orgInfo.EntityMetadata.Guid.ToNullableGuid(), new RequestOptions() { Query = "name:" + CFSpace }).Result;
+
+                if (spaceList.Count() > 1)
+                {
+                    logger.LogError("There are more than one space with name {0} in organization {1}", CFSpace, CFOrganization);
+                    return null;
+                }
+                if (spaceList.FirstOrDefault() != null)
+                {
+                    spaceGuid = new Guid(spaceList.FirstOrDefault().EntityMetadata.Guid);
+                }
+                else
+                {
+                    logger.LogError("Space {0} not found", CFSpace);
+                    return null;
+                }
+            }
+            return spaceGuid;
+        }
     }
 }

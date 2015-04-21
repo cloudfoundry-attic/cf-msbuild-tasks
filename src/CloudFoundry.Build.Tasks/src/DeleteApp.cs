@@ -16,6 +16,9 @@ namespace CloudFoundry.Build.Tasks
         public string CFAppName { get; set; }
 
         [Required]
+        public string CFOrganization { get; set; }
+
+        [Required]
         public string CFSpace { get; set; }
 
         public bool CFDeleteRoutes { get; set; }
@@ -32,15 +35,15 @@ namespace CloudFoundry.Build.Tasks
 
             logger.LogMessage("Deleting application {0} from space {1}", CFAppName, CFSpace);
 
-            PagedResponseCollection<ListAllSpacesResponse> spaceList = client.Spaces.ListAllSpaces(new RequestOptions() { Query = "name:" + CFSpace }).Result;
-
             Guid? spaceGuid = null;
-            spaceGuid= new Guid(spaceList.FirstOrDefault().EntityMetadata.Guid);
 
-            if (spaceGuid == null)
+            if (CFSpace.Length > 0 && CFOrganization.Length > 0)
             {
-                logger.LogError("Space {0} not found", CFSpace);
-                return false;
+                spaceGuid = Utils.GetSpaceGuid(client, logger, CFOrganization, CFSpace);
+                if (spaceGuid == null)
+                {
+                    return false;
+                }
             }
 
             PagedResponseCollection<ListAllAppsForSpaceResponse> appList = client.Spaces.ListAllAppsForSpace(spaceGuid, new RequestOptions() { Query = "name:" + CFAppName }).Result;

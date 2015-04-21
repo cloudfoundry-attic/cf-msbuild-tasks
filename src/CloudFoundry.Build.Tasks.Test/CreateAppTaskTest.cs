@@ -34,6 +34,14 @@ namespace CloudFoundry.Build.Tasks.Test
 
                 CloudFoundry.CloudController.V2.Client.Base.Fakes.ShimAbstractSpacesEndpoint.AllInstances.ListAllAppsForSpaceNullableOfGuidRequestOptions = TestUtils.CustomListAllAppsForSpace;
 
+                CloudFoundry.CloudController.V2.Client.Fakes.ShimPagedResponseCollection<ListAllOrganizationsResponse>.AllInstances.ResourcesGet = TestUtils.CustomListAllOrganizationsResponse;
+
+                CloudFoundry.CloudController.V2.Client.Base.Fakes.ShimAbstractOrganizationsEndpoint.AllInstances.ListAllOrganizationsRequestOptions = TestUtils.CustomListAllOrganizations;
+
+                CloudFoundry.CloudController.V2.Client.Fakes.ShimPagedResponseCollection<ListAllSpacesForOrganizationResponse>.AllInstances.ResourcesGet = TestUtils.CustomListAllSpacesForOrganizationResponse;
+
+                CloudFoundry.CloudController.V2.Client.Base.Fakes.ShimAbstractOrganizationsEndpoint.AllInstances.ListAllSpacesForOrganizationNullableOfGuidRequestOptions = TestUtils.CustomListAllSpacesForOrganization;
+
                 TestUtils.InitTestMetadata();
 
                 CreateApp task = new CreateApp();
@@ -41,6 +49,7 @@ namespace CloudFoundry.Build.Tasks.Test
                 task.CFPassword = Settings.Default.Password;
                 task.CFServerUri = Settings.Default.ServerUri;
                 task.CFSpace= "TestSpace";
+                task.CFOrganization = "TestOrg";
                 task.CFStack = "testStack";
 
                 task.BuildEngine = new FakeBuildEngine();
