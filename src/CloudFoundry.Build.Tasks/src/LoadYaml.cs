@@ -107,8 +107,6 @@ namespace CloudFoundry.Build.Tasks
                 CFPlacementZone = Configuration.PlacementZone;
                 CFSsoEnabled = Configuration.SsoEnabled;
 
-                //logger.LogMessage("Autoscale settings: {0}", Autoscale);
-                //logger.LogMessage("Services configuration: {0}", Services);
                 logger.LogMessage("Configuration loaded");
             }
             catch (Exception ex)

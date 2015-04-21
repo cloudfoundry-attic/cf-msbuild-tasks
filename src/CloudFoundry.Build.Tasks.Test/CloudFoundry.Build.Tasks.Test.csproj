@@ -52,7 +52,7 @@
     <Reference Include="CloudFoundry.Logyard.Client">
       <HintPath>..\..\packages\cf-dotnet-sdk.1.0.0.148\lib\Net45\CloudFoundry.Logyard.Client.dll</HintPath>
     </Reference>
-	<Reference Include="CloudFoundry.Logyard.Client.1.0.0.132.Fakes">
+    <Reference Include="CloudFoundry.Logyard.Client.1.0.0.132.Fakes">
       <HintPath>FakesAssemblies\CloudFoundry.Logyard.Client.1.0.0.132.Fakes.dll</HintPath>
     </Reference>
     <Reference Include="CloudFoundry.Logyard.Client.1.0.0.148.Fakes">
@@ -122,6 +122,8 @@
     <Compile Include="DeleteServiceTaskTest.cs" />
     <Compile Include="UnbindRoutesTaskTest.cs" />
     <Compile Include="UnbindServiceTaskTest.cs" />
+    <Compile Include="LoadYamlTaskTest.cs" />
+    <Compile Include="SaveYamlTaskTest.cs" />
     <Compile Include="UpdateAppTaskTest.cs" />
   </ItemGroup>
   <ItemGroup>
