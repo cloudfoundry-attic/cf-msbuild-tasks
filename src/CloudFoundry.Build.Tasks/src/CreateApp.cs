@@ -17,6 +17,9 @@ namespace CloudFoundry.Build.Tasks
         public string CFAppName { get; set;}
 
         [Required]
+        public string CFOrganization { get; set; }
+
+        [Required]
         public string CFSpace { get; set; }
 
         [Required]
@@ -41,15 +44,11 @@ namespace CloudFoundry.Build.Tasks
             Guid? spaceGuid = null;
             Guid? stackGuid = null;
 
-            if (CFSpace.Length > 0)
+            if (CFSpace.Length > 0 && CFOrganization.Length > 0)
             {
-                PagedResponseCollection<ListAllSpacesResponse> spaceList = client.Spaces.ListAllSpaces(new RequestOptions() { Query = "name:" + CFSpace }).Result;
-
-                spaceGuid = new Guid(spaceList.FirstOrDefault().EntityMetadata.Guid);
-
+                spaceGuid = Utils.GetSpaceGuid(client,logger,CFOrganization,CFSpace);
                 if (spaceGuid == null)
                 {
-                    logger.LogError("Space {0} not found", CFSpace);
                     return false;
                 }
             }
@@ -134,6 +133,7 @@ namespace CloudFoundry.Build.Tasks
 
             return true;
         }
+
 
     }
 }

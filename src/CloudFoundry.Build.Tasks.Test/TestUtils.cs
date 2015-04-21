@@ -284,5 +284,26 @@ namespace CloudFoundry.Build.Tasks.Test
         {
             return new List<ListAllServiceInstancesResponse>();
         }
+
+        internal static Task<PagedResponseCollection<ListAllOrganizationsResponse>> CustomListAllOrganizations(CloudController.V2.Client.Base.AbstractOrganizationsEndpoint arg1, RequestOptions arg2)
+        {
+            return Task.Factory.StartNew(() => { return new PagedResponseCollection<ListAllOrganizationsResponse>(); });
+        }
+
+        internal static List<ListAllOrganizationsResponse> CustomListAllOrganizationsResponse(PagedResponseCollection<ListAllOrganizationsResponse> arg1)
+        {
+            return new List<ListAllOrganizationsResponse>() { new ListAllOrganizationsResponse(){ EntityMetadata=new Metadata()}};
+
+        }
+
+        internal static Task<PagedResponseCollection<ListAllSpacesForOrganizationResponse>> CustomListAllSpacesForOrganization(CloudController.V2.Client.Base.AbstractOrganizationsEndpoint arg1, Guid? arg2, RequestOptions arg3)
+        {
+            return Task.Factory.StartNew(() => { return new PagedResponseCollection<ListAllSpacesForOrganizationResponse>(); });
+        }
+
+        internal static List<ListAllSpacesForOrganizationResponse> CustomListAllSpacesForOrganizationResponse(PagedResponseCollection<ListAllSpacesForOrganizationResponse> arg1)
+        {
+            return new List<ListAllSpacesForOrganizationResponse>() {new ListAllSpacesForOrganizationResponse(){ EntityMetadata=new Metadata(), Name="TestSpace"}};
+        }
     }
 }

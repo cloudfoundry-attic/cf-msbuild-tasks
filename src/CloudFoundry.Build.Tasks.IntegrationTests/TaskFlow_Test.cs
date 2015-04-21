@@ -28,6 +28,7 @@ namespace CloudFoundry.Build.Tasks.IntegrationTests
             task.CFAppMemory = 512;
             task.CFAppInstances = 1;
             task.CFSpace = "TestSpace";
+            task.CFOrganization = "TestOrg";
             task.CFStack = "win2012";
             task.CFEnvironmentJson = "{\"mykey\":\"abcd\",\"secondkey\":\"efgh\"}";
 
@@ -54,6 +55,8 @@ namespace CloudFoundry.Build.Tasks.IntegrationTests
 
             routeTask.CFRoutes = new string[1] { "testRoute.15.126.213.170.xip.io" };
             routeTask.CFSpace = "TestSpace";
+            routeTask.CFOrganization = "TestOrg";
+
             routeTask.BuildEngine=new FakeBuildEngine();
 
             routeTask.Execute();
@@ -80,7 +83,7 @@ namespace CloudFoundry.Build.Tasks.IntegrationTests
             serviceTask.CFServicePlan = "free";
             serviceTask.CFServiceType = "mysql";
             serviceTask.CFSpace = "TestSpace";
-
+            serviceTask.CFOrganization = "TestOrg";
             serviceTask.Execute();
 
             BindServices bindServiceTask = new BindServices();
@@ -101,6 +104,7 @@ namespace CloudFoundry.Build.Tasks.IntegrationTests
                 delTask.CFPassword = Settings.Default.Password;
                 delTask.CFServerUri = Settings.Default.ServerUri;
 
+                delTask.CFOrganization = "TestOrg";
                 delTask.CFSpace = "TestSpace";
                 delTask.CFAppName = "testIntegration";
                 delTask.CFDeleteServices = true;

@@ -18,6 +18,9 @@ namespace CloudFoundry.Build.Tasks
         public String[] CFRoutes { get; set; }
 
         [Required]
+        public string CFOrganization { get; set; }
+
+        [Required]
         public String CFSpace { get; set; }
 
         [Output]
@@ -32,11 +35,15 @@ namespace CloudFoundry.Build.Tasks
 
             Guid? spaceGuid = null;
 
-            if (CFSpace.Length > 0)
+            if (CFSpace.Length > 0 && CFOrganization.Length > 0)
             {
-                PagedResponseCollection<ListAllSpacesResponse> spaceList = client.Spaces.ListAllSpaces(new RequestOptions() { Query = "name:" + CFSpace }).Result;
 
-                spaceGuid = new Guid(spaceList.FirstOrDefault().EntityMetadata.Guid);
+                spaceGuid = Utils.GetSpaceGuid(client, logger, CFOrganization, CFSpace);
+
+                if (spaceGuid == null)
+                {
+                    return false;
+                }
             }
 
             List<string> createdGuid = new List<string>();
