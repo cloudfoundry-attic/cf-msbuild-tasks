@@ -30,6 +30,10 @@ namespace CloudFoundry.Build.Tasks.Test
 
                 CloudFoundry.CloudController.V2.Client.Base.Fakes.ShimAbstractRoutesEndpoint.AllInstances.CreateRouteCreateRouteRequest = TestUtils.CustomCreateRoute;
 
+                CloudFoundry.CloudController.V2.Client.Fakes.ShimPagedResponseCollection<ListAllRoutesResponse>.AllInstances.ResourcesGet = TestUtils.CustomListAllRoutesResponse;
+
+                CloudFoundry.CloudController.V2.Client.Base.Fakes.ShimAbstractRoutesEndpoint.AllInstances.ListAllRoutesRequestOptions = TestUtils.CustomListAllRoutes;
+
                 TestUtils.InitTestMetadata();
 
                 CreateRoutes task = new CreateRoutes();

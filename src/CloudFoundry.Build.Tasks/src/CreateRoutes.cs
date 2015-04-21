@@ -112,8 +112,23 @@ namespace CloudFoundry.Build.Tasks
             req.Host = host;
             try
             {
-                CreateRouteResponse response = client.Routes.CreateRoute(req).Result;
-                createdGuid.Add(response.EntityMetadata.Guid);
+
+                var routes = client.Routes.ListAllRoutes(new RequestOptions() { Query = string.Format(CultureInfo.InvariantCulture, "host:{0}&domain_guid:{1}", host, domainInfo.EntityMetadata.Guid) }).Result;
+
+                if (routes.Count() > 0)
+                {
+                    ListAllRoutesResponse routeInfo = routes.FirstOrDefault();
+                    logger.LogMessage("Route {0}.{1} already exists", routeInfo.Host, routeInfo.DomainUrl);
+                    if (routeInfo != null)
+                    {
+                        createdGuid.Add(routeInfo.EntityMetadata.Guid);
+                    }
+                }
+                else
+                {
+                    CreateRouteResponse response = client.Routes.CreateRoute(req).Result;
+                    createdGuid.Add(response.EntityMetadata.Guid);
+                }
             }
             catch (AggregateException ex)
             {
