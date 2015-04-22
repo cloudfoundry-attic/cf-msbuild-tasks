@@ -63,19 +63,19 @@
       <Output TaskParameter="CFRefreshToken" PropertyName="CFRefreshToken"/>
     </LoginTask>
 
-    <CreateApp CFAppName="$(CFAppName)" CFStack="$(CFStack)" CFSpace="$(CFSpace)" CFServerUri="$(CFServerUri)" CFEnvironmentJson="$(CFEnvironmentJson)" CFRefreshToken="$(CFRefreshToken)" CFAppMemory="$(CFAppMemory)" CFAppInstances="$(CFAppInstances)">
+    <CreateApp CFAppName="$(CFAppName)" CFStack="$(CFStack)" CFOrganization="$(CFOrganization)" CFSpace="$(CFSpace)" CFServerUri="$(CFServerUri)" CFEnvironmentJson="$(CFEnvironmentJson)" CFRefreshToken="$(CFRefreshToken)" CFAppMemory="$(CFAppMemory)" CFAppInstances="$(CFAppInstances)">
       <Output TaskParameter="CFAppGuid" PropertyName="CFAppGuid"/>
     </CreateApp>
 
     <PushApp CFAppGuid="$(CFAppGuid)" CFAppPath="$(PublishTempAppPath)" CFStart="false" CFServerUri="$(CFServerUri)" CFRefreshToken="$(CFRefreshToken)"></PushApp>
 
-    <CreateRoutes Condition="'$(CFRoutes)' != ''" CFServerUri="$(CFServerUri)" CFRefreshToken="$(CFRefreshToken)" CFSpace="$(CFSpace)" CFRoutes="@(CFRoutes)">
+    <CreateRoutes Condition="'$(CFRoutes)' != ''" CFServerUri="$(CFServerUri)" CFRefreshToken="$(CFRefreshToken)" CFOrganization="$(CFOrganization)" CFSpace="$(CFSpace)" CFRoutes="@(CFRoutes)">
       <Output TaskParameter="CFRouteGuids" PropertyName="CFRouteGuids"></Output>
     </CreateRoutes>
 
     <BindRoutes CFServerUri="$(CFServerUri)" CFRefreshToken="$(CFRefreshToken)" CFAppGuid="$(CFAppGuid)" CFRouteGuids="$(CFRouteGuids)"></BindRoutes>
 
-    <CreateServices Condition="'$(CFServices)' != ''" CFServerUri="$(CFServerUri)" CFRefreshToken="$(CFRefreshToken)" CFServices="$(CFServices)" CFSpace="$(CFSpace)">
+    <CreateServices Condition="'$(CFServices)' != ''" CFServerUri="$(CFServerUri)" CFRefreshToken="$(CFRefreshToken)" CFServices="$(CFServices)" CFOrganization="$(CFOrganization)" CFSpace="$(CFSpace)">
       <Output TaskParameter="CFServicesGuids" PropertyName="CFServicesGuids"></Output>
     </CreateServices>
 
@@ -97,7 +97,7 @@
       <Output TaskParameter="CFRefreshToken" PropertyName="CFRefreshToken"/>
     </LoginTask>
 
-    <DeleteApp CFServerUri="$(CFServerUri)" CFRefreshToken="$(CFRefreshToken)" CFAppName="$(CFAppName)" CFSpace="$(CFSpace)" CFDeleteRoutes="true" CFDeleteServices="true"></DeleteApp>
+    <DeleteApp CFServerUri="$(CFServerUri)" CFRefreshToken="$(CFRefreshToken)" CFAppName="$(CFAppName)" CFOrganization="$(CFOrganization)" CFSpace="$(CFSpace)" CFDeleteRoutes="true" CFDeleteServices="true"></DeleteApp>
   </Target>
 
 </Project>
