@@ -148,6 +148,11 @@ namespace CloudFoundry.Build.Tasks
                     return null;
                 }
             }
+            else
+            {
+                logger.LogError("Organization {0} not found", CFOrganization);
+                return null;
+            }
             return spaceGuid;
         }
     }
