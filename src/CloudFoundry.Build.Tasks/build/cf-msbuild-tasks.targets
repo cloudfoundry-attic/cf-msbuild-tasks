@@ -59,7 +59,7 @@
       <CFEnvironmentJson Condition="'$(CFLocalBuild)'=='false'" Include="{&quot;PUBLISH_WEBSITE&quot;: &quot;$(CFAppName)&quot;, &quot;MSBUILD_CONFIGURATION&quot;: &quot;$(CFMSBuildConfiguration)&quot;, &quot;MSBUILD_PLATFORM&quot;: &quot;$(CFMSBuildPlatform)&quot;}"></CFEnvironmentJson>
     </ItemGroup>
 
-    <LoginTask CFUser="$(CFUser)" CFPassword="$(CFPassword)" CFServerUri="$(CFServerUri)">
+    <LoginTask Condition="'$(CFUser)' != '' AND '$(CFPassword)' != ''" CFUser="$(CFUser)" CFPassword="$(CFPassword)" CFServerUri="$(CFServerUri)">
       <Output TaskParameter="CFRefreshToken" PropertyName="CFRefreshToken"/>
     </LoginTask>
 
@@ -93,7 +93,7 @@
       <CFRefreshToken Include="$(CFRefreshToken)"></CFRefreshToken>
     </ItemGroup>
 
-    <LoginTask CFUser="$(CFUser)" CFPassword="$(CFPassword)" CFServerUri="$(CFServerUri)">
+    <LoginTask Condition="'$(CFUser)' != '' AND '$(CFPassword)' != ''" CFUser="$(CFUser)" CFPassword="$(CFPassword)" CFServerUri="$(CFServerUri)">
       <Output TaskParameter="CFRefreshToken" PropertyName="CFRefreshToken"/>
     </LoginTask>
 
