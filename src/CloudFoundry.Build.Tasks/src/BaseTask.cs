@@ -2,12 +2,9 @@
 using CloudFoundry.UAA;
 using Microsoft.Build.Framework;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Globalization;
+using System.Security.Authentication;
 
-[assembly:CLSCompliant(true)]
 namespace CloudFoundry.Build.Tasks
 {
     public class BaseTask : ITask
@@ -30,6 +27,8 @@ namespace CloudFoundry.Build.Tasks
 
         public string CFPassword { get; set; }
 
+        public bool CFSavedPassword { get; set; }
+
         public string CFRefreshToken { get; set; }
 
         [Required]
@@ -42,14 +41,27 @@ namespace CloudFoundry.Build.Tasks
 
         internal CloudFoundryClient InitClient()
         {
-
             //skip ssl
             System.Net.ServicePointManager.ServerCertificateValidationCallback = ((sender, certificate, chain, sslPolicyErrors) => true);
 
             CloudFoundryClient client = new CloudFoundryClient(new Uri(CFServerUri), new System.Threading.CancellationToken());
 
-            if (CFUser != null && CFPassword != null)
+            if (CFUser != null && (CFPassword != null || CFSavedPassword))
             {
+                if (CFPassword == null)
+                {
+                    this.CFPassword = CloudCredentialsManager.GetPassword(new Uri(this.CFServerUri), this.CFUser);
+
+                    if (this.CFPassword == null)
+                    {
+                        throw new AuthenticationException(
+                            string.Format(CultureInfo.InvariantCulture,
+                            "Could not find a password for user '{0}' and target '{1}' in your local credentials store. Either make sure the entry exists in your credentials store, or provide CFPassword.",
+                            this.CFUser,
+                            this.CFServerUri));
+                    }
+                }
+
                 CloudCredentials creds = new CloudCredentials();
                 creds.User = CFUser;
                 creds.Password = CFPassword;
@@ -61,11 +73,10 @@ namespace CloudFoundry.Build.Tasks
             }
             else
             {
-                throw new System.Security.Authentication.AuthenticationException("Could not authenticate client without refresh token or credentials!");
+                throw new AuthenticationException("Could not authenticate client without refresh token or credentials.");
             }
 
             return client;
         }
-
     }
 }
