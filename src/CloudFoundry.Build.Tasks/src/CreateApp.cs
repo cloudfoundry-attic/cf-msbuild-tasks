@@ -26,6 +26,7 @@ namespace CloudFoundry.Build.Tasks
         public string CFStack { get; set; }
 
         public int CFAppMemory { get; set; }
+
         public int CFAppInstances { get; set; }
 
         public string CFEnvironmentJson { get; set; }
