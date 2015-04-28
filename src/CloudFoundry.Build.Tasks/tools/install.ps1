@@ -1,5 +1,7 @@
 param($installPath, $toolsPath, $package, $project)
 
+Set-Variable cfpubxmlFile -option Constant -value "push.cfpubxml"
+
 function Add-FileItemToProject($project, $toolsPath, $path, $file) {
 
 	$ErrorActionPreference = "SilentlyContinue"
@@ -61,8 +63,8 @@ function UpdateDeployTargetFile($project, $xmlfile) {
 
 function Main 
 {
-	UpdateDeployTargetFile $project (Join-Path $toolsPath "push.cf.pubxml")
-	Add-FileItemToProject $project $toolsPath "Properties\PublishProfiles" "push.cf.pubxml"
+	UpdateDeployTargetFile $project (Join-Path $toolsPath $cfpubxmlFile)
+	Add-FileItemToProject $project $toolsPath "Properties\PublishProfiles" $cfpubxmlFile
 }
 
 Main

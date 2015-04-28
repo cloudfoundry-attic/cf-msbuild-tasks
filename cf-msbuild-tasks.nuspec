@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+	<metadata>
+		<id>cf-msbuild-tasks</id>
+		<version>$version$</version>
+		<title>Cloud Foundry MSbuild Tasks</title>
+		<authors>Hewlett-Packard Development Company, L.P.</authors>
+		<owners>Hewlett-Packard Development Company, L.P.</owners>
+		<licenseUrl>https://github.com/hpcloud/cf-msbuild-tasks/blob/master/LICENSE</licenseUrl>
+		<projectUrl>https://github.com/hpcloud/cf-msbuild-tasks</projectUrl>
+		<iconUrl>https://region-b.geo-1.objects.hpcloudsvc.com/v1/54026737306152/ALS/v1.2/nuget-cloudfoundry-logo.png</iconUrl>
+		<requireLicenseAcceptance>false</requireLicenseAcceptance>
+		<description>Cloud Foundry MSbuild Tasks</description>
+		<releaseNotes>Built from git commit  $commit$</releaseNotes>
+		<copyright>� Copyright 2015 Hewlett-Packard Development Company, L.P.</copyright>
+		<tags>cloud foundy cloudfoundry paas sdk net .net dotnet msbuild tasks</tags>
+	</metadata>
+	<files>
+		<file src="lib\*.*" target="build" />
+		<file src="src\CloudFoundry.Build.Tasks\build\*.*" target="build" />
+		<file src="src\CloudFoundry.Build.Tasks\tools\*.*" target="tools" />
+	</files>
+</package>
