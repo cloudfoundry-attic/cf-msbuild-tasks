@@ -36,7 +36,7 @@ namespace CloudFoundry.Build.Tasks
 
             GetV1InfoResponse v1Info = client.Info.GetV1Info().Result;
 
-            using (LogyardLog logyard = new LogyardLog(new Uri(v1Info.AppLogEndpoint), string.Format(CultureInfo.InvariantCulture, "bearer {0}", client.AuthorizationToken)))
+            using (LogyardLog logyard = new LogyardLog(new Uri(v1Info.AppLogEndpoint), string.Format(CultureInfo.InvariantCulture, "bearer {0}", client.AuthorizationToken), null, CFSkipSslValidation))
             {
 
                 logyard.ErrorReceived += (sender, error) =>

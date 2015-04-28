@@ -16,6 +16,7 @@
     <CFOrganization></CFOrganization>
     <CFSpace></CFSpace>
     <CFLocalBuild>true</CFLocalBuild>
+    <CFSkipSslValidation>true</CFSkipSslValidation>
 
     <DeployTargetFile>C:\Path_to_targets_file_from_package</DeployTargetFile>
     <WebPublishMethod>CloudFoundry</WebPublishMethod>
