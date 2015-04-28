@@ -31,6 +31,8 @@ namespace CloudFoundry.Build.Tasks
 
         public string CFRefreshToken { get; set; }
 
+        public bool CFSkipSslValidation { get; set; }
+
         [Required]
         public string CFServerUri { get; set; }
 
@@ -41,10 +43,7 @@ namespace CloudFoundry.Build.Tasks
 
         internal CloudFoundryClient InitClient()
         {
-            //skip ssl
-            System.Net.ServicePointManager.ServerCertificateValidationCallback = ((sender, certificate, chain, sslPolicyErrors) => true);
-
-            CloudFoundryClient client = new CloudFoundryClient(new Uri(CFServerUri), new System.Threading.CancellationToken());
+            CloudFoundryClient client = new CloudFoundryClient(new Uri(CFServerUri), new System.Threading.CancellationToken(), null, CFSkipSslValidation);
 
             if (CFUser != null && (CFPassword != null || CFSavedPassword))
             {

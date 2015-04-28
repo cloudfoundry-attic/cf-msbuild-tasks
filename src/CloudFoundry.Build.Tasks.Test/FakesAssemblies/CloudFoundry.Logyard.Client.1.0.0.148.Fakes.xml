@@ -100,6 +100,12 @@
         <member name="P:CloudFoundry.Logyard.Client.Fakes.ShimLogyardLog.ConstructorUriString">
             <summary>Sets the shim of LogyardLog.LogyardLog(Uri logyardEndpoint, String authenticationToken)</summary>
         </member>
+        <member name="P:CloudFoundry.Logyard.Client.Fakes.ShimLogyardLog.ConstructorUriStringUri">
+            <summary>Sets the shim of LogyardLog.LogyardLog(Uri logyardEndpoint, String authenticationToken, Uri httpProxy)</summary>
+        </member>
+        <member name="P:CloudFoundry.Logyard.Client.Fakes.ShimLogyardLog.ConstructorUriStringUriBoolean">
+            <summary>Sets the shim of LogyardLog.LogyardLog(Uri logyardEndpoint, String authenticationToken, Uri httpProxy, Boolean skipCertificateValidation)</summary>
+        </member>
         <member name="P:CloudFoundry.Logyard.Client.Fakes.ShimLogyardLog.Dispose">
             <summary>Sets the shim of LogyardLog.Dispose()</summary>
         </member>
@@ -112,6 +118,12 @@
         <member name="P:CloudFoundry.Logyard.Client.Fakes.ShimLogyardLog.ErrorReceivedRemoveEventHandlerOfErrorEventArgs">
             <summary>Sets the shim of LogyardLog.remove_ErrorReceived(EventHandler`1&lt;ErrorEventArgs&gt; value)</summary>
         </member>
+        <member name="P:CloudFoundry.Logyard.Client.Fakes.ShimLogyardLog.HttpProxyGet">
+            <summary>Sets the shim of LogyardLog.get_HttpProxy()</summary>
+        </member>
+        <member name="P:CloudFoundry.Logyard.Client.Fakes.ShimLogyardLog.HttpProxySetUri">
+            <summary>Sets the shim of LogyardLog.set_HttpProxy(Uri value)</summary>
+        </member>
         <member name="P:CloudFoundry.Logyard.Client.Fakes.ShimLogyardLog.LogyardEndpointGet">
             <summary>Sets the shim of LogyardLog.get_LogyardEndpoint()</summary>
         </member>
@@ -123,6 +135,12 @@
         </member>
         <member name="P:CloudFoundry.Logyard.Client.Fakes.ShimLogyardLog.MessageReceivedRemoveEventHandlerOfMessageEventArgs">
             <summary>Sets the shim of LogyardLog.remove_MessageReceived(EventHandler`1&lt;MessageEventArgs&gt; value)</summary>
+        </member>
+        <member name="P:CloudFoundry.Logyard.Client.Fakes.ShimLogyardLog.SkipCertificateValidationGet">
+            <summary>Sets the shim of LogyardLog.get_SkipCertificateValidation()</summary>
+        </member>
+        <member name="P:CloudFoundry.Logyard.Client.Fakes.ShimLogyardLog.SkipCertificateValidationSetBoolean">
+            <summary>Sets the shim of LogyardLog.set_SkipCertificateValidation(Boolean value)</summary>
         </member>
         <member name="P:CloudFoundry.Logyard.Client.Fakes.ShimLogyardLog.StartLogStreamString">
             <summary>Sets the shim of LogyardLog.StartLogStream(String appGuid)</summary>
@@ -181,6 +199,12 @@
         <member name="P:CloudFoundry.Logyard.Client.Fakes.ShimLogyardLog.AllInstances.ErrorReceivedRemoveEventHandlerOfErrorEventArgs">
             <summary>Sets the shim of LogyardLog.remove_ErrorReceived(EventHandler`1&lt;ErrorEventArgs&gt; value)</summary>
         </member>
+        <member name="P:CloudFoundry.Logyard.Client.Fakes.ShimLogyardLog.AllInstances.HttpProxyGet">
+            <summary>Sets the shim of LogyardLog.get_HttpProxy()</summary>
+        </member>
+        <member name="P:CloudFoundry.Logyard.Client.Fakes.ShimLogyardLog.AllInstances.HttpProxySetUri">
+            <summary>Sets the shim of LogyardLog.set_HttpProxy(Uri value)</summary>
+        </member>
         <member name="P:CloudFoundry.Logyard.Client.Fakes.ShimLogyardLog.AllInstances.LogyardEndpointGet">
             <summary>Sets the shim of LogyardLog.get_LogyardEndpoint()</summary>
         </member>
@@ -192,6 +216,12 @@
         </member>
         <member name="P:CloudFoundry.Logyard.Client.Fakes.ShimLogyardLog.AllInstances.MessageReceivedRemoveEventHandlerOfMessageEventArgs">
             <summary>Sets the shim of LogyardLog.remove_MessageReceived(EventHandler`1&lt;MessageEventArgs&gt; value)</summary>
+        </member>
+        <member name="P:CloudFoundry.Logyard.Client.Fakes.ShimLogyardLog.AllInstances.SkipCertificateValidationGet">
+            <summary>Sets the shim of LogyardLog.get_SkipCertificateValidation()</summary>
+        </member>
+        <member name="P:CloudFoundry.Logyard.Client.Fakes.ShimLogyardLog.AllInstances.SkipCertificateValidationSetBoolean">
+            <summary>Sets the shim of LogyardLog.set_SkipCertificateValidation(Boolean value)</summary>
         </member>
         <member name="P:CloudFoundry.Logyard.Client.Fakes.ShimLogyardLog.AllInstances.StartLogStreamString">
             <summary>Sets the shim of LogyardLog.StartLogStream(String appGuid)</summary>
@@ -620,6 +650,12 @@
             <summary>Stub type of CloudFoundry.Logyard.Client.LogyardLog</summary>
         </member>
         <member name="M:CloudFoundry.Logyard.Client.Fakes.StubLogyardLog.#ctor(System.Uri,System.String)">
+            <summary>Initializes a new instance</summary>
+        </member>
+        <member name="M:CloudFoundry.Logyard.Client.Fakes.StubLogyardLog.#ctor(System.Uri,System.String,System.Uri)">
+            <summary>Initializes a new instance</summary>
+        </member>
+        <member name="M:CloudFoundry.Logyard.Client.Fakes.StubLogyardLog.#ctor(System.Uri,System.String,System.Uri,System.Boolean)">
             <summary>Initializes a new instance</summary>
         </member>
         <member name="M:CloudFoundry.Logyard.Client.Fakes.StubLogyardLog.Dispose(System.Boolean)">

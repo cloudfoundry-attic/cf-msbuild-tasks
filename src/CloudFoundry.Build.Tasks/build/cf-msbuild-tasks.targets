@@ -59,29 +59,29 @@
       <CFEnvironmentJson Condition="'$(CFLocalBuild)'=='false'" Include="{&quot;PUBLISH_WEBSITE&quot;: &quot;$(CFAppName)&quot;, &quot;MSBUILD_CONFIGURATION&quot;: &quot;$(CFMSBuildConfiguration)&quot;, &quot;MSBUILD_PLATFORM&quot;: &quot;$(CFMSBuildPlatform)&quot;}"></CFEnvironmentJson>
     </ItemGroup>
 
-    <LoginTask Condition="'$(CFUser)' != '' AND '$(CFPassword)' != ''" CFUser="$(CFUser)" CFPassword="$(CFPassword)" CFServerUri="$(CFServerUri)">
+    <LoginTask Condition="'$(CFUser)' != '' AND '$(CFPassword)' != ''" CFUser="$(CFUser)" CFPassword="$(CFPassword)" CFServerUri="$(CFServerUri)" CFSkipSslValidation="$(CFSkipSslValidation)">
       <Output TaskParameter="CFRefreshToken" PropertyName="CFRefreshToken"/>
     </LoginTask>
 
-    <CreateApp CFAppName="$(CFAppName)" CFStack="$(CFStack)" CFOrganization="$(CFOrganization)" CFSpace="$(CFSpace)" CFServerUri="$(CFServerUri)" CFEnvironmentJson="$(CFEnvironmentJson)" CFRefreshToken="$(CFRefreshToken)" CFAppMemory="$(CFAppMemory)" CFAppInstances="$(CFAppInstances)">
+    <CreateApp CFAppName="$(CFAppName)" CFStack="$(CFStack)" CFOrganization="$(CFOrganization)" CFSpace="$(CFSpace)" CFServerUri="$(CFServerUri)" CFEnvironmentJson="$(CFEnvironmentJson)" CFRefreshToken="$(CFRefreshToken)" CFAppMemory="$(CFAppMemory)" CFAppInstances="$(CFAppInstances)" CFSkipSslValidation="$(CFSkipSslValidation)">
       <Output TaskParameter="CFAppGuid" PropertyName="CFAppGuid"/>
     </CreateApp>
 
-    <PushApp CFAppGuid="$(CFAppGuid)" CFAppPath="$(PublishTempAppPath)" CFStart="false" CFServerUri="$(CFServerUri)" CFRefreshToken="$(CFRefreshToken)"></PushApp>
+    <PushApp CFAppGuid="$(CFAppGuid)" CFAppPath="$(PublishTempAppPath)" CFStart="false" CFServerUri="$(CFServerUri)" CFRefreshToken="$(CFRefreshToken)" CFSkipSslValidation="$(CFSkipSslValidation)"></PushApp>
 
-    <CreateRoutes Condition="'$(CFRoutes)' != ''" CFServerUri="$(CFServerUri)" CFRefreshToken="$(CFRefreshToken)" CFOrganization="$(CFOrganization)" CFSpace="$(CFSpace)" CFRoutes="@(CFRoutes)">
+    <CreateRoutes Condition="'$(CFRoutes)' != ''" CFServerUri="$(CFServerUri)" CFRefreshToken="$(CFRefreshToken)" CFOrganization="$(CFOrganization)" CFSpace="$(CFSpace)" CFRoutes="@(CFRoutes)" CFSkipSslValidation="$(CFSkipSslValidation)">
       <Output TaskParameter="CFRouteGuids" PropertyName="CFRouteGuids"></Output>
     </CreateRoutes>
 
-    <BindRoutes CFServerUri="$(CFServerUri)" CFRefreshToken="$(CFRefreshToken)" CFAppGuid="$(CFAppGuid)" CFRouteGuids="$(CFRouteGuids)"></BindRoutes>
+    <BindRoutes CFServerUri="$(CFServerUri)" CFRefreshToken="$(CFRefreshToken)" CFAppGuid="$(CFAppGuid)" CFRouteGuids="$(CFRouteGuids)" CFSkipSslValidation="$(CFSkipSslValidation)"></BindRoutes>
 
-    <CreateServices Condition="'$(CFServices)' != ''" CFServerUri="$(CFServerUri)" CFRefreshToken="$(CFRefreshToken)" CFServices="$(CFServices)" CFOrganization="$(CFOrganization)" CFSpace="$(CFSpace)">
+    <CreateServices Condition="'$(CFServices)' != ''" CFServerUri="$(CFServerUri)" CFRefreshToken="$(CFRefreshToken)" CFServices="$(CFServices)" CFOrganization="$(CFOrganization)" CFSpace="$(CFSpace)" CFSkipSslValidation="$(CFSkipSslValidation)">
       <Output TaskParameter="CFServicesGuids" PropertyName="CFServicesGuids"></Output>
     </CreateServices>
 
-    <BindServices CFServerUri="$(CFServerUri)" CFRefreshToken="$(CFRefreshToken)" CFAppGuid="$(CFAppGuid)" CFServicesGuids="$(CFServicesGuids)"></BindServices>
+    <BindServices CFServerUri="$(CFServerUri)" CFRefreshToken="$(CFRefreshToken)" CFAppGuid="$(CFAppGuid)" CFServicesGuids="$(CFServicesGuids)" CFSkipSslValidation="$(CFSkipSslValidation)"></BindServices>
 
-    <RestartApp CFAppGuid="$(CFAppGuid)" CFServerUri="$(CFServerUri)" CFRefreshToken="$(CFRefreshToken)"></RestartApp>
+    <RestartApp CFAppGuid="$(CFAppGuid)" CFServerUri="$(CFServerUri)" CFRefreshToken="$(CFRefreshToken)" CFSkipSslValidation="$(CFSkipSslValidation)"></RestartApp>
 
     <!-- Remove previously created temp directory -->
     <RemoveDir Directories="$(PublishTempAppPath)" />
@@ -93,11 +93,11 @@
       <CFRefreshToken Include="$(CFRefreshToken)"></CFRefreshToken>
     </ItemGroup>
 
-    <LoginTask Condition="'$(CFUser)' != '' AND '$(CFPassword)' != ''" CFUser="$(CFUser)" CFPassword="$(CFPassword)" CFServerUri="$(CFServerUri)">
+    <LoginTask Condition="'$(CFUser)' != '' AND '$(CFPassword)' != ''" CFUser="$(CFUser)" CFPassword="$(CFPassword)" CFServerUri="$(CFServerUri)" CFSkipSslValidation="$(CFSkipSslValidation)">
       <Output TaskParameter="CFRefreshToken" PropertyName="CFRefreshToken"/>
     </LoginTask>
 
-    <DeleteApp CFServerUri="$(CFServerUri)" CFRefreshToken="$(CFRefreshToken)" CFAppName="$(CFAppName)" CFOrganization="$(CFOrganization)" CFSpace="$(CFSpace)" CFDeleteRoutes="true" CFDeleteServices="true"></DeleteApp>
+    <DeleteApp CFServerUri="$(CFServerUri)" CFRefreshToken="$(CFRefreshToken)" CFAppName="$(CFAppName)" CFOrganization="$(CFOrganization)" CFSpace="$(CFSpace)" CFDeleteRoutes="true" CFDeleteServices="true" CFSkipSslValidation="$(CFSkipSslValidation)"></DeleteApp>
   </Target>
 
 </Project>
