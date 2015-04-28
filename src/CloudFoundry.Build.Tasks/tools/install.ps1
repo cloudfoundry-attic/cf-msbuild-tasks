@@ -1,6 +1,6 @@
 param($installPath, $toolsPath, $package, $project)
 
-Set-Variable cfpubxmlFile -option Constant -value "push.cfpubxml"
+Set-Variable cfpubxmlFile -option Constant -value "push.cf.pubxml"
 
 function Add-FileItemToProject($project, $toolsPath, $path, $file) {
 
