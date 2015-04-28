@@ -1,8 +1,10 @@
 ﻿using CloudFoundry.CloudController.V2.Client;
 using CloudFoundry.UAA;
+using CloudFoundry.UAA.Exceptions;
 using Microsoft.Build.Framework;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,53 +12,16 @@ using System.Threading.Tasks;
 namespace CloudFoundry.Build.Tasks
 {
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1726:UsePreferredTerms", MessageId = "Login", Justification="Using login name preferred")]
-    public class LoginTask : ITask
+    public class LoginTask : BaseTask
     {
-        internal Microsoft.Build.Utilities.TaskLoggingHelper logger;
 
-        public IBuildEngine BuildEngine
-        {
-            get;
-            set;
-        }
-
-        public ITaskHost HostObject
-        {
-            get;
-            set;
-        }
-
-        [Required]
-        public string CFUser { get; set; }
-        [Required]
-        public string CFPassword { get; set; }
-        [Required]
-        public string CFServerUri { get; set; }
-        public bool CFSkipSslValidation { get; set; }
         [Output]
-        public string CFRefreshToken { get; set; }
+        public new string CFRefreshToken { get; set; }
 
-        public bool Execute()
+        public override bool Execute()
         {
-            logger = new Microsoft.Build.Utilities.TaskLoggingHelper(this);
+            InitClient();
 
-            CloudFoundryClient client = new CloudFoundryClient(new Uri(CFServerUri), new System.Threading.CancellationToken(), null, CFSkipSslValidation);
-
-            CloudCredentials creds = new CloudCredentials();
-            creds.User = CFUser;
-            creds.Password = CFPassword;
-            AuthenticationContext context = client.Login(creds).Result;
-
-            if (context.Token != null)
-            {
-                CFRefreshToken = context.Token.RefreshToken;
-                logger.LogMessage("Login success - Refresh token: {0}", CFRefreshToken);
-            }
-            else
-            {
-                logger.LogError("Login failed, please check parameters");
-                return false;
-            }
             return true;
         }
 

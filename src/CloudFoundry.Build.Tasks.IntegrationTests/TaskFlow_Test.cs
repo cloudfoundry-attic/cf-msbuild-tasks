@@ -16,6 +16,7 @@ namespace CloudFoundry.Build.Tasks.IntegrationTests
             login.CFUser = Settings.Default.User;
             login.CFPassword = Settings.Default.Password;
             login.CFServerUri = Settings.Default.ServerUri;
+            login.CFSkipSslValidation = true;
 
             login.Execute();
 
@@ -23,7 +24,7 @@ namespace CloudFoundry.Build.Tasks.IntegrationTests
 
             task.CFRefreshToken = login.CFRefreshToken;
             task.CFServerUri = Settings.Default.ServerUri;
-
+            task.CFSkipSslValidation = true;
             task.CFAppName = "testIntegration";
             task.CFAppMemory = 512;
             task.CFAppInstances = 1;
@@ -39,7 +40,7 @@ namespace CloudFoundry.Build.Tasks.IntegrationTests
             pushTask.CFUser = Settings.Default.User;
             pushTask.CFPassword = Settings.Default.Password;
             pushTask.CFServerUri = Settings.Default.ServerUri;
-
+            pushTask.CFSkipSslValidation = true;
             pushTask.CFAppGuid = task.CFAppGuid;
             pushTask.CFAppPath = Settings.Default.AppPath;
             pushTask.CFStart = true;
@@ -52,7 +53,7 @@ namespace CloudFoundry.Build.Tasks.IntegrationTests
             routeTask.CFUser = Settings.Default.User;
             routeTask.CFPassword = Settings.Default.Password;
             routeTask.CFServerUri = Settings.Default.ServerUri;
-
+            routeTask.CFSkipSslValidation = true;
             routeTask.CFRoutes = new string[1] { "testRoute.15.126.213.170.xip.io" };
             routeTask.CFSpace = "TestSpace";
             routeTask.CFOrganization = "TestOrg";
@@ -66,7 +67,7 @@ namespace CloudFoundry.Build.Tasks.IntegrationTests
             bindTask.CFPassword = Settings.Default.Password;
             bindTask.CFServerUri = Settings.Default.ServerUri;
             bindTask.BuildEngine = new FakeBuildEngine();
-
+            bindTask.CFSkipSslValidation = true;
 
             bindTask.CFAppGuid = task.CFAppGuid;
             bindTask.CFRouteGuids = routeTask.CFRouteGuids;
@@ -78,7 +79,7 @@ namespace CloudFoundry.Build.Tasks.IntegrationTests
             serviceTask.CFPassword = Settings.Default.Password;
             serviceTask.CFServerUri = Settings.Default.ServerUri;
             serviceTask.BuildEngine = new FakeBuildEngine();
-
+            serviceTask.CFSkipSslValidation = true;
             serviceTask.CFServiceName = "testService";
             serviceTask.CFServicePlan = "free";
             serviceTask.CFServiceType = "mysql";
@@ -91,7 +92,7 @@ namespace CloudFoundry.Build.Tasks.IntegrationTests
             bindServiceTask.CFPassword = Settings.Default.Password;
             bindServiceTask.CFServerUri = Settings.Default.ServerUri;
             bindServiceTask.BuildEngine = new FakeBuildEngine();
-
+            bindServiceTask.CFSkipSslValidation = true;
             bindServiceTask.CFAppGuid = task.CFAppGuid;
             bindServiceTask.CFServicesGuids = new string[1] { serviceTask.CFServiceGuid };
             bindServiceTask.Execute();
@@ -103,7 +104,7 @@ namespace CloudFoundry.Build.Tasks.IntegrationTests
                 delTask.CFUser = Settings.Default.User;
                 delTask.CFPassword = Settings.Default.Password;
                 delTask.CFServerUri = Settings.Default.ServerUri;
-
+                delTask.CFSkipSslValidation = true;
                 delTask.CFOrganization = "TestOrg";
                 delTask.CFSpace = "TestSpace";
                 delTask.CFAppName = "testIntegration";

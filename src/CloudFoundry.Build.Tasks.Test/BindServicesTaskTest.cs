@@ -30,7 +30,7 @@ namespace CloudFoundry.Build.Tasks.Test
                 task.CFPassword = Settings.Default.Password;
                 task.CFServerUri = Settings.Default.ServerUri;
                 task.BuildEngine = new FakeBuildEngine();
-
+                task.CFSavedPassword = false;
                 task.Execute();
 
                 Assert.AreEqual(task.CFBindingGuids.Length, 2);

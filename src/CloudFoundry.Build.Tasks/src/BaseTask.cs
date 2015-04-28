@@ -41,17 +41,18 @@ namespace CloudFoundry.Build.Tasks
             return true;
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily")]
         internal CloudFoundryClient InitClient()
         {
             CloudFoundryClient client = new CloudFoundryClient(new Uri(CFServerUri), new System.Threading.CancellationToken(), null, CFSkipSslValidation);
-
-            if (CFUser != null && (CFPassword != null || CFSavedPassword))
+            
+            if (string.IsNullOrWhiteSpace(CFUser)==false && (string.IsNullOrWhiteSpace(CFPassword) == false || CFSavedPassword))
             {
-                if (CFPassword == null)
+                if (string.IsNullOrWhiteSpace(CFPassword))
                 {
                     this.CFPassword = CloudCredentialsManager.GetPassword(new Uri(this.CFServerUri), this.CFUser);
 
-                    if (this.CFPassword == null)
+                    if (string.IsNullOrWhiteSpace(this.CFPassword))
                     {
                         throw new AuthenticationException(
                             string.Format(CultureInfo.InvariantCulture,
@@ -64,9 +65,17 @@ namespace CloudFoundry.Build.Tasks
                 CloudCredentials creds = new CloudCredentials();
                 creds.User = CFUser;
                 creds.Password = CFPassword;
-                client.Login(creds).Wait();
+                var authContext =  client.Login(creds).Result;
+                if (this is LoginTask)
+                {
+                    if (authContext.Token != null)
+                    {
+                        ((LoginTask)this).CFRefreshToken = authContext.Token.RefreshToken;
+                    }
+
+                }
             }
-            else if (CFRefreshToken != null)
+            else if (string.IsNullOrWhiteSpace(CFRefreshToken) == false)
             {
                 client.Login(CFRefreshToken).Wait();
             }
