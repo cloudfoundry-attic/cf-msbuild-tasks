@@ -27,6 +27,7 @@ namespace CloudFoundry.Build.Tasks.Test
                 task.CFRouteGuids = new string[1] { Guid.NewGuid().ToString() };
                 task.CFUser = Settings.Default.User;
                 task.CFPassword = Settings.Default.Password;
+                task.CFSavedPassword = false;
                 task.CFServerUri = Settings.Default.ServerUri;
                 task.BuildEngine = new FakeBuildEngine();
 

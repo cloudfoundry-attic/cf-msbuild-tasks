@@ -14,7 +14,7 @@ namespace CloudFoundry.Build.Tasks.Test
     public class LoginTaskTest
     {
         [TestMethod]
-        public void LoginFail_Test()
+        public void Login_Test()
         {
             using (ShimsContext.Create())
             {
@@ -27,7 +27,7 @@ namespace CloudFoundry.Build.Tasks.Test
 
                 login.BuildEngine = new FakeBuildEngine();
 
-                Assert.IsFalse(login.Execute());
+                Assert.IsTrue(login.Execute());
             }
         }
     }
