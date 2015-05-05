@@ -107,7 +107,10 @@
 
   <!-- Target for restoring nuget packages -->
   <Target Name="RestoreNugetPackages">
-    <Exec Command="$(NuGetCommand) restore $(SDKMSBuildTasksSolution)"/>
+    <PropertyGroup>
+      <Source Condition="$(Source) == ''">https://nuget.org/api/v2/</Source>
+    </PropertyGroup>
+    <Exec Command="$(NuGetCommand) restore $(SDKMSBuildTasksSolution) -source $(Source)"/>
   </Target>
 
   <!-- Target for creating the nuget package -->
