@@ -48,14 +48,24 @@ namespace CloudFoundry.Build.Tasks
 
                foreach (string service in provServs)
                {
-                   string[] serviceInfo=service.Split(',');
-                   ProvisionedService serviceDetails = new ProvisionedService();
-                   
-                   serviceDetails.Name = serviceInfo[0];
-                   serviceDetails.Type = serviceInfo[1];
-                   serviceDetails.Plan = serviceInfo[2];
+                   if (string.IsNullOrWhiteSpace(service) == false)
+                   {
+                       string[] serviceInfo = service.Split(',');
 
-                   servicesList.Add(serviceDetails);
+                       if (serviceInfo.Length != 3)
+                       {
+                           logger.LogError("Invalid service information in {0}", service);
+                           continue;
+                       }
+
+                       ProvisionedService serviceDetails = new ProvisionedService();
+
+                       serviceDetails.Name = serviceInfo[0].Trim();
+                       serviceDetails.Type = serviceInfo[1].Trim();
+                       serviceDetails.Plan = serviceInfo[2].Trim();
+
+                       servicesList.Add(serviceDetails);
+                   }
                }
             }
             catch(Exception ex)
