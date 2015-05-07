@@ -46,18 +46,7 @@ namespace CloudFoundry.Build.Tasks.Test
                 TestUtils.InitTestMetadata();
 
                 CreateServices task = new CreateServices();
-                task.CFServices = @"<ArrayOfProvisionedService>   
-   <ProvisionedService>
-      <Name>service1</Name>
-      <Plan>free</Plan>
-      <Type>mysql</Type>
-   </ProvisionedService>
-   <ProvisionedService>
-      <Name>service2</Name>
-      <Plan>free</Plan>
-      <Type>mssql2012</Type>
-   </ProvisionedService>
-</ArrayOfProvisionedService>";
+                task.CFServices = @"service1,mysql,free;service2,mssql2012,free;";
 
                 task.CFSpace = "TestSpace";
                 task.CFOrganization = "TestOrg";
@@ -68,7 +57,7 @@ namespace CloudFoundry.Build.Tasks.Test
 
                 task.Execute();
 
-                Assert.AreEqual(task.CFServicesGuids.Length, 2);
+                Assert.AreEqual(2, task.CFServicesGuids.Length);
             }
         }
     }
