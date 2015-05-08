@@ -89,11 +89,12 @@
 
   <!-- This task will remove the application, bound routes and bound provisioned service instances -->
   <Target Name="CleanUp">
+    <Error Condition="'$(PublishProfile)'==''" Text="PublishProfile parameter must be set." />
     <ItemGroup>
       <CFRefreshToken Include="$(CFRefreshToken)"></CFRefreshToken>
     </ItemGroup>
 
-    <LoginTask Condition="'$(CFUser)' != '' AND '$(CFPassword)' != ''" CFUser="$(CFUser)" CFPassword="$(CFPassword)" CFServerUri="$(CFServerUri)" CFSkipSslValidation="$(CFSkipSslValidation)">
+    <LoginTask Condition="'$(CFUser)' != ''" CFUser="$(CFUser)" CFPassword="$(CFPassword)" CFSavedPassword="$(CFSavedPassword)" CFServerUri="$(CFServerUri)" CFSkipSslValidation="$(CFSkipSslValidation)">
       <Output TaskParameter="CFRefreshToken" PropertyName="CFRefreshToken"/>
     </LoginTask>
 
