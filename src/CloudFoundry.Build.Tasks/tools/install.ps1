@@ -65,7 +65,7 @@ function Main
 {
 	if (($project.Type.ToUpperInvariant() -ne "C#".ToUpperInvariant()) -and ($project.Type.ToUpperInvariant() -ne "VB.NET".ToUpperInvariant()))
 	{
-		throw "Project type not supported."
+		throw "Project type $($project.Type) not supported."
 	}
 
 	UpdateDeployTargetFile $project (Join-Path $toolsPath $cfpubxmlFile)
