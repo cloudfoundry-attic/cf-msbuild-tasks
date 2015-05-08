@@ -136,7 +136,7 @@
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
-    <None Include="tools\push.cfpubxml" />
+    <None Include="tools\push.cf.pubxml" />
     <None Include="tools\install.ps1" />
     <None Include="tools\uninstall.ps1" />
   </ItemGroup>
