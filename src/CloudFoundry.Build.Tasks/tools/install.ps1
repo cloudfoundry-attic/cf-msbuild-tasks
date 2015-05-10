@@ -53,7 +53,7 @@ function UpdateDeployTargetFile($project, $xmlfile) {
 		$dir = Split-Path $project.FileName -Parent
 	}
 
-	$target = Get-ChildItem $dir -File "cf-msbuild-tasks.targets" -Recurse | Select-Object -First 1
+	$target = Get-ChildItem $dir -Filter "cf-msbuild-tasks.targets" -Recurse | Select-Object -First 1
 	$rel = Resolve-Path $target.FullName -Relative
 
 	$xml = [xml] (Get-Content $xmlfile)
