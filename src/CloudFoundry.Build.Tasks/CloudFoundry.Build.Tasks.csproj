@@ -112,6 +112,7 @@
     <Compile Include="src\DeleteApp.cs" />
     <Compile Include="src\DeleteRoute.cs" />
     <Compile Include="src\DeleteService.cs" />
+    <Compile Include="src\ErrorFormatter.cs" />
     <Compile Include="src\LoadYaml.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="src\LoginTask.cs" />

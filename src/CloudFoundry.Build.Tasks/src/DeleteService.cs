@@ -25,30 +25,41 @@ namespace CloudFoundry.Build.Tasks
 
             logger = new Microsoft.Build.Utilities.TaskLoggingHelper(this);
 
-            CloudFoundryClient client = InitClient();
-            
-            logger.LogMessage("Deleting service {0} from space {1}", CFServiceName, CFSpace);
-
-            Guid? spaceGuid = null;
-
-            if (CFSpace.Length > 0 && CFOrganization.Length > 0)
+            try
             {
-                spaceGuid = Utils.GetSpaceGuid(client, logger, CFOrganization, CFSpace);
-                if (spaceGuid == null)
+                CloudFoundryClient client = InitClient();
+
+                logger.LogMessage("Deleting service {0} from space {1}", CFServiceName, CFSpace);
+
+                Guid? spaceGuid = null;
+
+                if (CFSpace.Length > 0 && CFOrganization.Length > 0)
                 {
+                    spaceGuid = Utils.GetSpaceGuid(client, logger, CFOrganization, CFSpace);
+                    if (spaceGuid == null)
+                    {
+                        return false;
+                    }
+                }
+
+                var servicesList = client.Spaces.ListAllServiceInstancesForSpace(spaceGuid, new RequestOptions() { Query = "name:" + CFServiceName }).Result;
+
+                if (servicesList.Count() > 1)
+                {
+                    logger.LogError("There are more services named {0} in space {1}", CFServiceName, CFSpace);
                     return false;
                 }
+
+                client.ServiceInstances.DeleteServiceInstance(new Guid(servicesList.First().EntityMetadata.Guid)).Wait();
             }
-
-            var servicesList = client.Spaces.ListAllServiceInstancesForSpace(spaceGuid, new RequestOptions() { Query = "name:" + CFServiceName }).Result;
-
-            if (servicesList.Count() > 1)
+            catch (AggregateException exception)
             {
-                logger.LogError("There are more services named {0} in space {1}", CFServiceName, CFSpace);
+                List<string> messages = new List<string>();
+                ErrorFormatter.FormatExceptionMessage(exception, messages);
+                this.logger.LogError(string.Join(Environment.NewLine, messages));
                 return false;
             }
 
-            client.ServiceInstances.DeleteServiceInstance(new Guid(servicesList.First().EntityMetadata.Guid)).Wait();
             return true;
         }
     }

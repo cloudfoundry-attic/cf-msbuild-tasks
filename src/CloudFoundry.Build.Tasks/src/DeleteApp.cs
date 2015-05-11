@@ -27,75 +27,84 @@ namespace CloudFoundry.Build.Tasks
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling")]
         public override bool Execute()
-        {
-
+        {            
             logger = new Microsoft.Build.Utilities.TaskLoggingHelper(this);
 
-            CloudFoundryClient client = InitClient();
-
-            logger.LogMessage("Deleting application {0} from space {1}", CFAppName, CFSpace);
-
-            Guid? spaceGuid = null;
-
-            if (CFSpace.Length > 0 && CFOrganization.Length > 0)
+            try
             {
-                spaceGuid = Utils.GetSpaceGuid(client, logger, CFOrganization, CFSpace);
-                if (spaceGuid == null)
+                CloudFoundryClient client = InitClient();
+
+                logger.LogMessage("Deleting application {0} from space {1}", CFAppName, CFSpace);
+
+                Guid? spaceGuid = null;
+
+                if (CFSpace.Length > 0 && CFOrganization.Length > 0)
                 {
+                    spaceGuid = Utils.GetSpaceGuid(client, logger, CFOrganization, CFSpace);
+                    if (spaceGuid == null)
+                    {
+                        return false;
+                    }
+                }
+
+                PagedResponseCollection<ListAllAppsForSpaceResponse> appList = client.Spaces.ListAllAppsForSpace(spaceGuid, new RequestOptions() { Query = "name:" + CFAppName }).Result;
+                if (appList.Count() > 1)
+                {
+                    logger.LogError("There are more applications named {0} in space {1}", CFAppName, CFSpace);
                     return false;
                 }
-            }
 
-            PagedResponseCollection<ListAllAppsForSpaceResponse> appList = client.Spaces.ListAllAppsForSpace(spaceGuid, new RequestOptions() { Query = "name:" + CFAppName }).Result;
-            if (appList.Count() > 1)
-            {
-                logger.LogError("There are more applications named {0} in space {1}", CFAppName, CFSpace);
-                return false;
-            }
+                Guid appGuid = new Guid(appList.FirstOrDefault().EntityMetadata.Guid);
 
-            Guid appGuid = new Guid(appList.FirstOrDefault().EntityMetadata.Guid);
-
-            if (CFDeleteRoutes == true)
-            {
-                logger.LogMessage("Deleting routes associated with {0}", CFAppName);
-                var routeList = client.Apps.ListAllRoutesForApp(appGuid).Result;
-                foreach (var route in routeList)
+                if (CFDeleteRoutes == true)
                 {
-                    client.Routes.DeleteRoute(new Guid(route.EntityMetadata.Guid)).Wait();
-                }
-            }
-
-            if (CFDeleteServices == true)
-            {
-                logger.LogMessage("Deleting services bound to {0}", CFAppName);
-             
-                var serviceBindingList = client.Apps.ListAllServiceBindingsForApp(appGuid).Result;
-
-                foreach (var serviceBind in serviceBindingList)
-                {
-                    client.ServiceBindings.DeleteServiceBinding(new Guid(serviceBind.EntityMetadata.Guid)).Wait();
-                    try
+                    logger.LogMessage("Deleting routes associated with {0}", CFAppName);
+                    var routeList = client.Apps.ListAllRoutesForApp(appGuid).Result;
+                    foreach (var route in routeList)
                     {
-                        client.ServiceInstances.DeleteServiceInstance(serviceBind.ServiceInstanceGuid).Wait();
+                        client.Routes.DeleteRoute(new Guid(route.EntityMetadata.Guid)).Wait();
                     }
-                    catch (AggregateException ex)
+                }
+
+                if (CFDeleteServices == true)
+                {
+                    logger.LogMessage("Deleting services bound to {0}", CFAppName);
+
+                    var serviceBindingList = client.Apps.ListAllServiceBindingsForApp(appGuid).Result;
+
+                    foreach (var serviceBind in serviceBindingList)
                     {
-                        foreach (Exception e in ex.Flatten().InnerExceptions)
+                        client.ServiceBindings.DeleteServiceBinding(new Guid(serviceBind.EntityMetadata.Guid)).Wait();
+                        try
                         {
-                            if (e is CloudFoundryException)
+                            client.ServiceInstances.DeleteServiceInstance(serviceBind.ServiceInstanceGuid).Wait();
+                        }
+                        catch (AggregateException ex)
+                        {
+                            foreach (Exception e in ex.Flatten().InnerExceptions)
                             {
-                                logger.LogWarning(e.Message);
-                            }
-                            else
-                            {
-                                throw;
+                                if (e is CloudFoundryException)
+                                {
+                                    logger.LogWarning(e.Message);
+                                }
+                                else
+                                {
+                                    throw;
+                                }
                             }
                         }
                     }
                 }
-            }
 
-            client.Apps.DeleteApp(appGuid).Wait();
+                client.Apps.DeleteApp(appGuid).Wait();
+            }
+            catch (AggregateException exception)
+            {
+                List<string> messages = new List<string>();
+                ErrorFormatter.FormatExceptionMessage(exception, messages);
+                this.logger.LogError(string.Join(Environment.NewLine, messages));
+                return false;
+            }
 
             return true;
         }

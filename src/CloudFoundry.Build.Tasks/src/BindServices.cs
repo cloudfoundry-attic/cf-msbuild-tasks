@@ -25,41 +25,51 @@ namespace CloudFoundry.Build.Tasks
         {
             logger = new Microsoft.Build.Utilities.TaskLoggingHelper(this);
 
-            CloudFoundryClient client = InitClient();
-
-            logger.LogMessage("Binding services to app {0}", CFAppGuid);
-
-            List<string> bindingGuids = new List<string>();
-
-            foreach (string serviceGuid in CFServicesGuids)
+            try
             {
-                CreateServiceBindingRequest request = new CreateServiceBindingRequest();
-                request.AppGuid = new Guid(CFAppGuid);
-                request.ServiceInstanceGuid = new Guid(serviceGuid);
+                CloudFoundryClient client = InitClient();
 
-                try
+                logger.LogMessage("Binding services to app {0}", CFAppGuid);
+
+                List<string> bindingGuids = new List<string>();
+
+                foreach (string serviceGuid in CFServicesGuids)
                 {
-                    var result = client.ServiceBindings.CreateServiceBinding(request).Result;
-                    bindingGuids.Add(result.EntityMetadata.Guid);
-                }
-                catch (AggregateException ex)
-                {
-                    foreach (Exception e in ex.Flatten().InnerExceptions)
+                    CreateServiceBindingRequest request = new CreateServiceBindingRequest();
+                    request.AppGuid = new Guid(CFAppGuid);
+                    request.ServiceInstanceGuid = new Guid(serviceGuid);
+
+                    try
                     {
-                        if (e is CloudFoundryException)
+                        var result = client.ServiceBindings.CreateServiceBinding(request).Result;
+                        bindingGuids.Add(result.EntityMetadata.Guid);
+                    }
+                    catch (AggregateException ex)
+                    {
+                        foreach (Exception e in ex.Flatten().InnerExceptions)
                         {
-                            logger.LogWarning(e.Message);
-                        }
-                        else
-                        {
-                            throw;
+                            if (e is CloudFoundryException)
+                            {
+                                logger.LogWarning(e.Message);
+                            }
+                            else
+                            {
+                                throw;
+                            }
                         }
                     }
                 }
+
+                CFBindingGuids = bindingGuids.ToArray();
+
             }
-
-            CFBindingGuids = bindingGuids.ToArray();
-
+            catch (AggregateException exception)
+            {
+                List<string> messages = new List<string>();
+                ErrorFormatter.FormatExceptionMessage(exception, messages);
+                this.logger.LogError(string.Join(Environment.NewLine, messages));
+                return false;
+            }
             return true;
         }
     }

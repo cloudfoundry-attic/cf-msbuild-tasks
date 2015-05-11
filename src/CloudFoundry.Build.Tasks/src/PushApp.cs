@@ -24,17 +24,27 @@ namespace CloudFoundry.Build.Tasks
             
             logger = new Microsoft.Build.Utilities.TaskLoggingHelper(this);
 
-            CloudFoundryClient client = InitClient();
-
-            if (!Directory.Exists(CFAppPath))
+            try
             {
-                logger.LogError("Directory {0} not found", CFAppPath);
+                CloudFoundryClient client = InitClient();
+
+                if (!Directory.Exists(CFAppPath))
+                {
+                    logger.LogError("Directory {0} not found", CFAppPath);
+                    return false;
+                }
+
+                client.Apps.PushProgress += Apps_PushProgress;
+
+                client.Apps.Push(new Guid(CFAppGuid), CFAppPath, CFStart).Wait();
+            }
+            catch (AggregateException exception)
+            {
+                List<string> messages = new List<string>();
+                ErrorFormatter.FormatExceptionMessage(exception, messages);
+                this.logger.LogError(string.Join(Environment.NewLine, messages));
                 return false;
             }
-
-            client.Apps.PushProgress += Apps_PushProgress;
-            
-            client.Apps.Push(new Guid(CFAppGuid), CFAppPath, CFStart).Wait();
             return true;
         }
 
