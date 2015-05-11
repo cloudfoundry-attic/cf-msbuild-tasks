@@ -20,8 +20,17 @@ namespace CloudFoundry.Build.Tasks
 
         public override bool Execute()
         {
-            InitClient();
-
+            try
+            {
+                InitClient();
+            }
+            catch (AggregateException exception)
+            {
+                List<string> messages = new List<string>();
+                ErrorFormatter.FormatExceptionMessage(exception, messages);
+                this.logger.LogError(string.Join(Environment.NewLine, messages));
+                return false;
+            }
             return true;
         }
 
