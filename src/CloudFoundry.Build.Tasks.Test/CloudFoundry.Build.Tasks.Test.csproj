@@ -136,6 +136,7 @@
     <Compile Include="LoadYamlTaskTest.cs" />
     <Compile Include="SaveYamlTaskTest.cs" />
     <Compile Include="UpdateAppTaskTest.cs" />
+    <Compile Include="ValidateTaskTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

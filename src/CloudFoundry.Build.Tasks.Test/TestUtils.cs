@@ -292,7 +292,7 @@ namespace CloudFoundry.Build.Tasks.Test
 
         internal static List<ListAllOrganizationsResponse> CustomListAllOrganizationsResponse(PagedResponseCollection<ListAllOrganizationsResponse> arg1)
         {
-            return new List<ListAllOrganizationsResponse>() { new ListAllOrganizationsResponse(){ EntityMetadata=new Metadata()}};
+            return new List<ListAllOrganizationsResponse>() { new ListAllOrganizationsResponse(){ EntityMetadata=new Metadata() }};
 
         }
 
@@ -304,6 +304,11 @@ namespace CloudFoundry.Build.Tasks.Test
         internal static List<ListAllSpacesForOrganizationResponse> CustomListAllSpacesForOrganizationResponse(PagedResponseCollection<ListAllSpacesForOrganizationResponse> arg1)
         {
             return new List<ListAllSpacesForOrganizationResponse>() {new ListAllSpacesForOrganizationResponse(){ EntityMetadata=new Metadata(), Name="TestSpace"}};
+        }
+
+        internal static EntityGuid CustomMetadataGuidGet(Metadata arg1)
+        {
+            return EntityGuid.FromGuid(Guid.NewGuid());
         }
     }
 }

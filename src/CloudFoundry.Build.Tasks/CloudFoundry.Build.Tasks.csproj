@@ -130,6 +130,7 @@
     <Compile Include="src\UnbindService.cs" />
     <Compile Include="src\UpdateApp.cs" />
     <Compile Include="src\Utils.cs" />
+    <Compile Include="src\Validate.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="build\cf-msbuild-tasks.targets" />
