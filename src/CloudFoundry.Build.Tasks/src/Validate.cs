@@ -1,15 +1,15 @@
-﻿using CloudFoundry.CloudController.V2.Client;
-using CloudFoundry.CloudController.V2.Client.Data;
-using Microsoft.Build.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-
-namespace CloudFoundry.Build.Tasks
+﻿namespace CloudFoundry.Build.Tasks
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+    using System.Text.RegularExpressions;
+    using System.Threading.Tasks;
+    using CloudFoundry.CloudController.V2.Client;
+    using CloudFoundry.CloudController.V2.Client.Data;
+    using Microsoft.Build.Framework;
+
     public class Validate : BaseTask
     {
         [Required]
@@ -25,49 +25,49 @@ namespace CloudFoundry.Build.Tasks
         public string CFStack { get; set; }
 
         [Required]
-        public String[] CFRoutes { get; set; }
+        public string[] CFRoutes { get; set; }
 
         public string CFServices { get; set; }
 
         public override bool Execute()
         {
-            logger = new TaskLogger(this);
+            this.Logger = new TaskLogger(this);
             try
             {
                 CloudFoundryClient client = InitClient();
 
                 PagedResponseCollection<ListAllStacksResponse> stackList = client.Stacks.ListAllStacks().Result;
 
-                var stackInfo = stackList.Where(o => o.Name == CFStack).FirstOrDefault();
+                var stackInfo = stackList.Where(o => o.Name == this.CFStack).FirstOrDefault();
 
                 if (stackInfo == null)
                 {
-                    logger.LogError("Stack {0} not found", CFStack);
+                    this.Logger.LogError("Stack {0} not found", this.CFStack);
                     return false;
                 }
 
-                Guid? spaceGuid = Utils.GetSpaceGuid(client, logger, CFOrganization, CFSpace);
+                Guid? spaceGuid = Utils.GetSpaceGuid(client, this.Logger, this.CFOrganization, this.CFSpace);
 
                 if (spaceGuid.HasValue == false)
                 {
-                    logger.LogError("Invalid space and organization");
+                    this.Logger.LogError("Invalid space and organization");
                     return false;
                 }
 
                 PagedResponseCollection<ListAllDomainsDeprecatedResponse> domainInfoList = client.DomainsDeprecated.ListAllDomainsDeprecated().Result;
 
-                foreach (String Route in CFRoutes)
+                foreach (string route in this.CFRoutes)
                 {
-                    foreach (var url in Route.Split(';'))
+                    foreach (var url in route.Split(';'))
                     {
-                        logger.LogMessage("Validating route {0}", url);
+                        this.Logger.LogMessage("Validating route {0}", url);
                         string domain = string.Empty;
                         string host = string.Empty;
                         Utils.ExtractDomainAndHost(url, out domain, out host);
 
                         if (string.IsNullOrWhiteSpace(domain) || string.IsNullOrWhiteSpace(host))
                         {
-                            logger.LogError("Error extracting domain and host information from route {0}", url);
+                            this.Logger.LogError("Error extracting domain and host information from route {0}", url);
                             continue;
                         }
 
@@ -75,38 +75,37 @@ namespace CloudFoundry.Build.Tasks
 
                         if (domainInfo == null)
                         {
-                            logger.LogError("Domain {0} not found", domain);
+                            this.Logger.LogError("Domain {0} not found", domain);
                             return false;
                         }
                     }
                 }
 
-                if (string.IsNullOrWhiteSpace(CFServices) == false)
+                if (string.IsNullOrWhiteSpace(this.CFServices) == false)
                 {
-                    if (ValidateServices(client, CFServices) == false)
+                    if (this.ValidateServices(client, this.CFServices) == false)
                     {
-                        logger.LogError("Error validating services");
+                        this.Logger.LogError("Error validating services");
                         return false;
                     }
                 }
             }
             catch (Exception exception)
             {
-                this.logger.LogError("Validate failed", exception);
+                this.Logger.LogError("Validate failed", exception);
                 return false;
             }
 
             return true;
         }
 
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
-        private bool ValidateServices(CloudFoundryClient client, string CFServices)
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "General exceptions logged to file")]
+        private bool ValidateServices(CloudFoundryClient client, string cfservices)
         {
             List<ProvisionedService> servicesList = new List<ProvisionedService>();
             try
             {
-                string[] provServs = CFServices.Split(';');
+                string[] provServs = cfservices.Split(';');
 
                 foreach (string service in provServs)
                 {
@@ -116,7 +115,7 @@ namespace CloudFoundry.Build.Tasks
 
                         if (serviceInfo.Length != 3)
                         {
-                            logger.LogError("Invalid service information in {0}", service);
+                            this.Logger.LogError("Invalid service information in {0}", service);
                             continue;
                         }
 
@@ -132,20 +131,20 @@ namespace CloudFoundry.Build.Tasks
             }
             catch (Exception ex)
             {
-                logger.LogErrorFromException(ex);
-                logger.LogWarning("Error trying to obtain service information, trying to deserialize as xml");
-                servicesList = Utils.Deserialize<List<ProvisionedService>>(CFServices);
+                this.Logger.LogErrorFromException(ex);
+                this.Logger.LogWarning("Error trying to obtain service information, trying to deserialize as xml");
+                servicesList = Utils.Deserialize<List<ProvisionedService>>(cfservices);
             }
 
             foreach (ProvisionedService service in servicesList)
             {
-                logger.LogMessage("Validating {0} service {1}", service.Type, service.Name);
+                this.Logger.LogMessage("Validating {0} service {1}", service.Type, service.Name);
 
                 PagedResponseCollection<ListAllServicesResponse> allServicesList = client.Services.ListAllServices(new RequestOptions() { Query = "label:" + service.Type }).Result;
 
                 if (allServicesList.Count() < 1)
                 {
-                    logger.LogError("Invalid service type {0}", service.Type);
+                    this.Logger.LogError("Invalid service type {0}", service.Type);
                     return false;
                 }
 
@@ -161,7 +160,7 @@ namespace CloudFoundry.Build.Tasks
                     }
                     else
                     {
-                        logger.LogError("Invalid plan {2} for service {0} - {1}", service.Name, service.Type, service.Plan);
+                        this.Logger.LogError("Invalid plan {2} for service {0} - {1}", service.Name, service.Type, service.Plan);
                         return false;
                     }
                 }

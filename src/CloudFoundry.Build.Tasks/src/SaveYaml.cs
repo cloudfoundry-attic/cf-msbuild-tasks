@@ -1,19 +1,22 @@
-﻿using Microsoft.Build.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CloudFoundry.Build.Tasks
+﻿namespace CloudFoundry.Build.Tasks
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+    using System.Threading.Tasks;
+    using Microsoft.Build.Framework;
+
     public class SaveYaml : ITask
-    { 
+    {
+        private TaskLogger logger;
+
         public IBuildEngine BuildEngine
         {
             get;
             set;
         }
+
         public ITaskHost HostObject
         {
             get;
@@ -43,7 +46,7 @@ namespace CloudFoundry.Build.Tasks
 
         [Required]
         public int CFInstancesNumber { get; set; }
-        
+
         [Required]
         public int CFAppMemory { get; set; }
 
@@ -62,46 +65,42 @@ namespace CloudFoundry.Build.Tasks
 
         [Required]
         public string CFConfigurationFile { get; set; }
-
-        private TaskLogger logger;
       
         public bool Execute()
         {
-            logger = new TaskLogger(this);
-            logger.LogMessage("Saving configuration to {0}", CFConfigurationFile);
+            this.logger = new TaskLogger(this);
+            this.logger.LogMessage("Saving configuration to {0}", this.CFConfigurationFile);
 
             try
             {
-                PushProperties Configuration = new PushProperties();
-                Configuration.AppDir = CFAppPath;
-                Configuration.Applications = new Dictionary<string, AppDetails>();
-                Configuration.Applications.Add(CFAppPath, new AppDetails() { Name = CFAppName, Url = CFRoute });
-                Configuration.AutoscaleInfo = new Autoscale() { Cpu = new Cpu() { MaxCpu = CFMaxCpu, MinCpu = CFMinCpu }, Enabled = CFEnabled != null ? CFEnabled : "no", InstancesInfo = new Instances() { MaxInstances = CFMaxInstances != 0 ? CFMaxInstances : 1, MinInstances = CFMinInstances != 0 ? CFMinInstances : 1 } };
-                Configuration.Disk = CFDisk != 0 ? CFDisk : 1024;
-                Configuration.Instances = CFInstancesNumber;
-                Configuration.Memory = CFAppMemory;
-                Configuration.Name = CFAppName;
-                Configuration.PlacementZone = CFPlacementZone != null ? CFPlacementZone : "default";
-                if (CFServiceName != null)
+                PushProperties configuration = new PushProperties();
+                configuration.AppDir = this.CFAppPath;
+                configuration.Applications = new Dictionary<string, AppDetails>();
+                configuration.Applications.Add(this.CFAppPath, new AppDetails() { Name = this.CFAppName, Url = this.CFRoute });
+                configuration.AutoscaleInfo = new Autoscale() { Cpu = new Cpu() { MaxCpu = this.CFMaxCpu, MinCpu = this.CFMinCpu }, Enabled = this.CFEnabled != null ? this.CFEnabled : "no", InstancesInfo = new Instances() { MaxInstances = this.CFMaxInstances != 0 ? this.CFMaxInstances : 1, MinInstances = this.CFMinInstances != 0 ? this.CFMinInstances : 1 } };
+                configuration.Disk = this.CFDisk != 0 ? this.CFDisk : 1024;
+                configuration.Instances = this.CFInstancesNumber;
+                configuration.Memory = this.CFAppMemory;
+                configuration.Name = this.CFAppName;
+                configuration.PlacementZone = this.CFPlacementZone != null ? this.CFPlacementZone : "default";
+                if (this.CFServiceName != null)
                 {
-                    Configuration.Services = new Dictionary<string, ServiceDetails>();
-                    Configuration.Services.Add(CFServiceName, new ServiceDetails() { Plan = CFServicePlan, Type = CFServiceType });
+                    configuration.Services = new Dictionary<string, ServiceDetails>();
+                    configuration.Services.Add(this.CFServiceName, new ServiceDetails() { Plan = this.CFServicePlan, Type = this.CFServiceType });
                 }
 
-                Configuration.SsoEnabled = CFSsoEnabled != null ? CFSsoEnabled : "no";
-                Configuration.Stack = CFStack;
+                configuration.SsoEnabled = this.CFSsoEnabled != null ? this.CFSsoEnabled : "no";
+                configuration.Stack = this.CFStack;
 
-                Utils.SerializeToFile(Configuration, CFConfigurationFile);
+                Utils.SerializeToFile(configuration, this.CFConfigurationFile);
             }
-
             catch (Exception exception)
             {
                 this.logger.LogError("Save Yaml failed", exception);
                 return false;
             }
+
             return true;
         }
-
-      
     }
 }

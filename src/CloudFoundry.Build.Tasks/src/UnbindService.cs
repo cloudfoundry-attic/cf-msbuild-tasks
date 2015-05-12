@@ -1,14 +1,14 @@
-using CloudFoundry.CloudController.V2.Client;
-using CloudFoundry.CloudController.V2.Client.Data;
-using Microsoft.Build.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace CloudFoundry.Build.Tasks
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+    using System.Threading.Tasks;
+    using CloudFoundry.CloudController.V2.Client;
+    using CloudFoundry.CloudController.V2.Client.Data;
+    using Microsoft.Build.Framework;
+
     public class UnbindService : BaseTask
     {
         [Required]
@@ -25,45 +25,42 @@ namespace CloudFoundry.Build.Tasks
 
         public override bool Execute()
         {
-
-            logger = new TaskLogger(this);
+            this.Logger = new TaskLogger(this);
             try
             {
                 CloudFoundryClient client = InitClient();
 
-                logger.LogMessage("Unbinding service {0} from app {1}", CFServiceName, CFAppName);
+                Logger.LogMessage("Unbinding service {0} from app {1}", this.CFServiceName, this.CFAppName);
 
                 Guid? spaceGuid = null;
 
-                if ((!string.IsNullOrWhiteSpace(CFSpace)) && (!string.IsNullOrWhiteSpace(CFOrganization)))
+                if ((!string.IsNullOrWhiteSpace(this.CFSpace)) && (!string.IsNullOrWhiteSpace(this.CFOrganization)))
                 {
-                    spaceGuid = Utils.GetSpaceGuid(client, logger, CFOrganization, CFSpace);
+                    spaceGuid = Utils.GetSpaceGuid(client, this.Logger, this.CFOrganization, this.CFSpace);
                     if (spaceGuid == null)
                     {
                         return false;
                     }
                 }
 
-
-                var servicesList = client.Spaces.ListAllServiceInstancesForSpace(spaceGuid, new RequestOptions() { Query = "name:" + CFServiceName }).Result;
+                var servicesList = client.Spaces.ListAllServiceInstancesForSpace(spaceGuid, new RequestOptions() { Query = "name:" + this.CFServiceName }).Result;
 
                 if (servicesList.Count() > 1)
                 {
-                    logger.LogError("There are more services named {0} in space {1}", CFServiceName, CFSpace);
+                    Logger.LogError("There are more services named {0} in space {1}", this.CFServiceName, this.CFSpace);
                     return false;
                 }
 
                 Guid serviceGuid = new Guid(servicesList.FirstOrDefault().EntityMetadata.Guid);
 
-                PagedResponseCollection<ListAllAppsForSpaceResponse> appList = client.Spaces.ListAllAppsForSpace(spaceGuid, new RequestOptions() { Query = "name:" + CFAppName }).Result;
+                PagedResponseCollection<ListAllAppsForSpaceResponse> appList = client.Spaces.ListAllAppsForSpace(spaceGuid, new RequestOptions() { Query = "name:" + this.CFAppName }).Result;
                 if (appList.Count() > 1)
                 {
-                    logger.LogError("There are more applications named {0} in space {1}", CFAppName, CFSpace);
+                    Logger.LogError("There are more applications named {0} in space {1}", this.CFAppName, this.CFSpace);
                     return false;
                 }
 
                 Guid appGuid = new Guid(appList.FirstOrDefault().EntityMetadata.Guid);
-
 
                 var bindingsList = client.Apps.ListAllServiceBindingsForApp(appGuid).Result;
 
@@ -77,7 +74,7 @@ namespace CloudFoundry.Build.Tasks
             }
             catch (Exception exception)
             {
-                this.logger.LogError("Unbind Service failed", exception);
+                this.Logger.LogError("Unbind Service failed", exception);
                 return false;
             }
 
