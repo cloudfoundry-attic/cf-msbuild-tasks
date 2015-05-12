@@ -1,15 +1,15 @@
-using CloudFoundry.CloudController.V2.Client;
-using CloudFoundry.CloudController.V2.Client.Data;
-using Microsoft.Build.Framework;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace CloudFoundry.Build.Tasks
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Globalization;
+    using System.Linq;
+    using System.Text;
+    using System.Threading.Tasks;
+    using CloudFoundry.CloudController.V2.Client;
+    using CloudFoundry.CloudController.V2.Client.Data;
+    using Microsoft.Build.Framework;
+
     public class DeleteRoute : BaseTask
     {
         [Required]
@@ -17,21 +17,20 @@ namespace CloudFoundry.Build.Tasks
 
         public override bool Execute()
         {
-
-            logger = new TaskLogger(this);
+            this.Logger = new TaskLogger(this);
             try
             {
                 CloudFoundryClient client = InitClient();
 
-                logger.LogMessage("Deleting route {0}", CFRoute);
+                Logger.LogMessage("Deleting route {0}", this.CFRoute);
 
                 string domain = string.Empty;
                 string host = string.Empty;
-                Utils.ExtractDomainAndHost(CFRoute, out domain, out host);
+                Utils.ExtractDomainAndHost(this.CFRoute, out domain, out host);
 
                 if (string.IsNullOrWhiteSpace(domain) || string.IsNullOrWhiteSpace(host))
                 {
-                    logger.LogError("Error extracting domain and host information from route {0}", CFRoute);
+                    Logger.LogError("Error extracting domain and host information from route {0}", this.CFRoute);
                     return false;
                 }
 
@@ -42,7 +41,7 @@ namespace CloudFoundry.Build.Tasks
 
                 if (routeList.Count() > 1)
                 {
-                    logger.LogError("There is more than one route that matches for deletion of route {0}", CFRoute);
+                    Logger.LogError("There is more than one route that matches for deletion of route {0}", this.CFRoute);
                     return false;
                 }
 
@@ -50,9 +49,10 @@ namespace CloudFoundry.Build.Tasks
             }
             catch (Exception exception)
             {
-                this.logger.LogError("Delete Route failed", exception);
+                this.Logger.LogError("Delete Route failed", exception);
                 return false;
             }
+
             return true;
         }
     }

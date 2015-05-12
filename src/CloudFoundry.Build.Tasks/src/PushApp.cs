@@ -1,15 +1,15 @@
-﻿using CloudFoundry.CloudController.V2.Client;
-using CloudFoundry.UAA;
-using Microsoft.Build.Framework;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CloudFoundry.Build.Tasks
+﻿namespace CloudFoundry.Build.Tasks
 {
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+    using System.Text;
+    using System.Threading.Tasks;
+    using CloudFoundry.CloudController.V2.Client;
+    using CloudFoundry.UAA;
+    using Microsoft.Build.Framework;
+
     public class PushApp : BaseTask
     {
         [Required]
@@ -19,36 +19,37 @@ namespace CloudFoundry.Build.Tasks
         public string CFAppPath { get; set; }
 
         public bool CFStart { get; set; }
+
         public override bool Execute()
         {
-            
-            logger = new TaskLogger(this);
+            this.Logger = new TaskLogger(this);
 
             try
             {
                 CloudFoundryClient client = InitClient();
 
-                if (!Directory.Exists(CFAppPath))
+                if (!Directory.Exists(this.CFAppPath))
                 {
-                    logger.LogError("Directory {0} not found", CFAppPath);
+                    Logger.LogError("Directory {0} not found", this.CFAppPath);
                     return false;
                 }
 
-                client.Apps.PushProgress += Apps_PushProgress;
+                client.Apps.PushProgress += this.Apps_PushProgress;
 
-                client.Apps.Push(new Guid(CFAppGuid), CFAppPath, CFStart).Wait();
+                client.Apps.Push(new Guid(this.CFAppGuid), this.CFAppPath, this.CFStart).Wait();
             }
             catch (Exception exception)
             {
-                this.logger.LogError("Push App failed", exception);
+                this.Logger.LogError("Push App failed", exception);
                 return false;
             }
+
             return true;
         }
 
-        void Apps_PushProgress(object sender, CloudController.V2.Client.PushProgressEventArgs e)
+        private void Apps_PushProgress(object sender, CloudController.V2.Client.PushProgressEventArgs e)
         {
-            logger.LogMessage("Received from push job:{0} - {1}%", e.Message, e.Percent);
+            Logger.LogMessage("Received from push job:{0} - {1}%", e.Message, e.Percent);
         }
     }
 }

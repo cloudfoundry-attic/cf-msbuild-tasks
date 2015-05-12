@@ -1,16 +1,16 @@
-using CloudFoundry.CloudController.V2.Client;
-using CloudFoundry.CloudController.V2.Client.Data;
-using Microsoft.Build.Framework;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace CloudFoundry.Build.Tasks
 {
-    public class UnbindRoute:BaseTask
+    using System;
+    using System.Collections.Generic;
+    using System.Globalization;
+    using System.Linq;
+    using System.Text;
+    using System.Threading.Tasks;
+    using CloudFoundry.CloudController.V2.Client;
+    using CloudFoundry.CloudController.V2.Client.Data;
+    using Microsoft.Build.Framework;
+
+    public class UnbindRoute : BaseTask
     {
         [Required]
         public string CFRoute { get; set; }
@@ -26,22 +26,21 @@ namespace CloudFoundry.Build.Tasks
 
         public override bool Execute()
         {
-
-            logger = new TaskLogger(this);
+            this.Logger = new TaskLogger(this);
 
             try
             {
                 CloudFoundryClient client = InitClient();
 
-                logger.LogMessage("Unbinding route {0} from app {1}", CFRoute, CFAppName);
+                Logger.LogMessage("Unbinding route {0} from app {1}", this.CFRoute, this.CFAppName);
 
                 string domain = string.Empty;
                 string host = string.Empty;
-                Utils.ExtractDomainAndHost(CFRoute, out domain, out host);
+                Utils.ExtractDomainAndHost(this.CFRoute, out domain, out host);
 
                 if (string.IsNullOrWhiteSpace(domain) || string.IsNullOrWhiteSpace(host))
                 {
-                    logger.LogError("Error extracting domain and host information from route {0}", CFRoute);
+                    Logger.LogError("Error extracting domain and host information from route {0}", this.CFRoute);
                     return false;
                 }
 
@@ -50,19 +49,19 @@ namespace CloudFoundry.Build.Tasks
 
                 Guid? spaceGuid = null;
 
-                if ((!string.IsNullOrWhiteSpace(CFSpace)) && (!string.IsNullOrWhiteSpace(CFOrganization)))
+                if ((!string.IsNullOrWhiteSpace(this.CFSpace)) && (!string.IsNullOrWhiteSpace(this.CFOrganization)))
                 {
-                    spaceGuid = Utils.GetSpaceGuid(client, logger, CFOrganization, CFSpace);
+                    spaceGuid = Utils.GetSpaceGuid(client, this.Logger, this.CFOrganization, this.CFSpace);
                     if (spaceGuid == null)
                     {
                         return false;
                     }
                 }
 
-                PagedResponseCollection<ListAllAppsForSpaceResponse> appList = client.Spaces.ListAllAppsForSpace(spaceGuid, new RequestOptions() { Query = "name:" + CFAppName }).Result;
+                PagedResponseCollection<ListAllAppsForSpaceResponse> appList = client.Spaces.ListAllAppsForSpace(spaceGuid, new RequestOptions() { Query = "name:" + this.CFAppName }).Result;
                 if (appList.Count() > 1)
                 {
-                    logger.LogError("There are more applications named {0} in space {1}", CFAppName, CFSpace);
+                    Logger.LogError("There are more applications named {0} in space {1}", this.CFAppName, this.CFSpace);
                     return false;
                 }
 
@@ -74,7 +73,7 @@ namespace CloudFoundry.Build.Tasks
 
                 if (routeInfo == null)
                 {
-                    logger.LogError("Route {0} not found in {1}'s routes", CFRoute, CFAppName);
+                    Logger.LogError("Route {0} not found in {1}'s routes", this.CFRoute, this.CFAppName);
                     return false;
                 }
 
@@ -82,13 +81,11 @@ namespace CloudFoundry.Build.Tasks
             }
             catch (Exception exception)
             {
-                this.logger.LogError("Unbind Route failed", exception);
+                this.Logger.LogError("Unbind Route failed", exception);
                 return false;
             }
         
             return true;
         }
-
-      
     }
 }
