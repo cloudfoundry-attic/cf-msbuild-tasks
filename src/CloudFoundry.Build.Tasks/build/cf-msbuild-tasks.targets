@@ -15,6 +15,7 @@
   <UsingTask AssemblyFile="Cloudfoundry.Build.Tasks.dll" TaskName="SaveYaml" />
   <UsingTask AssemblyFile="Cloudfoundry.Build.Tasks.dll" TaskName="DeleteApp" />
   <UsingTask AssemblyFile="Cloudfoundry.Build.Tasks.dll" TaskName="RestartApp" />
+  <UsingTask AssemblyFile="Cloudfoundry.Build.Tasks.dll" TaskName="Validate" />
 
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v12.0\Web\Microsoft.Web.Publishing.targets" Condition="false" />
 
@@ -64,7 +65,10 @@
       <Output TaskParameter="CFRefreshToken" PropertyName="CFRefreshToken"/>
     </LoginTask>
 
-    <CreateApp CFAppName="$(CFAppName)" CFStack="$(CFStack)" CFOrganization="$(CFOrganization)" CFSpace="$(CFSpace)" CFServerUri="$(CFServerUri)" CFEnvironmentJson="@(CFEnvironmentJson)" CFRefreshToken="$(CFRefreshToken)" CFAppMemory="$(CFAppMemory)" CFAppInstances="$(CFAppInstances)" CFSkipSslValidation="$(CFSkipSslValidation)">
+	<Validate CFAppName="$(CFAppName)" CFStack="$(CFStack)" CFOrganization="$(CFOrganization)" CFSpace="$(CFSpace)" CFServerUri="$(CFServerUri)" CFRefreshToken="$(CFRefreshToken)" CFRoutes="@(CFRoutes)" CFServices="$(CFServices)" CFSkipSslValidation="$(CFSkipSslValidation)">
+	</Validate>
+	
+    <CreateApp CFAppName="$(CFAppName)" CFStack="$(CFStack)" CFOrganization="$(CFOrganization)" CFSpace="$(CFSpace)" CFServerUri="$(CFServerUri)" CFEnvironmentJson="$(CFEnvironmentJson)" CFRefreshToken="$(CFRefreshToken)" CFAppMemory="$(CFAppMemory)" CFAppInstances="$(CFAppInstances)" CFSkipSslValidation="$(CFSkipSslValidation)">
       <Output TaskParameter="CFAppGuid" PropertyName="CFAppGuid"/>
     </CreateApp>
 
