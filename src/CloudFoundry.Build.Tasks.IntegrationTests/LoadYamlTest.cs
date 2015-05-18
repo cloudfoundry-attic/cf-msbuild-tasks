@@ -3,18 +3,20 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace CloudFoundry.Build.Tasks.IntegrationTests
 {
     [TestClass]
+    [Ignore]
     public class LoadYamlTest
     {
         [TestMethod]
         public void LoadYaml_Test()
         {
-            string pathToManifest=@"C:\test\manifest.yaml";
+            string pathToManifest = @"C:\test\manifest.yaml";
 
             if (File.Exists(pathToManifest))
             {

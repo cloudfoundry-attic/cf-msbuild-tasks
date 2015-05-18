@@ -25,7 +25,67 @@ namespace CloudFoundry.Build.Tasks.IntegrationTests.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("admin")]
+        [global::System.Configuration.DefaultSettingValueAttribute("org")]
+        public string Organization {
+            get {
+                return ((string)(this["Organization"]));
+            }
+            set {
+                this["Organization"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("space")]
+        public string Space {
+            get {
+                return ((string)(this["Space"]));
+            }
+            set {
+                this["Space"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("win2012r2")]
+        public string Stack {
+            get {
+                return ((string)(this["Stack"]));
+            }
+            set {
+                this["Stack"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("mssql2012")]
+        public string ServiceType {
+            get {
+                return ((string)(this["ServiceType"]));
+            }
+            set {
+                this["ServiceType"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("free")]
+        public string ServicePlan {
+            get {
+                return ((string)(this["ServicePlan"]));
+            }
+            set {
+                this["ServicePlan"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("testUser")]
         public string User {
             get {
                 return ((string)(this["User"]));
@@ -37,7 +97,7 @@ namespace CloudFoundry.Build.Tasks.IntegrationTests.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("admin")]
+        [global::System.Configuration.DefaultSettingValueAttribute("testPassword")]
         public string Password {
             get {
                 return ((string)(this["Password"]));
@@ -49,7 +109,7 @@ namespace CloudFoundry.Build.Tasks.IntegrationTests.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("http://api.15.126.213.170.xip.io")]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://api.1.2.3.4.xip.io")]
         public string ServerUri {
             get {
                 return ((string)(this["ServerUri"]));
@@ -61,13 +121,13 @@ namespace CloudFoundry.Build.Tasks.IntegrationTests.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("C:\\test\\CloudTestApp-Ng")]
-        public string AppPath {
+        [global::System.Configuration.DefaultSettingValueAttribute("testapp{0}.1.2.3.4.xip.io")]
+        public string Route {
             get {
-                return ((string)(this["AppPath"]));
+                return ((string)(this["Route"]));
             }
             set {
-                this["AppPath"] = value;
+                this["Route"] = value;
             }
         }
     }

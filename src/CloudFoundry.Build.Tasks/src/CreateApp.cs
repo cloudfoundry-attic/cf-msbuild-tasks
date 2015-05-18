@@ -47,7 +47,7 @@ namespace CloudFoundry.Build.Tasks
 
             if (CFSpace.Length > 0 && CFOrganization.Length > 0)
             {
-                spaceGuid = Utils.GetSpaceGuid(client,logger,CFOrganization,CFSpace);
+                spaceGuid = Utils.GetSpaceGuid(client, logger, CFOrganization, CFSpace);
                 if (spaceGuid == null)
                 {
                     return false;
