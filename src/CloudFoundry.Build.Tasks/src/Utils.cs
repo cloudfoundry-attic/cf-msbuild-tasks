@@ -117,7 +117,7 @@ namespace CloudFoundry.Build.Tasks
         }
 
 
-        internal static Guid? GetSpaceGuid(CloudFoundryClient client,Microsoft.Build.Utilities.TaskLoggingHelper logger, string CFOrganization, string CFSpace)
+        internal static Guid? GetSpaceGuid(CloudFoundryClient client, TaskLogger logger, string CFOrganization, string CFSpace)
         {
             Guid? spaceGuid=null;
             PagedResponseCollection<ListAllOrganizationsResponse> orgList = client.Organizations.ListAllOrganizations(new RequestOptions() { Query = "name:" + CFOrganization }).Result;

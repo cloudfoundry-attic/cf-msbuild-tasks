@@ -22,19 +22,27 @@ namespace CloudFoundry.Build.Tasks
         public override bool Execute()
         {
             
-            logger = new Microsoft.Build.Utilities.TaskLoggingHelper(this);
+            logger = new TaskLogger(this);
 
-            CloudFoundryClient client = InitClient();
-
-            if (!Directory.Exists(CFAppPath))
+            try
             {
-                logger.LogError("Directory {0} not found", CFAppPath);
+                CloudFoundryClient client = InitClient();
+
+                if (!Directory.Exists(CFAppPath))
+                {
+                    logger.LogError("Directory {0} not found", CFAppPath);
+                    return false;
+                }
+
+                client.Apps.PushProgress += Apps_PushProgress;
+
+                client.Apps.Push(new Guid(CFAppGuid), CFAppPath, CFStart).Wait();
+            }
+            catch (Exception exception)
+            {
+                this.logger.LogError("Push App failed", exception);
                 return false;
             }
-
-            client.Apps.PushProgress += Apps_PushProgress;
-            
-            client.Apps.Push(new Guid(CFAppGuid), CFAppPath, CFStart).Wait();
             return true;
         }
 

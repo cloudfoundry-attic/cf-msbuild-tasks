@@ -18,23 +18,29 @@ namespace CloudFoundry.Build.Tasks
         public String[] CFRouteGuids { get; set; }
         public override bool Execute()
         {
-           
-            logger = new Microsoft.Build.Utilities.TaskLoggingHelper(this);
+            logger = new TaskLogger(this);
 
-            if (CFAppGuid.Length == 0)
+            if (CFAppGuid == null || CFAppGuid.Length == 0)
             {
                 logger.LogError("Application Guid must be specified");
                 return false;
             }
 
-            CloudFoundryClient client = InitClient();
-            
-            logger.LogMessage("Binding routes to application {0}", CFAppGuid);
-            foreach (string routeGuid in CFRouteGuids)
+            try
             {
-                client.Apps.AssociateRouteWithApp(new Guid(CFAppGuid), new Guid(routeGuid)).Wait();
+                CloudFoundryClient client = InitClient();
+
+                logger.LogMessage("Binding routes to application {0}", CFAppGuid);
+                foreach (string routeGuid in CFRouteGuids)
+                {
+                    client.Apps.AssociateRouteWithApp(new Guid(CFAppGuid), new Guid(routeGuid)).Wait();
+                }
             }
-            
+            catch (Exception exception)
+            {
+                this.logger.LogError("Bind Routes failed", exception);
+                return false;
+            }
             return true;
         }
     }
