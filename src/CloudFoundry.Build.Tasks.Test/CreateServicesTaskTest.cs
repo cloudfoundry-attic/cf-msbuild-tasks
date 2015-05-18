@@ -3,6 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.QualityTools.Testing.Fakes;
 using CloudFoundry.CloudController.V2.Client.Data;
 using CloudFoundry.Build.Tasks.Test.Properties;
+using Microsoft.Build.Utilities;
 
 namespace CloudFoundry.Build.Tasks.Test
 {
@@ -46,7 +47,8 @@ namespace CloudFoundry.Build.Tasks.Test
                 TestUtils.InitTestMetadata();
 
                 CreateServices task = new CreateServices();
-                task.CFServices = @"service1,mysql,free;service2,mssql2012,free;";
+                task.CFServices = new TaskItem[1];
+                task.CFServices[0] = new TaskItem("service1,mysql,free;service2,mssql2012,free;");
 
                 task.CFSpace = "TestSpace";
                 task.CFOrganization = "TestOrg";

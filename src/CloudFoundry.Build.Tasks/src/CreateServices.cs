@@ -15,7 +15,7 @@ namespace CloudFoundry.Build.Tasks
         public string CFOrganization { get; set; }
 
         [Required]
-        public string CFServices { get; set; }
+        public ITaskItem[] CFServices { get; set; }
 
         [Required]
         public string CFSpace { get; set; }
@@ -43,28 +43,44 @@ namespace CloudFoundry.Build.Tasks
                         return false;
                     }
                 }
-                List<ProvisionedService> servicesList = new List<ProvisionedService>();
+            }
+            List<ProvisionedService> servicesList = new List<ProvisionedService>();
+
+            foreach (ITaskItem servicesInfo in CFServices)
+            {
                 try
                 {
-                    string[] provServs = CFServices.Split(';');
-
-                    foreach (string service in provServs)
+                    if (servicesInfo.ToString().Contains(','))
                     {
-                        if (string.IsNullOrWhiteSpace(service) == false)
+                        string[] provServs = servicesInfo.ToString().Split(';');
+
+                        foreach (string service in provServs)
                         {
-                            string[] serviceInfo = service.Split(',');
-
-                            if (serviceInfo.Length != 3)
+                            if (string.IsNullOrWhiteSpace(service) == false)
                             {
-                                logger.LogError("Invalid service information in {0}", service);
-                                continue;
+                                string[] serviceInfo = service.Split(',');
+
+                                if (serviceInfo.Length != 3)
+                                {
+                                    logger.LogError("Invalid service information in {0}", service);
+                                    continue;
+                                }
+
+                                ProvisionedService serviceDetails = new ProvisionedService();
+
+                                serviceDetails.Name = serviceInfo[0].Trim();
+                                serviceDetails.Type = serviceInfo[1].Trim();
+                                serviceDetails.Plan = serviceInfo[2].Trim();
+
+                                servicesList.Add(serviceDetails);
                             }
-
-                            ProvisionedService serviceDetails = new ProvisionedService();
-
-                            serviceDetails.Name = serviceInfo[0].Trim();
-                            serviceDetails.Type = serviceInfo[1].Trim();
-                            serviceDetails.Plan = serviceInfo[2].Trim();
+                        }
+                    }
+                    else
+                    {
+                        ProvisionedService serviceDetails = new ProvisionedService();
+                        serviceDetails.Name = servicesInfo.ToString();
+                        serviceDetails.Type = servicesInfo.GetMetadata("Type");
 
                             servicesList.Add(serviceDetails);
                         }
