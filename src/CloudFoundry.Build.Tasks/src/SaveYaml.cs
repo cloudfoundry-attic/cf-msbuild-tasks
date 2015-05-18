@@ -63,34 +63,42 @@ namespace CloudFoundry.Build.Tasks
         [Required]
         public string CFConfigurationFile { get; set; }
 
-        private Microsoft.Build.Utilities.TaskLoggingHelper logger;
+        private TaskLogger logger;
       
         public bool Execute()
         {
-            logger = new Microsoft.Build.Utilities.TaskLoggingHelper(this);
+            logger = new TaskLogger(this);
             logger.LogMessage("Saving configuration to {0}", CFConfigurationFile);
-            
-            PushProperties Configuration = new PushProperties();
-            Configuration.AppDir = CFAppPath;
-            Configuration.Applications = new Dictionary<string, AppDetails>();
-            Configuration.Applications.Add(CFAppPath, new AppDetails() { Name = CFAppName, Url = CFRoute });
-            Configuration.AutoscaleInfo = new Autoscale() { Cpu = new Cpu() { MaxCpu = CFMaxCpu, MinCpu = CFMinCpu }, Enabled = CFEnabled !=null ? CFEnabled: "no", InstancesInfo = new Instances() { MaxInstances = CFMaxInstances !=0 ? CFMaxInstances : 1, MinInstances = CFMinInstances != 0 ? CFMinInstances : 1 } };
-            Configuration.Disk = CFDisk!=0 ? CFDisk : 1024;
-            Configuration.Instances = CFInstancesNumber;
-            Configuration.Memory = CFAppMemory;
-            Configuration.Name = CFAppName;
-            Configuration.PlacementZone = CFPlacementZone !=null ? CFPlacementZone : "default";
-            if (CFServiceName != null)
+
+            try
             {
-                Configuration.Services = new Dictionary<string, ServiceDetails>();
-                Configuration.Services.Add(CFServiceName, new ServiceDetails() { Plan = CFServicePlan, Type = CFServiceType });
+                PushProperties Configuration = new PushProperties();
+                Configuration.AppDir = CFAppPath;
+                Configuration.Applications = new Dictionary<string, AppDetails>();
+                Configuration.Applications.Add(CFAppPath, new AppDetails() { Name = CFAppName, Url = CFRoute });
+                Configuration.AutoscaleInfo = new Autoscale() { Cpu = new Cpu() { MaxCpu = CFMaxCpu, MinCpu = CFMinCpu }, Enabled = CFEnabled != null ? CFEnabled : "no", InstancesInfo = new Instances() { MaxInstances = CFMaxInstances != 0 ? CFMaxInstances : 1, MinInstances = CFMinInstances != 0 ? CFMinInstances : 1 } };
+                Configuration.Disk = CFDisk != 0 ? CFDisk : 1024;
+                Configuration.Instances = CFInstancesNumber;
+                Configuration.Memory = CFAppMemory;
+                Configuration.Name = CFAppName;
+                Configuration.PlacementZone = CFPlacementZone != null ? CFPlacementZone : "default";
+                if (CFServiceName != null)
+                {
+                    Configuration.Services = new Dictionary<string, ServiceDetails>();
+                    Configuration.Services.Add(CFServiceName, new ServiceDetails() { Plan = CFServicePlan, Type = CFServiceType });
+                }
+
+                Configuration.SsoEnabled = CFSsoEnabled != null ? CFSsoEnabled : "no";
+                Configuration.Stack = CFStack;
+
+                Utils.SerializeToFile(Configuration, CFConfigurationFile);
             }
-            
-            Configuration.SsoEnabled = CFSsoEnabled!=null ? CFSsoEnabled : "no";
-            Configuration.Stack = CFStack;
 
-            Utils.SerializeToFile(Configuration, CFConfigurationFile);
-
+            catch (Exception exception)
+            {
+                this.logger.LogError("Save Yaml failed", exception);
+                return false;
+            }
             return true;
         }
 

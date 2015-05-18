@@ -31,63 +31,70 @@ namespace CloudFoundry.Build.Tasks
 
         public override bool Execute()
         {
-            logger = new Microsoft.Build.Utilities.TaskLoggingHelper(this);
-            CloudFoundryClient client = InitClient();
-            
-            PagedResponseCollection<ListAllStacksResponse> stackList = client.Stacks.ListAllStacks().Result;
-
-            var stackInfo = stackList.Where(o => o.Name == CFStack).FirstOrDefault();
-
-            if (stackInfo == null)
+            logger = new TaskLogger(this);
+            try
             {
-                logger.LogError("Stack {0} not found", CFStack);
-                return false;
-            }
-            
-            Guid? spaceGuid = Utils.GetSpaceGuid(client, logger, CFOrganization, CFSpace);
+                CloudFoundryClient client = InitClient();
 
-            if (spaceGuid.HasValue == false)
-            {
-                logger.LogError("Invalid space and organization");
-                return false;
-            }
+                PagedResponseCollection<ListAllStacksResponse> stackList = client.Stacks.ListAllStacks().Result;
 
-            PagedResponseCollection<ListAllDomainsDeprecatedResponse> domainInfoList = client.DomainsDeprecated.ListAllDomainsDeprecated().Result;
+                var stackInfo = stackList.Where(o => o.Name == CFStack).FirstOrDefault();
 
-            foreach (String Route in CFRoutes)
-            {
-                foreach (var url in Route.Split(';'))
+                if (stackInfo == null)
                 {
-                    logger.LogMessage("Validating route {0}", url);
-                    string domain = string.Empty;
-                    string host = string.Empty;
-                    Utils.ExtractDomainAndHost(url, out domain, out host);
+                    logger.LogError("Stack {0} not found", CFStack);
+                    return false;
+                }
 
-                    if (domain.Length == 0 || host.Length == 0)
+                Guid? spaceGuid = Utils.GetSpaceGuid(client, logger, CFOrganization, CFSpace);
+
+                if (spaceGuid.HasValue == false)
+                {
+                    logger.LogError("Invalid space and organization");
+                    return false;
+                }
+
+                PagedResponseCollection<ListAllDomainsDeprecatedResponse> domainInfoList = client.DomainsDeprecated.ListAllDomainsDeprecated().Result;
+
+                foreach (String Route in CFRoutes)
+                {
+                    foreach (var url in Route.Split(';'))
                     {
-                        logger.LogError("Error extracting domain and host information from route {0}", url);
-                        continue;
+                        logger.LogMessage("Validating route {0}", url);
+                        string domain = string.Empty;
+                        string host = string.Empty;
+                        Utils.ExtractDomainAndHost(url, out domain, out host);
+
+                        if (domain.Length == 0 || host.Length == 0)
+                        {
+                            logger.LogError("Error extracting domain and host information from route {0}", url);
+                            continue;
+                        }
+
+                        ListAllDomainsDeprecatedResponse domainInfo = domainInfoList.Where(o => o.Name.ToUpperInvariant() == domain.ToUpperInvariant()).FirstOrDefault();
+
+                        if (domainInfo == null)
+                        {
+                            logger.LogError("Domain {0} not found", domain);
+                            return false;
+                        }
                     }
+                }
 
-                    ListAllDomainsDeprecatedResponse domainInfo = domainInfoList.Where(o => o.Name.ToUpperInvariant() == domain.ToUpperInvariant()).FirstOrDefault();
-
-                    if (domainInfo == null)
+                if (string.IsNullOrWhiteSpace(CFServices) == false)
+                {
+                    if (ValidateServices(client, CFServices) == false)
                     {
-                        logger.LogError("Domain {0} not found", domain);
+                        logger.LogError("Error validating services");
                         return false;
                     }
                 }
             }
-
-            if (string.IsNullOrWhiteSpace(CFServices) == false)
+            catch (Exception exception)
             {
-                if (ValidateServices(client, CFServices) == false)
-                {
-                    logger.LogError("Error validating services");
-                    return false;
-                }
+                this.logger.LogError("Validate failed", exception);
+                return false;
             }
-
 
             return true;
         }
