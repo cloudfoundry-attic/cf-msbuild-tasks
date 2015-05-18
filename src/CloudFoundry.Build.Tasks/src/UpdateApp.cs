@@ -44,34 +44,32 @@ namespace CloudFoundry.Build.Tasks
 
                 UpdateAppRequest request = new UpdateAppRequest();
 
-            request.Name = CFAppName;
-            request.Memory = CFAppMemory;
-            request.Instances = CFAppInstances;
-            request.Buildpack = CFAppBuildpack;
-            request.State = CFAppState;
-
-            if (CFEnvironmentJson != null)
-            {
-                Dictionary<string, string> EnvDict = new Dictionary<string, string>();
-                foreach (ITaskItem item in CFEnvironmentJson)
-                {
-                    if (Utils.IsJson(item.ToString()))
-                    {
-                        EnvDict = JsonConvert.DeserializeObject<Dictionary<string, string>>(item.ToString());
-                        break;
-                    }
-                    else
-                    {
-                        EnvDict.Add(item.ToString(), item.GetMetadata("Value"));
+                request.Name = CFAppName;
+                request.Memory = CFAppMemory;
+                request.Instances = CFAppInstances;
+                request.Buildpack = CFAppBuildpack;
+                request.State = CFAppState;
 
                 if (CFEnvironmentJson != null)
                 {
-                    request.EnvironmentJson = JsonConvert.DeserializeObject<Dictionary<string, string>>(CFEnvironmentJson);
+                    Dictionary<string, string> EnvDict = new Dictionary<string, string>();
+                    foreach (ITaskItem item in CFEnvironmentJson)
+                    {
+                        if (Utils.IsJson(item.ToString()))
+                        {
+                            EnvDict = JsonConvert.DeserializeObject<Dictionary<string, string>>(item.ToString());
+                            break;
+                        }
+                        else
+                        {
+                            EnvDict.Add(item.ToString(), item.GetMetadata("Value"));
+                        }
+                    }
+
+                    UpdateAppResponse response = client.Apps.UpdateApp(new Guid(CFAppGuid), request).Result;
+
+                    logger.LogMessage("Updated app {0} with guid {1}", response.Name, CFAppGuid);
                 }
-
-                UpdateAppResponse response = client.Apps.UpdateApp(new Guid(CFAppGuid), request).Result;
-
-                logger.LogMessage("Updated app {0} with guid {1}", response.Name, CFAppGuid);
             }
             catch (Exception exception)
             {
