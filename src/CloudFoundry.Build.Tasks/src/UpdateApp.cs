@@ -23,7 +23,7 @@ namespace CloudFoundry.Build.Tasks
 
         public string CFAppState { get; set; }
 
-        public string CFEnvironmentJson { get; set; }
+        public ITaskItem[] CFEnvironmentJson { get; set; }
 
         [Required]
         public string CFAppGuid { get; set; }
@@ -44,11 +44,25 @@ namespace CloudFoundry.Build.Tasks
 
                 UpdateAppRequest request = new UpdateAppRequest();
 
-                request.Name = CFAppName;
-                request.Memory = CFAppMemory;
-                request.Instances = CFAppInstances;
-                request.Buildpack = CFAppBuildpack;
-                request.State = CFAppState;
+            request.Name = CFAppName;
+            request.Memory = CFAppMemory;
+            request.Instances = CFAppInstances;
+            request.Buildpack = CFAppBuildpack;
+            request.State = CFAppState;
+
+            if (CFEnvironmentJson != null)
+            {
+                Dictionary<string, string> EnvDict = new Dictionary<string, string>();
+                foreach (ITaskItem item in CFEnvironmentJson)
+                {
+                    if (Utils.IsJson(item.ToString()))
+                    {
+                        EnvDict = JsonConvert.DeserializeObject<Dictionary<string, string>>(item.ToString());
+                        break;
+                    }
+                    else
+                    {
+                        EnvDict.Add(item.ToString(), item.GetMetadata("Value"));
 
                 if (CFEnvironmentJson != null)
                 {

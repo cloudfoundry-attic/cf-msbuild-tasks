@@ -4,7 +4,8 @@ using CloudFoundry.Build.Tasks.IntegrationTests.Properties;
 using System.Net;
 using System.Reflection;
 using System.IO;
-
+using Microsoft.Build.Framework;
+using Microsoft.Build.Utilities;
 namespace CloudFoundry.Build.Tasks.IntegrationTests
 {
     [TestClass]
@@ -37,7 +38,8 @@ namespace CloudFoundry.Build.Tasks.IntegrationTests
             task.CFSpace = Settings.Default.Space;
             task.CFOrganization = Settings.Default.Organization;
             task.CFStack = Settings.Default.Stack;
-            task.CFEnvironmentJson = "{\"mykey\":\"abcd\",\"secondkey\":\"efgh\"}";
+            task.CFEnvironmentJson = new TaskItem[1]{ new TaskItem("testName") };
+            task.CFEnvironmentJson[0].SetMetadata("Value", "testValue");
 
             task.BuildEngine = new FakeBuildEngine();
             task.Execute();
