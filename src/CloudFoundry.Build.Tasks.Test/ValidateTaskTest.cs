@@ -68,13 +68,13 @@ namespace CloudFoundry.Build.Tasks.Test
          }
 
          [TestMethod]
-         public void ValidateBadName_Test()
+         public void ValidateAnyName_Test()
          {
              Validate task = GetValidateTask();
 
-             task.CFAppName = "t@#!asda1";
+             task.CFAppName = "t@#!asda1--";
          
-             Assert.IsFalse(task.Execute());
+             Assert.IsTrue(task.Execute());
          }
 
          [TestMethod]

@@ -29,19 +29,11 @@ namespace CloudFoundry.Build.Tasks
 
         public string CFServices { get; set; }
 
-        private Regex reg = new Regex(@"^[a-zA-Z0-9_]*$");
-
         public override bool Execute()
         {
             logger = new Microsoft.Build.Utilities.TaskLoggingHelper(this);
             CloudFoundryClient client = InitClient();
             
-            if (reg.IsMatch(CFAppName) == false)
-            {
-                logger.LogError("Invalid application name {0}", CFAppName);
-                return false;
-            }
-
             PagedResponseCollection<ListAllStacksResponse> stackList = client.Stacks.ListAllStacks().Result;
 
             var stackInfo = stackList.Where(o => o.Name == CFStack).FirstOrDefault();
@@ -77,7 +69,7 @@ namespace CloudFoundry.Build.Tasks
                         continue;
                     }
 
-                    ListAllDomainsDeprecatedResponse domainInfo = domainInfoList.Where(o => o.Name == domain).FirstOrDefault();
+                    ListAllDomainsDeprecatedResponse domainInfo = domainInfoList.Where(o => o.Name.ToUpperInvariant() == domain.ToUpperInvariant()).FirstOrDefault();
 
                     if (domainInfo == null)
                     {
@@ -141,12 +133,6 @@ namespace CloudFoundry.Build.Tasks
             foreach (ProvisionedService service in servicesList)
             {
                 logger.LogMessage("Validating {0} service {1}", service.Type, service.Name);
-
-                if (reg.IsMatch(service.Name) == false)
-                {
-                    logger.LogError("Invalid service name {0}", service.Name);
-                    return false;
-                }
 
                 PagedResponseCollection<ListAllServicesResponse> allServicesList = client.Services.ListAllServices(new RequestOptions() { Query = "label:" + service.Type }).Result;
 
