@@ -32,50 +32,58 @@ namespace CloudFoundry.Build.Tasks
 
         public override bool Execute()
         {
-           
-            logger = new Microsoft.Build.Utilities.TaskLoggingHelper(this);
 
-            CloudFoundryClient client = InitClient();
+            logger = new TaskLogger(this);
 
-            Guid? spaceGuid = null;
-
-            if (CFSpace.Length > 0 && CFOrganization.Length > 0)
+            try
             {
-                spaceGuid = Utils.GetSpaceGuid(client, logger, CFOrganization, CFSpace);
+                CloudFoundryClient client = InitClient();
 
-                if (spaceGuid == null)
+                Guid? spaceGuid = null;
+
+                if ((!string.IsNullOrWhiteSpace(CFSpace)) && (!string.IsNullOrWhiteSpace(CFOrganization)))
                 {
-                    return false;
+                    spaceGuid = Utils.GetSpaceGuid(client, logger, CFOrganization, CFSpace);
+
+                    if (spaceGuid == null)
+                    {
+                        return false;
+                    }
                 }
+
+                Guid? planGuid = null;
+                PagedResponseCollection<ListAllServicesResponse> servicesList = client.Services.ListAllServices(new RequestOptions() { Query = "label:" + CFServiceType }).Result;
+
+                foreach (var service in servicesList)
+                {
+                    var planList = client.Services.ListAllServicePlansForService(new Guid(service.EntityMetadata.Guid)).Result;
+
+                    var plan = planList.Where(o => o.Name == CFServicePlan).FirstOrDefault();
+
+                    if (plan != null)
+                    {
+                        planGuid = new Guid(plan.EntityMetadata.Guid);
+                        break;
+                    }
+                }
+
+                CreateServiceInstanceRequest request = new CreateServiceInstanceRequest();
+
+                request.Name = CFServiceName;
+                request.ServicePlanGuid = planGuid;
+                request.SpaceGuid = spaceGuid;
+
+                CreateServiceInstanceResponse result = client.ServiceInstances.CreateServiceInstance(request).Result;
+
+                CFServiceGuid = result.EntityMetadata.Guid;
+
+                logger.LogMessage("Created {0} service {1}", CFServiceType, result.Name);
             }
-
-            Guid? planGuid = null;
-            PagedResponseCollection<ListAllServicesResponse> servicesList = client.Services.ListAllServices(new RequestOptions() { Query = "label:" + CFServiceType }).Result;
-
-            foreach (var service in servicesList)
+            catch (Exception exception)
             {
-               var planList = client.Services.ListAllServicePlansForService(new Guid(service.EntityMetadata.Guid)).Result;
-
-               var plan = planList.Where(o => o.Name == CFServicePlan).FirstOrDefault();
-
-               if (plan != null)
-               {
-                   planGuid = new Guid(plan.EntityMetadata.Guid);
-                   break;
-               }
+                this.logger.LogError("Create Service failed", exception);
+                return false;
             }
-
-            CreateServiceInstanceRequest request = new CreateServiceInstanceRequest();
-
-            request.Name = CFServiceName;
-            request.ServicePlanGuid = planGuid;
-            request.SpaceGuid = spaceGuid;
-
-            CreateServiceInstanceResponse result = client.ServiceInstances.CreateServiceInstance(request).Result;
-
-            CFServiceGuid = result.EntityMetadata.Guid;
-
-            logger.LogMessage("Created {0} service {1}", CFServiceType, result.Name);
             return true;
         }
     }

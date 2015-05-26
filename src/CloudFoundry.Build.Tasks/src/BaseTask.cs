@@ -9,7 +9,7 @@ namespace CloudFoundry.Build.Tasks
 {
     public class BaseTask : ITask
     {
-        internal Microsoft.Build.Utilities.TaskLoggingHelper logger;
+        internal TaskLogger logger;
 
         public IBuildEngine BuildEngine
         {

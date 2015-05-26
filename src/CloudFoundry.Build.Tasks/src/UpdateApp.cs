@@ -30,33 +30,40 @@ namespace CloudFoundry.Build.Tasks
 
         public override bool Execute()
         {
-            logger = new Microsoft.Build.Utilities.TaskLoggingHelper(this);
+            logger = new TaskLogger(this);
 
-            if (CFAppGuid.Length == 0)
+            if (string.IsNullOrWhiteSpace(CFAppGuid))
             {
                 logger.LogError("Application guid must be specified");
                 return false;
             }
 
-            CloudFoundryClient client = InitClient();
-
-            UpdateAppRequest request = new UpdateAppRequest();
-
-            request.Name = CFAppName;
-            request.Memory = CFAppMemory;
-            request.Instances = CFAppInstances;
-            request.Buildpack = CFAppBuildpack;
-            request.State = CFAppState;
-
-            if (CFEnvironmentJson != null)
+            try
             {
-                request.EnvironmentJson = JsonConvert.DeserializeObject<Dictionary<string,string>>(CFEnvironmentJson);
+                CloudFoundryClient client = InitClient();
+
+                UpdateAppRequest request = new UpdateAppRequest();
+
+                request.Name = CFAppName;
+                request.Memory = CFAppMemory;
+                request.Instances = CFAppInstances;
+                request.Buildpack = CFAppBuildpack;
+                request.State = CFAppState;
+
+                if (CFEnvironmentJson != null)
+                {
+                    request.EnvironmentJson = JsonConvert.DeserializeObject<Dictionary<string, string>>(CFEnvironmentJson);
+                }
+
+                UpdateAppResponse response = client.Apps.UpdateApp(new Guid(CFAppGuid), request).Result;
+
+                logger.LogMessage("Updated app {0} with guid {1}", response.Name, CFAppGuid);
             }
-
-            UpdateAppResponse response = client.Apps.UpdateApp(new Guid(CFAppGuid), request).Result;
-
-            logger.LogMessage("Updated app {0} with guid {1}", response.Name, CFAppGuid);
-
+            catch (Exception exception)
+            {
+                this.logger.LogError("Update App failed", exception);
+                return false;
+            }
 
             return true;
         }
