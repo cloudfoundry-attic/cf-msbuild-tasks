@@ -29,7 +29,7 @@ namespace CloudFoundry.Build.Tasks
                 string host = string.Empty;
                 Utils.ExtractDomainAndHost(CFRoute, out domain, out host);
 
-                if (domain.Length == 0 || host.Length == 0)
+                if (string.IsNullOrWhiteSpace(domain) || string.IsNullOrWhiteSpace(host))
                 {
                     logger.LogError("Error extracting domain and host information from route {0}", CFRoute);
                     return false;

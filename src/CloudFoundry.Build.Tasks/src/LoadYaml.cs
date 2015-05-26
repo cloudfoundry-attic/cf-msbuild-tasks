@@ -112,7 +112,7 @@ namespace CloudFoundry.Build.Tasks
             catch (Exception ex)
             {
                 logger.LogError("Load Yaml failed", ex);
-                throw;
+                return false;
             }
 
             return true;

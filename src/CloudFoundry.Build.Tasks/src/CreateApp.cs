@@ -47,7 +47,7 @@ namespace CloudFoundry.Build.Tasks
 
             try
             {
-                if (CFSpace.Length > 0 && CFOrganization.Length > 0)
+                if ((!string.IsNullOrWhiteSpace(CFSpace)) && (!string.IsNullOrWhiteSpace(CFOrganization)))
                 {
                     spaceGuid = Utils.GetSpaceGuid(client, logger, CFOrganization, CFSpace);
                     if (spaceGuid == null)
@@ -56,7 +56,7 @@ namespace CloudFoundry.Build.Tasks
                     }
                 }
 
-                if (CFStack.Length > 0)
+                if (!string.IsNullOrWhiteSpace(CFStack))
                 {
                     PagedResponseCollection<ListAllStacksResponse> stackList = client.Stacks.ListAllStacks().Result;
 
