@@ -22,7 +22,7 @@ namespace CloudFoundry.Build.Tasks
             logger = new TaskLogger(this);
             logger.LogMessage("Restarting application {0}", CFAppGuid);
 
-            if (CFAppGuid.Length == 0)
+            if (string.IsNullOrWhiteSpace(CFAppGuid))
             {
                 logger.LogError("Application Guid must be specified");
                 return false;

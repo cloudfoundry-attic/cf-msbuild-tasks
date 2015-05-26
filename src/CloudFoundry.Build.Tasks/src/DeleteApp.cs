@@ -40,7 +40,7 @@ namespace CloudFoundry.Build.Tasks
 
                 Guid? spaceGuid = null;
 
-                if (CFSpace.Length > 0 && CFOrganization.Length > 0)
+                if ((!string.IsNullOrWhiteSpace(CFSpace)) && (!string.IsNullOrWhiteSpace(CFOrganization)))
                 {
                     spaceGuid = Utils.GetSpaceGuid(client, logger, CFOrganization, CFSpace);
                     if (spaceGuid == null)
@@ -91,7 +91,8 @@ namespace CloudFoundry.Build.Tasks
                                 }
                                 else
                                 {
-                                    throw;
+                                    this.logger.LogError("Delete App failed", ex);
+                                    return false;
                                 }
                             }
                         }

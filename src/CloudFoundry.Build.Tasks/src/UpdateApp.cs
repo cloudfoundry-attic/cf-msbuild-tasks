@@ -32,7 +32,7 @@ namespace CloudFoundry.Build.Tasks
         {
             logger = new TaskLogger(this);
 
-            if (CFAppGuid.Length == 0)
+            if (string.IsNullOrWhiteSpace(CFAppGuid))
             {
                 logger.LogError("Application guid must be specified");
                 return false;

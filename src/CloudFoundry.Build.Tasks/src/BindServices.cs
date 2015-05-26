@@ -54,7 +54,8 @@ namespace CloudFoundry.Build.Tasks
                             }
                             else
                             {
-                                throw;
+                                this.logger.LogError("Bind Services failed", ex);
+                                return false;
                             }
                         }
                     }
