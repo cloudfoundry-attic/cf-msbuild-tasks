@@ -26,54 +26,60 @@ namespace CloudFoundry.Build.Tasks
         public override bool Execute()
         {
 
-            logger = new Microsoft.Build.Utilities.TaskLoggingHelper(this);
-
-            CloudFoundryClient client = InitClient();
-
-            logger.LogMessage("Unbinding service {0} from app {1}", CFServiceName, CFAppName);
-
-            Guid? spaceGuid = null;
-
-            if (CFSpace.Length > 0 && CFOrganization.Length > 0)
+            logger = new TaskLogger(this);
+            try
             {
-                spaceGuid = Utils.GetSpaceGuid(client, logger, CFOrganization, CFSpace);
-                if (spaceGuid == null)
+                CloudFoundryClient client = InitClient();
+
+                logger.LogMessage("Unbinding service {0} from app {1}", CFServiceName, CFAppName);
+
+                Guid? spaceGuid = null;
+
+                if ((!string.IsNullOrWhiteSpace(CFSpace)) && (!string.IsNullOrWhiteSpace(CFOrganization)))
                 {
+                    spaceGuid = Utils.GetSpaceGuid(client, logger, CFOrganization, CFSpace);
+                    if (spaceGuid == null)
+                    {
+                        return false;
+                    }
+                }
+
+
+                var servicesList = client.Spaces.ListAllServiceInstancesForSpace(spaceGuid, new RequestOptions() { Query = "name:" + CFServiceName }).Result;
+
+                if (servicesList.Count() > 1)
+                {
+                    logger.LogError("There are more services named {0} in space {1}", CFServiceName, CFSpace);
                     return false;
                 }
-            }
 
+                Guid serviceGuid = new Guid(servicesList.FirstOrDefault().EntityMetadata.Guid);
 
-            var servicesList = client.Spaces.ListAllServiceInstancesForSpace(spaceGuid, new RequestOptions() { Query = "name:" + CFServiceName }).Result;
-
-            if (servicesList.Count() > 1)
-            {
-                logger.LogError("There are more services named {0} in space {1}", CFServiceName, CFSpace);
-                return false;
-            }
-
-            Guid serviceGuid=new Guid(servicesList.FirstOrDefault().EntityMetadata.Guid);
-
-            PagedResponseCollection<ListAllAppsForSpaceResponse> appList = client.Spaces.ListAllAppsForSpace(spaceGuid, new RequestOptions() { Query = "name:" + CFAppName }).Result;
-            if (appList.Count() > 1)
-            {
-                logger.LogError("There are more applications named {0} in space {1}", CFAppName, CFSpace);
-                return false;
-            }
-
-            Guid appGuid = new Guid(appList.FirstOrDefault().EntityMetadata.Guid);
-
-
-            var bindingsList = client.Apps.ListAllServiceBindingsForApp(appGuid).Result;
-
-            foreach (var bind in bindingsList)
-            {
-                if (bind.ServiceInstanceGuid.Value == serviceGuid)
+                PagedResponseCollection<ListAllAppsForSpaceResponse> appList = client.Spaces.ListAllAppsForSpace(spaceGuid, new RequestOptions() { Query = "name:" + CFAppName }).Result;
+                if (appList.Count() > 1)
                 {
-                    client.Apps.RemoveServiceBindingFromApp(appGuid, new Guid(bind.EntityMetadata.Guid)).Wait();
+                    logger.LogError("There are more applications named {0} in space {1}", CFAppName, CFSpace);
+                    return false;
+                }
+
+                Guid appGuid = new Guid(appList.FirstOrDefault().EntityMetadata.Guid);
+
+
+                var bindingsList = client.Apps.ListAllServiceBindingsForApp(appGuid).Result;
+
+                foreach (var bind in bindingsList)
+                {
+                    if (bind.ServiceInstanceGuid.Value == serviceGuid)
+                    {
+                        client.Apps.RemoveServiceBindingFromApp(appGuid, new Guid(bind.EntityMetadata.Guid)).Wait();
+                    }
                 }
             }
-            
+            catch (Exception exception)
+            {
+                this.logger.LogError("Unbind Service failed", exception);
+                return false;
+            }
 
             return true;
         }

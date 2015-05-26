@@ -11,7 +11,7 @@ namespace CloudFoundry.Build.Tasks
     {
         private IBuildEngine buildEngine;
         private ITaskHost taskHost;
-        private Microsoft.Build.Utilities.TaskLoggingHelper logger;
+        private TaskLogger logger;
         public IBuildEngine BuildEngine
         {
             get
@@ -60,7 +60,7 @@ namespace CloudFoundry.Build.Tasks
 
         public bool Execute()
         {
-            logger = new Microsoft.Build.Utilities.TaskLoggingHelper(this);
+            logger = new TaskLogger(this);
             logger.LogMessage("Loading configuration from {0}", CFConfigurationFile);
             try
             {
@@ -111,8 +111,8 @@ namespace CloudFoundry.Build.Tasks
             }
             catch (Exception ex)
             {
-                logger.LogErrorFromException(ex);
-                throw;
+                logger.LogError("Load Yaml failed", ex);
+                return false;
             }
 
             return true;

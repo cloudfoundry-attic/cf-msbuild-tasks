@@ -28,46 +28,70 @@ namespace CloudFoundry.Build.Tasks
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling")]
         public override bool Execute()
-        { 
-            logger = new Microsoft.Build.Utilities.TaskLoggingHelper(this);
+        {
+            logger = new TaskLogger(this);
 
-            CloudFoundryClient client = InitClient();
-
-            Guid? spaceGuid = null;
-
-            if (CFSpace.Length > 0 && CFOrganization.Length > 0)
+            try
             {
+                CloudFoundryClient client = InitClient();
 
-                spaceGuid = Utils.GetSpaceGuid(client, logger, CFOrganization, CFSpace);
+                Guid? spaceGuid = null;
 
-                if (spaceGuid == null)
+                if ((!string.IsNullOrWhiteSpace(CFSpace)) && (!string.IsNullOrWhiteSpace(CFOrganization)))
                 {
-                    return false;
-                }
-            }
 
-            List<string> createdGuid = new List<string>();
-            PagedResponseCollection<ListAllDomainsDeprecatedResponse> domainInfoList = client.DomainsDeprecated.ListAllDomainsDeprecated().Result;
+                    spaceGuid = Utils.GetSpaceGuid(client, logger, CFOrganization, CFSpace);
 
-            if (spaceGuid.HasValue)
-            {
-                foreach (String Route in CFRoutes)
-                {
-                    if (Route.Contains(';'))
+                    if (spaceGuid == null)
                     {
-                        foreach (var url in Route.Split(';'))
+                        return false;
+                    }
+                }
+
+                List<string> createdGuid = new List<string>();
+                PagedResponseCollection<ListAllDomainsDeprecatedResponse> domainInfoList = client.DomainsDeprecated.ListAllDomainsDeprecated().Result;
+
+                if (spaceGuid.HasValue)
+                {
+                    foreach (String Route in CFRoutes)
+                    {
+                        if (Route.Contains(';'))
                         {
-                            logger.LogMessage("Creating route {0}", url);
+                            foreach (var url in Route.Split(';'))
+                            {
+                                logger.LogMessage("Creating route {0}", url);
+                                string domain = string.Empty;
+                                string host = string.Empty;
+                                Utils.ExtractDomainAndHost(url, out domain, out host);
+
+                                if (string.IsNullOrWhiteSpace(domain) || string.IsNullOrWhiteSpace(host))
+                                {
+                                    logger.LogError("Error extracting domain and host information from route {0}", url);
+                                    continue;
+                                }
+
+                                ListAllDomainsDeprecatedResponse domainInfo = domainInfoList.Where(o => o.Name == domain).FirstOrDefault();
+
+                                if (domainInfo == null)
+                                {
+                                    logger.LogError("Domain {0} not found", domain);
+                                    continue;
+                                }
+
+                                CreateRoute(client, spaceGuid, createdGuid, host, domainInfo);
+                            }
+                        }
+                        else
+                        {
                             string domain = string.Empty;
                             string host = string.Empty;
-                            Utils.ExtractDomainAndHost(url, out domain, out host);
+                            Utils.ExtractDomainAndHost(Route, out domain, out host);
 
-                            if (domain.Length == 0 || host.Length == 0)
+                            if (string.IsNullOrWhiteSpace(domain) || string.IsNullOrWhiteSpace(host))
                             {
-                                logger.LogError("Error extracting domain and host information from route {0}", url);
+                                logger.LogError("Error extracting domain and host information from route {0}", Route);
                                 continue;
                             }
-
                             ListAllDomainsDeprecatedResponse domainInfo = domainInfoList.Where(o => o.Name == domain).FirstOrDefault();
 
                             if (domainInfo == null)
@@ -75,39 +99,22 @@ namespace CloudFoundry.Build.Tasks
                                 logger.LogError("Domain {0} not found", domain);
                                 continue;
                             }
-
                             CreateRoute(client, spaceGuid, createdGuid, host, domainInfo);
                         }
                     }
-                    else
-                    {
-                        string domain = string.Empty;
-                        string host = string.Empty;
-                        Utils.ExtractDomainAndHost(Route, out domain, out host);
-
-                        if (domain.Length == 0 || host.Length == 0)
-                        {
-                            logger.LogError("Error extracting domain and host information from route {0}", Route);
-                            continue;
-                        }
-                        ListAllDomainsDeprecatedResponse domainInfo = domainInfoList.Where(o => o.Name == domain).FirstOrDefault();
-
-                        if (domainInfo == null)
-                        {
-                            logger.LogError("Domain {0} not found", domain);
-                            continue;
-                        }
-                        CreateRoute(client, spaceGuid, createdGuid, host, domainInfo);
-                    }
+                    CFRouteGuids = createdGuid.ToArray();
                 }
-                CFRouteGuids = createdGuid.ToArray();
+                else
+                {
+                    logger.LogError("Space {0} not found", CFSpace);
+                    return false;
+                }
             }
-            else
+            catch (Exception exception)
             {
-                logger.LogError("Space {0} not found", CFSpace);
+                this.logger.LogError("Create Route failed", exception);
                 return false;
             }
-
             return true;
         }
 

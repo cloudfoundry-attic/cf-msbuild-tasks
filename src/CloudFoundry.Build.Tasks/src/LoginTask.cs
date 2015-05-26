@@ -20,8 +20,16 @@ namespace CloudFoundry.Build.Tasks
 
         public override bool Execute()
         {
-            InitClient();
-
+            logger = new TaskLogger(this);
+            try
+            {
+                InitClient();
+            }
+            catch (Exception exception)
+            {
+                this.logger.LogError("Login failed", exception);
+                return false;
+            }
             return true;
         }
 
