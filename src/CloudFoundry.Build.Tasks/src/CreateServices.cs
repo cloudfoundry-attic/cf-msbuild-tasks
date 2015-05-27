@@ -1,14 +1,14 @@
-﻿using CloudFoundry.CloudController.V2.Client;
-using CloudFoundry.CloudController.V2.Client.Data;
-using Microsoft.Build.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CloudFoundry.Build.Tasks
+﻿namespace CloudFoundry.Build.Tasks
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+    using System.Threading.Tasks;
+    using CloudFoundry.CloudController.V2.Client;
+    using CloudFoundry.CloudController.V2.Client.Data;
+    using Microsoft.Build.Framework;
+
     public class CreateServices : BaseTask
     {
         [Required]
@@ -23,11 +23,10 @@ namespace CloudFoundry.Build.Tasks
         [Output]
         public string[] CFServicesGuids { get; set; }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes"), System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Needed to allow continuation"), System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling", Justification = "Coupling needed")]
         public override bool Execute()
         {
-
-            logger = new TaskLogger(this);
+            this.Logger = new TaskLogger(this);
 
             try
             {
@@ -35,18 +34,19 @@ namespace CloudFoundry.Build.Tasks
 
                 Guid? spaceGuid = null;
 
-                if ((!string.IsNullOrWhiteSpace(CFSpace)) && (!string.IsNullOrWhiteSpace(CFOrganization)))
+                if ((!string.IsNullOrWhiteSpace(this.CFSpace)) && (!string.IsNullOrWhiteSpace(this.CFOrganization)))
                 {
-                    spaceGuid = Utils.GetSpaceGuid(client, logger, CFOrganization, CFSpace);
+                    spaceGuid = Utils.GetSpaceGuid(client, this.Logger, this.CFOrganization, this.CFSpace);
                     if (spaceGuid == null)
                     {
                         return false;
                     }
                 }
+
                 List<ProvisionedService> servicesList = new List<ProvisionedService>();
                 try
                 {
-                    string[] provServs = CFServices.Split(';');
+                    string[] provServs = this.CFServices.Split(';');
 
                     foreach (string service in provServs)
                     {
@@ -56,7 +56,7 @@ namespace CloudFoundry.Build.Tasks
 
                             if (serviceInfo.Length != 3)
                             {
-                                logger.LogError("Invalid service information in {0}", service);
+                                Logger.LogError("Invalid service information in {0}", service);
                                 continue;
                             }
 
@@ -72,16 +72,16 @@ namespace CloudFoundry.Build.Tasks
                 }
                 catch (Exception ex)
                 {
-                    logger.LogErrorFromException(ex);
-                    logger.LogWarning("Error trying to obtain service information, trying to deserialize as xml");
-                    servicesList = Utils.Deserialize<List<ProvisionedService>>(CFServices);
+                    Logger.LogErrorFromException(ex);
+                    Logger.LogWarning("Error trying to obtain service information, trying to deserialize as xml");
+                    servicesList = Utils.Deserialize<List<ProvisionedService>>(this.CFServices);
                 }
 
                 List<string> serviceGuids = new List<string>();
 
                 foreach (ProvisionedService service in servicesList)
                 {
-                    logger.LogMessage("Creating {0} service {1}", service.Type, service.Name);
+                    Logger.LogMessage("Creating {0} service {1}", service.Type, service.Name);
                     Guid? planGuid = null;
                     PagedResponseCollection<ListAllServicesResponse> allServicesList = client.Services.ListAllServices(new RequestOptions() { Query = "label:" + service.Type }).Result;
 
@@ -97,10 +97,11 @@ namespace CloudFoundry.Build.Tasks
                             break;
                         }
                     }
+                    
                     Guid? serviceInstanceGuid = null;
                     if ((serviceInstanceGuid = Utils.CheckForExistingService(service.Name, planGuid, client)) != null)
                     {
-                        logger.LogMessage("Service {0} - {1} already exists -> skipping", service.Name, service.Type);
+                        Logger.LogMessage("Service {0} - {1} already exists -> skipping", service.Name, service.Type);
                         serviceGuids.Add(serviceInstanceGuid.Value.ToString());
                         continue;
                     }
@@ -116,13 +117,14 @@ namespace CloudFoundry.Build.Tasks
                     serviceGuids.Add(result.EntityMetadata.Guid);
                 }
 
-                CFServicesGuids = serviceGuids.ToArray();
+                this.CFServicesGuids = serviceGuids.ToArray();
             }
             catch (Exception exception)
             {
-                this.logger.LogError("Create Services failed", exception);
+                this.Logger.LogError("Create Services failed", exception);
                 return false;
             }
+
             return true;
         }
     }

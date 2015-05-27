@@ -1,23 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using YamlDotNet.Serialization;
-
-namespace CloudFoundry.Build.Tasks
+﻿namespace CloudFoundry.Build.Tasks
 {
+    using System;
+    using System.Collections.Generic;
+    using System.ComponentModel;
+    using System.Linq;
+    using System.Text;
+    using System.Threading.Tasks;
+    using YamlDotNet.Serialization;
+
     public class AppDetails
     {
         [YamlMember(Alias = "name")]
         public string Name { get; set; }
 
-
         [YamlMember(Alias = "url")]
         public string Url { get; set; }
     }
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1402:FileMayOnlyContainASingleClass", Justification = "Reviewed.")]
     public class Cpu
     {
         [YamlMember(Alias = "max")]
@@ -49,7 +49,6 @@ namespace CloudFoundry.Build.Tasks
 
     public class ServiceDetails
     {
-
         [YamlMember(Alias = "plan")]
         public string Plan { get; set; }
 
@@ -64,10 +63,9 @@ namespace CloudFoundry.Build.Tasks
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly", Justification = "Set by deserialization"), YamlMember(Alias = "applications")]
         public Dictionary<string, AppDetails> Applications { get; set; }
-        
+
         [YamlMember(Alias = "autoscale")]
         public Autoscale AutoscaleInfo { get; set; }
-
 
         [YamlMember(Alias = "disk")]
         public int Disk { get; set; }
@@ -80,7 +78,7 @@ namespace CloudFoundry.Build.Tasks
 
         [YamlMember(Alias = "name")]
         public string Name { get; set; }
-     
+
         [YamlMember(Alias = "placement-zone")]
         public string PlacementZone { get; set; }
 
@@ -93,5 +91,4 @@ namespace CloudFoundry.Build.Tasks
         [YamlMember(Alias = "stack")]
         public string Stack { get; set; }
     }
-
 }

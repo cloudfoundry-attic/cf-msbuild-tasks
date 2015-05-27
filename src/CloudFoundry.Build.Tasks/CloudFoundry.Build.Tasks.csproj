@@ -25,9 +25,10 @@
     <WarningLevel>4</WarningLevel>
     <RunCodeAnalysis>true</RunCodeAnalysis>
     <CodeAnalysisIgnoreGeneratedCode>true</CodeAnalysisIgnoreGeneratedCode>
-    <CodeAnalysisRuleSet>cf-build-tasks.ruleset</CodeAnalysisRuleSet>
+	<CodeAnalysisRuleSet>cf-build-tasks.ruleset</CodeAnalysisRuleSet> 
     <NoWarn>
     </NoWarn>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -170,4 +171,8 @@
   </Target>
   <Target Name="AfterBuild">
   </Target>-->
+
+	<PropertyGroup>
+		<StyleCopTreatErrorsAsWarnings>true</StyleCopTreatErrorsAsWarnings>
+	</PropertyGroup>
 </Project>

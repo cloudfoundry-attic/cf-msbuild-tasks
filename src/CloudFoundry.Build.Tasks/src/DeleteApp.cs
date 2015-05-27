@@ -1,15 +1,15 @@
-﻿using CloudFoundry.CloudController.Common.Exceptions;
-using CloudFoundry.CloudController.V2.Client;
-using CloudFoundry.CloudController.V2.Client.Data;
-using Microsoft.Build.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CloudFoundry.Build.Tasks
+﻿namespace CloudFoundry.Build.Tasks
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+    using System.Threading.Tasks;
+    using CloudFoundry.CloudController.Common.Exceptions;
+    using CloudFoundry.CloudController.V2.Client;
+    using CloudFoundry.CloudController.V2.Client.Data;
+    using Microsoft.Build.Framework;
+
     public class DeleteApp : BaseTask
     {
         [Required]
@@ -25,42 +25,40 @@ namespace CloudFoundry.Build.Tasks
 
         public bool CFDeleteServices { get; set; }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling", Justification = "Coupling needed")]
         public override bool Execute()
         {
-
-            logger = new TaskLogger(this);
+            this.Logger = new TaskLogger(this);
 
             try
             {
-
                 CloudFoundryClient client = InitClient();
 
-                logger.LogMessage("Deleting application {0} from space {1}", CFAppName, CFSpace);
+                Logger.LogMessage("Deleting application {0} from space {1}", this.CFAppName, this.CFSpace);
 
                 Guid? spaceGuid = null;
 
-                if ((!string.IsNullOrWhiteSpace(CFSpace)) && (!string.IsNullOrWhiteSpace(CFOrganization)))
+                if ((!string.IsNullOrWhiteSpace(this.CFSpace)) && (!string.IsNullOrWhiteSpace(this.CFOrganization)))
                 {
-                    spaceGuid = Utils.GetSpaceGuid(client, logger, CFOrganization, CFSpace);
+                    spaceGuid = Utils.GetSpaceGuid(client, this.Logger, this.CFOrganization, this.CFSpace);
                     if (spaceGuid == null)
                     {
                         return false;
                     }
                 }
 
-                PagedResponseCollection<ListAllAppsForSpaceResponse> appList = client.Spaces.ListAllAppsForSpace(spaceGuid, new RequestOptions() { Query = "name:" + CFAppName }).Result;
+                PagedResponseCollection<ListAllAppsForSpaceResponse> appList = client.Spaces.ListAllAppsForSpace(spaceGuid, new RequestOptions() { Query = "name:" + this.CFAppName }).Result;
                 if (appList.Count() > 1)
                 {
-                    logger.LogError("There are more applications named {0} in space {1}", CFAppName, CFSpace);
+                    Logger.LogError("There are more applications named {0} in space {1}", this.CFAppName, this.CFSpace);
                     return false;
                 }
 
                 Guid appGuid = new Guid(appList.FirstOrDefault().EntityMetadata.Guid);
 
-                if (CFDeleteRoutes == true)
+                if (this.CFDeleteRoutes == true)
                 {
-                    logger.LogMessage("Deleting routes associated with {0}", CFAppName);
+                    Logger.LogMessage("Deleting routes associated with {0}", this.CFAppName);
                     var routeList = client.Apps.ListAllRoutesForApp(appGuid).Result;
                     foreach (var route in routeList)
                     {
@@ -68,9 +66,9 @@ namespace CloudFoundry.Build.Tasks
                     }
                 }
 
-                if (CFDeleteServices == true)
+                if (this.CFDeleteServices == true)
                 {
-                    logger.LogMessage("Deleting services bound to {0}", CFAppName);
+                    Logger.LogMessage("Deleting services bound to {0}", this.CFAppName);
 
                     var serviceBindingList = client.Apps.ListAllServiceBindingsForApp(appGuid).Result;
 
@@ -87,11 +85,11 @@ namespace CloudFoundry.Build.Tasks
                             {
                                 if (e is CloudFoundryException)
                                 {
-                                    logger.LogWarning(e.Message);
+                                    Logger.LogWarning(e.Message);
                                 }
                                 else
                                 {
-                                    this.logger.LogError("Delete App failed", ex);
+                                    this.Logger.LogError("Delete App failed", ex);
                                     return false;
                                 }
                             }
@@ -103,9 +101,10 @@ namespace CloudFoundry.Build.Tasks
             }
             catch (Exception exception)
             {
-                this.logger.LogError("Delete App failed", exception);
+                this.Logger.LogError("Delete App failed", exception);
                 return false;
             }
+
             return true;
         }
     }
