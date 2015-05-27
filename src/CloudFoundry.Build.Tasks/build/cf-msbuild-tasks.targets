@@ -20,8 +20,10 @@
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v12.0\Web\Microsoft.Web.Publishing.targets" Condition="false" />
 
   <PropertyGroup>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">$(MSBuildProjectDirectory)\..\</SolutionDir>
+    <CFAppPath Condition="'$(CFAppPath)'=='' Or $(CFAppPath) == '*Undefined*'">$(SolutionDir)</CFAppPath>
     <NewGuid>$([System.Guid]::NewGuid())</NewGuid>
-    <PublishTempAppPath>$(TEMP)\$(NewGuid)</PublishTempAppPath>
+    <PublishTempAppPath>$(TEMP)\$(NewGuid)</PublishTempAppPath>    
   </PropertyGroup>
 
   <!-- Publish application to TEMP location -->
@@ -54,10 +56,13 @@
 
     <CallTarget Condition="'$(CFLocalBuild)'=='false'" Targets="CopySolutionFiles"></CallTarget>
 
+    <PropertyGroup>
+      <PUBLISH_WEBSITE Condition="'$(CFLocalBuild)'=='false' AND '$(PUBLISH_WEBSITE)' == ''">$(ProjectName)</PUBLISH_WEBSITE>
+    </PropertyGroup>
+    
     <ItemGroup>
       <CFRoutes Include="$(CFRoutes)"></CFRoutes>
       <CFRefreshToken Include="$(CFRefreshToken)"></CFRefreshToken>
-      <PUBLISH_WEBSITE Condition="'$(CFLocalBuild)'=='false' AND '$(PUBLISH_WEBSITE)' == ''" Include="$(ProjectName)"></PUBLISH_WEBSITE>
       <CFEnvironmentJson Condition="'$(CFLocalBuild)'=='false'" Include="{&quot;PUBLISH_WEBSITE&quot;: &quot;$(PUBLISH_WEBSITE)&quot;, &quot;MSBUILD_CONFIGURATION&quot;: &quot;$(CFMSBuildConfiguration)&quot;, &quot;MSBUILD_PLATFORM&quot;: &quot;$(CFMSBuildPlatform)&quot;}"></CFEnvironmentJson>
     </ItemGroup>
 
