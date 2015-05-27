@@ -1,23 +1,44 @@
-﻿using Microsoft.Build.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CloudFoundry.Build.Tasks
+﻿namespace CloudFoundry.Build.Tasks
 {
-    public class LoadYaml:ITask 
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+    using System.Threading.Tasks;
+    using Microsoft.Build.Framework;
+
+    public class LoadYaml : ITask
     {
         private IBuildEngine buildEngine;
+
         private ITaskHost taskHost;
+
         private TaskLogger logger;
+        
         public IBuildEngine BuildEngine
         {
             get
-            { return buildEngine; }
+            { 
+                return this.buildEngine; 
+            }
+
             set
-            { buildEngine = value; }
+            {
+                this.buildEngine = value; 
+            }
+        }
+
+        public ITaskHost HostObject
+        {
+            get
+            { 
+                return this.taskHost;
+            }
+
+            set
+            { 
+                this.taskHost = value; 
+            }
         }
 
         [Required]
@@ -58,19 +79,20 @@ namespace CloudFoundry.Build.Tasks
 
         private PushProperties Configuration { get; set; }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Log every exception")]
         public bool Execute()
         {
-            logger = new TaskLogger(this);
-            logger.LogMessage("Loading configuration from {0}", CFConfigurationFile);
+            this.logger = new TaskLogger(this);
+            this.logger.LogMessage("Loading configuration from {0}", this.CFConfigurationFile);
             try
             {
-                Configuration = Utils.DeserializeFromFile(CFConfigurationFile);
-                CFStack = Configuration.Stack;
-                CFAppName = Configuration.Name;
-                CFAppPath = Configuration.AppDir;
+                this.Configuration = Utils.DeserializeFromFile(this.CFConfigurationFile);
+                this.CFStack = this.Configuration.Stack;
+                this.CFAppName = this.Configuration.Name;
+                this.CFAppPath = this.Configuration.AppDir;
 
                 List<string> urlList = new List<string>();
-                foreach (var app in Configuration.Applications)
+                foreach (var app in this.Configuration.Applications)
                 {
                     if (app.Value.Url.Contains(";"))
                     {
@@ -82,48 +104,42 @@ namespace CloudFoundry.Build.Tasks
                         urlList.Add(app.Value.Url);
                     }
                 }
+
                 foreach (string s in urlList)
                 {
-                    logger.LogMessage("Loaded url {0}", s);
+                    this.logger.LogMessage("Loaded url {0}", s);
                 }
 
-                CFRoutes = string.Join(";",urlList);
-                
-                CFAppMemory = Configuration.Memory;
-                CFAppInstances = Configuration.Instances;
-                CFAutoscale = Utils.Serialize<Autoscale>(Configuration.AutoscaleInfo);
-                CFDisk = Configuration.Disk;
+                this.CFRoutes = string.Join(";", urlList);
 
-                if (Configuration.Services != null)
+                this.CFAppMemory = this.Configuration.Memory;
+                this.CFAppInstances = this.Configuration.Instances;
+                this.CFAutoscale = Utils.Serialize<Autoscale>(this.Configuration.AutoscaleInfo);
+                this.CFDisk = this.Configuration.Disk;
+
+                if (this.Configuration.Services != null)
                 {
                     List<ProvisionedService> servicesList = new List<ProvisionedService>();
-                    foreach (var service in Configuration.Services)
+                    foreach (var service in this.Configuration.Services)
                     {
                         servicesList.Add(new ProvisionedService() { Name = service.Key, Plan = service.Value.Plan, Type = service.Value.Type });
                     }
 
-                    CFServices = Utils.Serialize<List<ProvisionedService>>(servicesList);
+                    this.CFServices = Utils.Serialize<List<ProvisionedService>>(servicesList);
                 }
-                CFPlacementZone = Configuration.PlacementZone;
-                CFSsoEnabled = Configuration.SsoEnabled;
 
-                logger.LogMessage("Configuration loaded");
+                this.CFPlacementZone = this.Configuration.PlacementZone;
+                this.CFSsoEnabled = this.Configuration.SsoEnabled;
+
+                this.logger.LogMessage("Configuration loaded");
             }
             catch (Exception ex)
             {
-                logger.LogError("Load Yaml failed", ex);
+                this.logger.LogError("Load Yaml failed", ex);
                 return false;
             }
 
             return true;
-        }
-
-        public ITaskHost HostObject
-        {
-            get
-            { return taskHost; }
-            set
-            { taskHost = value; }
         }
     }
 }

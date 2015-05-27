@@ -1,16 +1,16 @@
-﻿using CloudFoundry.CloudController.V2.Client;
-using CloudFoundry.CloudController.V2.Client.Data;
-using CloudFoundry.UAA;
-using Microsoft.Build.Framework;
-using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CloudFoundry.Build.Tasks
+﻿namespace CloudFoundry.Build.Tasks
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+    using System.Threading.Tasks;
+    using CloudFoundry.CloudController.V2.Client;
+    using CloudFoundry.CloudController.V2.Client.Data;
+    using CloudFoundry.UAA;
+    using Microsoft.Build.Framework;
+    using Newtonsoft.Json;
+
     public class UpdateApp : BaseTask
     {
         public string CFAppName { get; set; }
@@ -30,11 +30,11 @@ namespace CloudFoundry.Build.Tasks
 
         public override bool Execute()
         {
-            logger = new TaskLogger(this);
+            this.Logger = new TaskLogger(this);
 
-            if (string.IsNullOrWhiteSpace(CFAppGuid))
+        if (string.IsNullOrWhiteSpace(this.CFAppGuid))
             {
-                logger.LogError("Application guid must be specified");
+                Logger.LogError("Application guid must be specified");
                 return false;
             }
 
@@ -44,24 +44,24 @@ namespace CloudFoundry.Build.Tasks
 
                 UpdateAppRequest request = new UpdateAppRequest();
 
-                request.Name = CFAppName;
-                request.Memory = CFAppMemory;
-                request.Instances = CFAppInstances;
-                request.Buildpack = CFAppBuildpack;
-                request.State = CFAppState;
+                request.Name = this.CFAppName;
+                request.Memory = this.CFAppMemory;
+                request.Instances = this.CFAppInstances;
+                request.Buildpack = this.CFAppBuildpack;
+                request.State = this.CFAppState;
 
-                if (CFEnvironmentJson != null)
+                if (this.CFEnvironmentJson != null)
                 {
-                    request.EnvironmentJson = JsonConvert.DeserializeObject<Dictionary<string, string>>(CFEnvironmentJson);
+                    request.EnvironmentJson = JsonConvert.DeserializeObject<Dictionary<string, string>>(this.CFEnvironmentJson);
                 }
 
-                UpdateAppResponse response = client.Apps.UpdateApp(new Guid(CFAppGuid), request).Result;
+                UpdateAppResponse response = client.Apps.UpdateApp(new Guid(this.CFAppGuid), request).Result;
 
-                logger.LogMessage("Updated app {0} with guid {1}", response.Name, CFAppGuid);
+                Logger.LogMessage("Updated app {0} with guid {1}", response.Name, this.CFAppGuid);
             }
             catch (Exception exception)
             {
-                this.logger.LogError("Update App failed", exception);
+                this.Logger.LogError("Update App failed", exception);
                 return false;
             }
 

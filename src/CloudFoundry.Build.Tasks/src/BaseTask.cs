@@ -1,16 +1,16 @@
-﻿using CloudFoundry.CloudController.V2.Client;
-using CloudFoundry.UAA;
-using Microsoft.Build.Framework;
-using System;
-using System.Globalization;
-using System.Security.Authentication;
-
-namespace CloudFoundry.Build.Tasks
+﻿namespace CloudFoundry.Build.Tasks
 {
+    using System;
+    using System.Globalization;
+    using System.Security.Authentication;
+    using CloudFoundry.CloudController.V2.Client;
+    using CloudFoundry.UAA;
+    using Microsoft.Build.Framework;
+
     public class BaseTask : ITask
     {
-        internal TaskLogger logger;
-
+        private TaskLogger logger;
+        
         public IBuildEngine BuildEngine
         {
             get;
@@ -36,26 +36,33 @@ namespace CloudFoundry.Build.Tasks
         [Required]
         public string CFServerUri { get; set; }
 
+        internal TaskLogger Logger
+        {
+            get { return this.logger; }
+            set { this.logger = value; }
+        }
+
         public virtual bool Execute()
         {
             return true;
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily", Justification = "Cast needed to change output property")]
         internal CloudFoundryClient InitClient()
         {
-            CloudFoundryClient client = new CloudFoundryClient(new Uri(CFServerUri), new System.Threading.CancellationToken(), null, CFSkipSslValidation);
-            
-            if (string.IsNullOrWhiteSpace(CFUser)==false && (string.IsNullOrWhiteSpace(CFPassword) == false || CFSavedPassword))
+            CloudFoundryClient client = new CloudFoundryClient(new Uri(this.CFServerUri), new System.Threading.CancellationToken(), null, this.CFSkipSslValidation);
+
+            if (string.IsNullOrWhiteSpace(this.CFUser) == false && (string.IsNullOrWhiteSpace(this.CFPassword) == false || this.CFSavedPassword))
             {
-                if (string.IsNullOrWhiteSpace(CFPassword))
+                if (string.IsNullOrWhiteSpace(this.CFPassword))
                 {
                     this.CFPassword = CloudCredentialsManager.GetPassword(new Uri(this.CFServerUri), this.CFUser);
 
                     if (string.IsNullOrWhiteSpace(this.CFPassword))
                     {
                         throw new AuthenticationException(
-                            string.Format(CultureInfo.InvariantCulture,
+                            string.Format(
+                            CultureInfo.InvariantCulture,
                             "Could not find a password for user '{0}' and target '{1}' in your local credentials store. Either make sure the entry exists in your credentials store, or provide CFPassword.",
                             this.CFUser,
                             this.CFServerUri));
@@ -63,21 +70,20 @@ namespace CloudFoundry.Build.Tasks
                 }
 
                 CloudCredentials creds = new CloudCredentials();
-                creds.User = CFUser;
-                creds.Password = CFPassword;
-                var authContext =  client.Login(creds).Result;
+                creds.User = this.CFUser;
+                creds.Password = this.CFPassword;
+                var authContext = client.Login(creds).Result;
                 if (this is LoginTask)
                 {
                     if (authContext.Token != null)
                     {
                         ((LoginTask)this).CFRefreshToken = authContext.Token.RefreshToken;
                     }
-
                 }
             }
-            else if (string.IsNullOrWhiteSpace(CFRefreshToken) == false)
+            else if (string.IsNullOrWhiteSpace(this.CFRefreshToken) == false)
             {
-                client.Login(CFRefreshToken).Wait();
+                client.Login(this.CFRefreshToken).Wait();
             }
             else
             {

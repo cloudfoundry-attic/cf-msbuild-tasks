@@ -1,15 +1,15 @@
-﻿using CloudFoundry.CloudController.Common.Exceptions;
-using CloudFoundry.CloudController.V2.Client;
-using CloudFoundry.CloudController.V2.Client.Data;
-using Microsoft.Build.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CloudFoundry.Build.Tasks
+﻿namespace CloudFoundry.Build.Tasks
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+    using System.Threading.Tasks;
+    using CloudFoundry.CloudController.Common.Exceptions;
+    using CloudFoundry.CloudController.V2.Client;
+    using CloudFoundry.CloudController.V2.Client.Data;
+    using Microsoft.Build.Framework;
+
     public class BindServices : BaseTask
     {
         [Required]
@@ -23,20 +23,20 @@ namespace CloudFoundry.Build.Tasks
 
         public override bool Execute()
         {
-            logger = new TaskLogger(this);
+            this.Logger = new TaskLogger(this);
 
             try
             {
                 CloudFoundryClient client = InitClient();
 
-                logger.LogMessage("Binding services to app {0}", CFAppGuid);
+                Logger.LogMessage("Binding services to app {0}", this.CFAppGuid);
 
                 List<string> bindingGuids = new List<string>();
 
-                foreach (string serviceGuid in CFServicesGuids)
+                foreach (string serviceGuid in this.CFServicesGuids)
                 {
                     CreateServiceBindingRequest request = new CreateServiceBindingRequest();
-                    request.AppGuid = new Guid(CFAppGuid);
+                    request.AppGuid = new Guid(this.CFAppGuid);
                     request.ServiceInstanceGuid = new Guid(serviceGuid);
 
                     try
@@ -50,24 +50,25 @@ namespace CloudFoundry.Build.Tasks
                         {
                             if (e is CloudFoundryException)
                             {
-                                logger.LogWarning(e.Message);
+                                Logger.LogWarning(e.Message);
                             }
                             else
                             {
-                                this.logger.LogError("Bind Services failed", ex);
+                                this.Logger.LogError("Bind Services failed", ex);
                                 return false;
                             }
                         }
                     }
                 }
 
-                CFBindingGuids = bindingGuids.ToArray();
+                this.CFBindingGuids = bindingGuids.ToArray();
             }
             catch (Exception exception)
             {
-                this.logger.LogError("Bind Services failed", exception);
+                this.Logger.LogError("Bind Services failed", exception);
                 return false;
             }
+
             return true;
         }
     }
