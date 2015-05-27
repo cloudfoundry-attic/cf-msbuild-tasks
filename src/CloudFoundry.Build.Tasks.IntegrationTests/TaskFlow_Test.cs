@@ -4,7 +4,8 @@ using CloudFoundry.Build.Tasks.IntegrationTests.Properties;
 using System.Net;
 using System.Reflection;
 using System.IO;
-
+using Microsoft.Build.Framework;
+using Microsoft.Build.Utilities;
 namespace CloudFoundry.Build.Tasks.IntegrationTests
 {
     [TestClass]
@@ -37,7 +38,8 @@ namespace CloudFoundry.Build.Tasks.IntegrationTests
             task.CFSpace = Settings.Default.Space;
             task.CFOrganization = Settings.Default.Organization;
             task.CFStack = Settings.Default.Stack;
-            task.CFEnvironmentJson = "{\"mykey\":\"abcd\",\"secondkey\":\"efgh\"}";
+            task.CFEnvironmentJson = new TaskItem[1]{ new TaskItem("testName") };
+            task.CFEnvironmentJson[0].SetMetadata("Value", "testValue");
 
             task.BuildEngine = new FakeBuildEngine();
             task.Execute();
@@ -60,12 +62,12 @@ namespace CloudFoundry.Build.Tasks.IntegrationTests
             routeTask.CFPassword = Settings.Default.Password;
             routeTask.CFServerUri = Settings.Default.ServerUri;
             routeTask.CFSkipSslValidation = true;
-            routeTask.CFRoutes = new string[1] { 
-                string.Format(Settings.Default.Route, task.CFAppName)
-            };
             routeTask.CFSpace = Settings.Default.Space;
             routeTask.CFOrganization = Settings.Default.Organization;
 
+            routeTask.CFRoutes = new TaskItem[1];
+            routeTask.CFRoutes[0] = new TaskItem(string.Format(Settings.Default.Route,task.CFAppName));
+       
             routeTask.BuildEngine = new FakeBuildEngine();
 
             routeTask.Execute();
@@ -105,7 +107,9 @@ namespace CloudFoundry.Build.Tasks.IntegrationTests
             bindServiceTask.CFServicesGuids = new string[1] { serviceTask.CFServiceGuid };
             bindServiceTask.Execute();
 
-            if (CheckIfAppIsWorking(routeTask.CFRoutes[0], 60) == true)
+            string route=string.Format("{0}.{1}",routeTask.CFRoutes[0].ToString(), routeTask.CFRoutes[0].GetMetadata("Domain"));
+
+            if (CheckIfAppIsWorking(route, 3) == true)
             {
 
                 DeleteApp delTask = new DeleteApp();

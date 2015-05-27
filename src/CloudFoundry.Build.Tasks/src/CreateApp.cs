@@ -29,7 +29,7 @@ namespace CloudFoundry.Build.Tasks
 
         public int CFAppInstances { get; set; }
 
-        public string CFEnvironmentJson { get; set; }
+        public ITaskItem[] CFEnvironmentJson { get; set; }
 
         public string CFAppBuildpack { get; set; }
 
@@ -60,7 +60,7 @@ namespace CloudFoundry.Build.Tasks
                 {
                     PagedResponseCollection<ListAllStacksResponse> stackList = client.Stacks.ListAllStacks().Result;
 
-                    var stackInfo = stackList.Where(o => o.Name == CFStack).FirstOrDefault();
+                var stackInfo = stackList.Where(o => o.Name == CFStack).FirstOrDefault();
 
                     if (stackInfo == null)
                     {
@@ -74,7 +74,7 @@ namespace CloudFoundry.Build.Tasks
                 {
                     PagedResponseCollection<ListAllAppsForSpaceResponse> apps = client.Spaces.ListAllAppsForSpace(spaceGuid, new RequestOptions() { Query = "name:" + CFAppName }).Result;
 
-                    if (apps.Count() > 0)
+                if (apps.Count() > 0)
                     {
                         CFAppGuid = apps.FirstOrDefault().EntityMetadata.Guid;
 
@@ -84,7 +84,11 @@ namespace CloudFoundry.Build.Tasks
 
                         if (CFEnvironmentJson != null)
                         {
-                            request.EnvironmentJson = JsonConvert.DeserializeObject<Dictionary<string, string>>(CFEnvironmentJson);
+                        Dictionary<string, string> EnvDict = GetEnvVars();
+                        if (EnvDict.Count > 0)
+                        {
+                            request.EnvironmentJson = EnvDict;
+                        }
                         }
 
                         if (CFAppMemory > 0)
@@ -111,10 +115,14 @@ namespace CloudFoundry.Build.Tasks
                         request.SpaceGuid = spaceGuid;
                         request.StackGuid = stackGuid;
 
+                    if(CFEnvironmentJson !=null){
+                        Dictionary<string, string> EnvDict = GetEnvVars();
                         if (CFEnvironmentJson != null)
                         {
-                            request.EnvironmentJson = JsonConvert.DeserializeObject<Dictionary<string, string>>(CFEnvironmentJson);
+                            request.EnvironmentJson = EnvDict;
                         }
+                    
+                    }
 
                         if (CFAppMemory > 0)
                         {
@@ -143,6 +151,23 @@ namespace CloudFoundry.Build.Tasks
             return true;
         }
 
+        private Dictionary<string, string> GetEnvVars()
+        {
+            Dictionary<string, string> EnvDict = new Dictionary<string, string>();
+            foreach (ITaskItem item in CFEnvironmentJson)
+            {
+                if (Utils.IsJson(item.ToString()))
+                {
+                    EnvDict = JsonConvert.DeserializeObject<Dictionary<string, string>>(item.ToString());
+                    break;
+                }
+                else
+                {
+                    EnvDict.Add(item.ToString(), item.GetMetadata("Value"));
+                }
+            }
+            return EnvDict;
+        }
 
     }
 }

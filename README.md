@@ -17,7 +17,13 @@ Tasks implemented in this library:
  - CreateApp 
 	 - allows the user to create a new application in the cloud
 	 - required parameters: cloud credentials (CFUser, CFPassword or CFRefreshToken and CFServerUri), application name (CFAppName), space name (CFSpace) and application's stack (CFStack)
-	 - optional parameters: memory limit (CFAppMemory), instances number (CFAppInstances) and buildpack name (CFAppBuildpack)
+	 - optional parameters: memory limit (CFAppMemory), instances number (CFAppInstances) and buildpack name (CFAppBuildpack), environment variables (CFEnvironmentJson)
+	 -  sample CFEnvironmentJson definition as msbuild metadata item:
+		 - `<ItemGroup>
+		  <CFEnvironmentJson Include="VariableName">
+		  <Value>VariableValue</Value>
+		  </CFEnvironmentJson>
+		  </ItemGroup>` 
 	 - output: created application's guid (CFAppGuid)
  - PushApp
 	 - allows the user to push an application to the cloud
@@ -25,7 +31,13 @@ Tasks implemented in this library:
 	 - optional parameters: allow application to start (CFStart - default value is false) 
  - CreateRoutes
 	 - allow users to create routes that can be later mapped to an application
-	 - required parameters: cloud credentials, an array of routes (CFRoutes) and the space name (CFSpace)
+	 - required parameters: cloud credentials, an array of routes provided as string or metadata item (CFRoutes) and the space name (CFSpace)
+	 - sample CFRoutes definiton as msbuild metadata item
+		 - `<ItemGroup>
+		  <CFRoutes Include="hostname">
+		  <Domain>sampledomain.com</Domain>
+		  </CFRoutes>
+		  </ItemGroup>`
 	 - output: returns a list of route guids
  - BindRoutes
 	 - allow users to bind routes to an application
@@ -36,7 +48,14 @@ Tasks implemented in this library:
 	 - output: returns the provisioned service's guid (CFServiceGuid)
  - CreateServices
 	 - allow users to provision a collection of services
-	 - required parameters: cloud credentials, services information provided as xml (CFServices) and space name (CFSpace)
+	 - required parameters: cloud credentials, services information provided as xml, string or metadata item (CFServices) and space name (CFSpace)
+	 - sample CFServices definition as msbuild metadata item:
+		 - `<ItemGroup>
+		  <CFServices Include="ServiceName">
+		  <Type>ServiceType<Type>
+		  <Plan>ServicePlan</Plan>
+		  </CFServices >
+		  </ItemGroup>`
 	 - output: returns an array of the provisioned services guids (CFServicesGuids)
  - BindServices
 	 - allows users to bind an array of provisioned services to an application

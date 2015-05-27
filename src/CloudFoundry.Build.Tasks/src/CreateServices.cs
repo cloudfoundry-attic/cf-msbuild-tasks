@@ -15,7 +15,7 @@ namespace CloudFoundry.Build.Tasks
         public string CFOrganization { get; set; }
 
         [Required]
-        public string CFServices { get; set; }
+        public ITaskItem[] CFServices { get; set; }
 
         [Required]
         public string CFSpace { get; set; }
@@ -43,80 +43,96 @@ namespace CloudFoundry.Build.Tasks
                         return false;
                     }
                 }
+
                 List<ProvisionedService> servicesList = new List<ProvisionedService>();
-                try
+
+                foreach (ITaskItem servicesInfo in CFServices)
                 {
-                    string[] provServs = CFServices.Split(';');
-
-                    foreach (string service in provServs)
+                    try
                     {
-                        if (string.IsNullOrWhiteSpace(service) == false)
+                        if (servicesInfo.ToString().Contains(','))
                         {
-                            string[] serviceInfo = service.Split(',');
+                            string[] provServs = servicesInfo.ToString().Split(';');
 
-                            if (serviceInfo.Length != 3)
+                            foreach (string service in provServs)
                             {
-                                logger.LogError("Invalid service information in {0}", service);
-                                continue;
+                                if (string.IsNullOrWhiteSpace(service) == false)
+                                {
+                                    string[] serviceInfo = service.Split(',');
+
+                                    if (serviceInfo.Length != 3)
+                                    {
+                                        logger.LogError("Invalid service information in {0}", service);
+                                        continue;
+                                    }
+
+                                    ProvisionedService serviceDetails = new ProvisionedService();
+
+                                    serviceDetails.Name = serviceInfo[0].Trim();
+                                    serviceDetails.Type = serviceInfo[1].Trim();
+                                    serviceDetails.Plan = serviceInfo[2].Trim();
+
+                                    servicesList.Add(serviceDetails);
+                                }
                             }
-
+                        }
+                        else
+                        {
                             ProvisionedService serviceDetails = new ProvisionedService();
-
-                            serviceDetails.Name = serviceInfo[0].Trim();
-                            serviceDetails.Type = serviceInfo[1].Trim();
-                            serviceDetails.Plan = serviceInfo[2].Trim();
-
+                            serviceDetails.Name = servicesInfo.ToString();
+                            serviceDetails.Type = servicesInfo.GetMetadata("Type");
+                            serviceDetails.Plan = servicesInfo.GetMetadata("Plan");
                             servicesList.Add(serviceDetails);
                         }
                     }
-                }
-                catch (Exception ex)
-                {
-                    logger.LogErrorFromException(ex);
-                    logger.LogWarning("Error trying to obtain service information, trying to deserialize as xml");
-                    servicesList = Utils.Deserialize<List<ProvisionedService>>(CFServices);
-                }
-
-                List<string> serviceGuids = new List<string>();
-
-                foreach (ProvisionedService service in servicesList)
-                {
-                    logger.LogMessage("Creating {0} service {1}", service.Type, service.Name);
-                    Guid? planGuid = null;
-                    PagedResponseCollection<ListAllServicesResponse> allServicesList = client.Services.ListAllServices(new RequestOptions() { Query = "label:" + service.Type }).Result;
-
-                    foreach (var serviceInfo in allServicesList)
+                    catch (Exception ex)
                     {
-                        var planList = client.Services.ListAllServicePlansForService(new Guid(serviceInfo.EntityMetadata.Guid)).Result;
+                        logger.LogErrorFromException(ex);
+                        logger.LogWarning("Error trying to obtain service information, trying to deserialize as xml");
+                        servicesList = Utils.Deserialize<List<ProvisionedService>>(servicesInfo.ToString());
+                    }
 
-                        var plan = planList.Where(o => o.Name == service.Plan).FirstOrDefault();
+                    List<string> serviceGuids = new List<string>();
 
-                        if (plan != null)
+                    foreach (ProvisionedService service in servicesList)
+                    {
+                        logger.LogMessage("Creating {0} service {1}", service.Type, service.Name);
+                        Guid? planGuid = null;
+                        PagedResponseCollection<ListAllServicesResponse> allServicesList = client.Services.ListAllServices(new RequestOptions() { Query = "label:" + service.Type }).Result;
+
+                        foreach (var serviceInfo in allServicesList)
                         {
-                            planGuid = new Guid(plan.EntityMetadata.Guid);
-                            break;
+                            var planList = client.Services.ListAllServicePlansForService(new Guid(serviceInfo.EntityMetadata.Guid)).Result;
+
+                            var plan = planList.Where(o => o.Name == service.Plan).FirstOrDefault();
+
+                            if (plan != null)
+                            {
+                                planGuid = new Guid(plan.EntityMetadata.Guid);
+                                break;
+                            }
                         }
+                        Guid? serviceInstanceGuid = null;
+                        if ((serviceInstanceGuid = Utils.CheckForExistingService(service.Name, planGuid, client)) != null)
+                        {
+                            logger.LogMessage("Service {0} - {1} already exists -> skipping", service.Name, service.Type);
+                            serviceGuids.Add(serviceInstanceGuid.Value.ToString());
+                            continue;
+                        }
+
+                        CreateServiceInstanceRequest request = new CreateServiceInstanceRequest();
+
+                        request.Name = service.Name;
+                        request.ServicePlanGuid = planGuid;
+                        request.SpaceGuid = spaceGuid;
+
+                        CreateServiceInstanceResponse result = client.ServiceInstances.CreateServiceInstance(request).Result;
+
+                        serviceGuids.Add(result.EntityMetadata.Guid);
                     }
-                    Guid? serviceInstanceGuid = null;
-                    if ((serviceInstanceGuid = Utils.CheckForExistingService(service.Name, planGuid, client)) != null)
-                    {
-                        logger.LogMessage("Service {0} - {1} already exists -> skipping", service.Name, service.Type);
-                        serviceGuids.Add(serviceInstanceGuid.Value.ToString());
-                        continue;
-                    }
 
-                    CreateServiceInstanceRequest request = new CreateServiceInstanceRequest();
-
-                    request.Name = service.Name;
-                    request.ServicePlanGuid = planGuid;
-                    request.SpaceGuid = spaceGuid;
-
-                    CreateServiceInstanceResponse result = client.ServiceInstances.CreateServiceInstance(request).Result;
-
-                    serviceGuids.Add(result.EntityMetadata.Guid);
+                    CFServicesGuids = serviceGuids.ToArray();
                 }
-
-                CFServicesGuids = serviceGuids.ToArray();
             }
             catch (Exception exception)
             {

@@ -1,5 +1,7 @@
 ﻿using CloudFoundry.CloudController.V2.Client;
 using CloudFoundry.CloudController.V2.Client.Data;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -154,6 +156,20 @@ namespace CloudFoundry.Build.Tasks
                 return null;
             }
             return spaceGuid;
+        }
+
+
+        internal static bool IsJson(string value)
+        {
+            try
+            {
+                JContainer.Parse(value);
+                return true;
+            }
+            catch (JsonReaderException)
+            {
+                return false;
+            }
         }
     }
 }

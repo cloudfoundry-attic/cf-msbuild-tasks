@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using CloudFoundry.CloudController.V2.Client.Data;
 using System.Collections.Generic;
 using CloudFoundry.CloudController.V2;
+using Microsoft.Build.Utilities;
 
 namespace CloudFoundry.Build.Tasks.Test
 {
@@ -45,7 +46,9 @@ namespace CloudFoundry.Build.Tasks.Test
                 TestUtils.InitTestMetadata();
 
                 CreateRoutes task = new CreateRoutes();
-                task.CFRoutes = new string[2] { "test.domain.com;test3.domain.com" ,"test2.domain.com" };
+                task.CFRoutes = new TaskItem[2];
+                task.CFRoutes[0] = new TaskItem("test.domain.com;test3.domain.com");
+                task.CFRoutes[1] = new TaskItem("test2.domain.com");
                 task.CFSpace = "TestSpace";
                 task.CFOrganization = "TestOrg";
                 task.CFUser = Settings.Default.User;

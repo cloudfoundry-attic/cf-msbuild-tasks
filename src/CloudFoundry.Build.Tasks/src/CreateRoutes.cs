@@ -15,7 +15,7 @@ namespace CloudFoundry.Build.Tasks
     public class CreateRoutes : BaseTask
     {
         [Required]
-        public String[] CFRoutes { get; set; }
+        public ITaskItem[] CFRoutes { get; set; }
 
         [Required]
         public string CFOrganization { get; set; }
@@ -51,41 +51,17 @@ namespace CloudFoundry.Build.Tasks
                 List<string> createdGuid = new List<string>();
                 PagedResponseCollection<ListAllDomainsDeprecatedResponse> domainInfoList = client.DomainsDeprecated.ListAllDomainsDeprecated().Result;
 
-                if (spaceGuid.HasValue)
+            if (spaceGuid.HasValue)
+            {
+                foreach (ITaskItem Route in CFRoutes)
                 {
-                    foreach (String Route in CFRoutes)
+                    if (Route.ToString().Contains('.'))
                     {
-                        if (Route.Contains(';'))
-                        {
-                            foreach (var url in Route.Split(';'))
-                            {
-                                logger.LogMessage("Creating route {0}", url);
-                                string domain = string.Empty;
-                                string host = string.Empty;
-                                Utils.ExtractDomainAndHost(url, out domain, out host);
-
-                                if (string.IsNullOrWhiteSpace(domain) || string.IsNullOrWhiteSpace(host))
-                                {
-                                    logger.LogError("Error extracting domain and host information from route {0}", url);
-                                    continue;
-                                }
-
-                                ListAllDomainsDeprecatedResponse domainInfo = domainInfoList.Where(o => o.Name == domain).FirstOrDefault();
-
-                                if (domainInfo == null)
-                                {
-                                    logger.LogError("Domain {0} not found", domain);
-                                    continue;
-                                }
-
-                                CreateRoute(client, spaceGuid, createdGuid, host, domainInfo);
-                            }
-                        }
-                        else
+                        foreach (var url in Route.ToString().Split(';'))
                         {
                             string domain = string.Empty;
                             string host = string.Empty;
-                            Utils.ExtractDomainAndHost(Route, out domain, out host);
+                            Utils.ExtractDomainAndHost(url, out domain, out host);
 
                             if (string.IsNullOrWhiteSpace(domain) || string.IsNullOrWhiteSpace(host))
                             {
@@ -102,7 +78,30 @@ namespace CloudFoundry.Build.Tasks
                             CreateRoute(client, spaceGuid, createdGuid, host, domainInfo);
                         }
                     }
-                    CFRouteGuids = createdGuid.ToArray();
+                    else
+                    {
+                        string domain = Route.GetMetadata("Domain");
+                        string host = Route.ToString();
+
+                        if (string.IsNullOrWhiteSpace(domain) || string.IsNullOrWhiteSpace(host))
+                        {
+                            logger.LogError("Error extracting domain and host information from route {0}", Route.ToString());
+                            continue;
+                        }
+
+                        ListAllDomainsDeprecatedResponse domainInfo = domainInfoList.Where(o => o.Name == domain).FirstOrDefault();
+
+                        if (domainInfo == null)
+                        {
+                            logger.LogError("Domain {0} not found", domain);
+                            continue;
+                        }
+
+                        CreateRoute(client, spaceGuid, createdGuid, host, domainInfo);
+
+                    }
+                }
+                CFRouteGuids = createdGuid.ToArray();
                 }
                 else
                 {
@@ -118,6 +117,7 @@ namespace CloudFoundry.Build.Tasks
             return true;
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling")]
         private void CreateRoute(CloudFoundryClient client, Guid? spaceGuid, List<string> createdGuid, string host, ListAllDomainsDeprecatedResponse domainInfo)
         {
             CreateRouteRequest req = new CreateRouteRequest();
@@ -140,6 +140,7 @@ namespace CloudFoundry.Build.Tasks
                 }
                 else
                 {
+                    logger.LogMessage("Creating route {0}.{1}", req.Host, domainInfo.Name);
                     CreateRouteResponse response = client.Routes.CreateRoute(req).Result;
                     createdGuid.Add(response.EntityMetadata.Guid);
                 }
