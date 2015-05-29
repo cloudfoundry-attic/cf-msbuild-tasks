@@ -36,6 +36,7 @@
     <SDKMSBuildTasksSolution>cf-msbuild-tasks.sln</SDKMSBuildTasksSolution>
     <PackageOutputDir>$(BinariesFolder)\packages</PackageOutputDir>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <NugetRepo>https://www.nuget.org/api/v2/</NugetRepo>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -146,7 +147,7 @@
   
   <!-- Target for restoring nuget packages -->
   <Target Name="RestoreNugetPackages">
-    <Exec Command="$(NuGetCommand) restore $(SDKMSBuildTasksSolution)"/>
+    <Exec Command="$(NuGetCommand) restore $(SDKMSBuildTasksSolution) -source $(NugetRepo)"/>
   </Target>
 
   <!-- Target for creating the nuget package -->

@@ -11,13 +11,7 @@ namespace CloudFoundry.Build.Tasks
     using Microsoft.Build.Framework;
 
     public class UnbindRoute : BaseTask
-    {
-        [Required]
-        public string CFRoute { get; set; }
-
-        [Required]
-        public string CFAppName { get; set; }
-
+    {   
         [Required]
         public string CFOrganization { get; set; }
 
@@ -27,25 +21,11 @@ namespace CloudFoundry.Build.Tasks
         public override bool Execute()
         {
             this.Logger = new TaskLogger(this);
+            var app = LoadAppFromManifest();
 
             try
             {
                 CloudFoundryClient client = InitClient();
-
-                Logger.LogMessage("Unbinding route {0} from app {1}", this.CFRoute, this.CFAppName);
-
-                string domain = string.Empty;
-                string host = string.Empty;
-                Utils.ExtractDomainAndHost(this.CFRoute, out domain, out host);
-
-                if (string.IsNullOrWhiteSpace(domain) || string.IsNullOrWhiteSpace(host))
-                {
-                    Logger.LogError("Error extracting domain and host information from route {0}", this.CFRoute);
-                    return false;
-                }
-
-                PagedResponseCollection<ListAllDomainsDeprecatedResponse> domainInfoList = client.DomainsDeprecated.ListAllDomainsDeprecated().Result;
-                ListAllDomainsDeprecatedResponse domainInfo = domainInfoList.Where(o => o.Name == domain).FirstOrDefault();
 
                 Guid? spaceGuid = null;
 
@@ -58,26 +38,32 @@ namespace CloudFoundry.Build.Tasks
                     }
                 }
 
-                PagedResponseCollection<ListAllAppsForSpaceResponse> appList = client.Spaces.ListAllAppsForSpace(spaceGuid, new RequestOptions() { Query = "name:" + this.CFAppName }).Result;
-                if (appList.Count() > 1)
+                var appGuid = Utils.GetAppGuid(client, app.Name, spaceGuid.Value);
+
+                if (appGuid.HasValue)
                 {
-                    Logger.LogError("There are more applications named {0} in space {1}", this.CFAppName, this.CFSpace);
+                    PagedResponseCollection<ListAllDomainsDeprecatedResponse> domainInfoList = client.DomainsDeprecated.ListAllDomainsDeprecated().Result;
+
+                    foreach (var domain in app.GetDomains())
+                    {
+                        foreach (var host in app.GetHosts())
+                        {
+                            Logger.LogMessage("Unbinding route {0}.{1} from app {2}", host, domain, app.Name);
+
+                            ListAllDomainsDeprecatedResponse domainInfo = domainInfoList.Where(o => o.Name == domain).FirstOrDefault();
+                            var routeGuid = Utils.GetRouteGuid(client, host, domainInfo.EntityMetadata.Guid.ToGuid());
+                            if (routeGuid.HasValue)
+                            {
+                                client.Routes.RemoveAppFromRoute(routeGuid.Value, appGuid.Value);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    Logger.LogError("App {0} not found in space {1}", app.Name, this.CFSpace);
                     return false;
                 }
-
-                Guid appGuid = new Guid(appList.FirstOrDefault().EntityMetadata.Guid);
-
-                PagedResponseCollection<ListAllRoutesForAppResponse> routeList = client.Apps.ListAllRoutesForApp(appGuid).Result;
-
-                ListAllRoutesForAppResponse routeInfo = routeList.Where(o => o.Host == host && o.DomainGuid == new Guid(domainInfo.EntityMetadata.Guid)).FirstOrDefault();
-
-                if (routeInfo == null)
-                {
-                    Logger.LogError("Route {0} not found in {1}'s routes", this.CFRoute, this.CFAppName);
-                    return false;
-                }
-
-                client.Routes.RemoveAppFromRoute(new Guid(routeInfo.EntityMetadata.Guid), appGuid).Wait();
             }
             catch (Exception exception)
             {

@@ -12,12 +12,6 @@ namespace CloudFoundry.Build.Tasks
     public class UnbindService : BaseTask
     {
         [Required]
-        public string CFAppName { get; set; }
-
-        [Required]
-        public string CFServiceName { get; set; }
-
-        [Required]
         public string CFOrganization { get; set; }
 
         [Required]
@@ -26,11 +20,12 @@ namespace CloudFoundry.Build.Tasks
         public override bool Execute()
         {
             this.Logger = new TaskLogger(this);
+
+            var app = LoadAppFromManifest();
+
             try
             {
                 CloudFoundryClient client = InitClient();
-
-                Logger.LogMessage("Unbinding service {0} from app {1}", this.CFServiceName, this.CFAppName);
 
                 Guid? spaceGuid = null;
 
@@ -43,33 +38,37 @@ namespace CloudFoundry.Build.Tasks
                     }
                 }
 
-                var servicesList = client.Spaces.ListAllServiceInstancesForSpace(spaceGuid, new RequestOptions() { Query = "name:" + this.CFServiceName }).Result;
+                var appGuid = Utils.GetAppGuid(client, app.Name, spaceGuid.Value);
 
-                if (servicesList.Count() > 1)
+                if (appGuid.HasValue)
                 {
-                    Logger.LogError("There are more services named {0} in space {1}", this.CFServiceName, this.CFSpace);
-                    return false;
-                }
-
-                Guid serviceGuid = new Guid(servicesList.FirstOrDefault().EntityMetadata.Guid);
-
-                PagedResponseCollection<ListAllAppsForSpaceResponse> appList = client.Spaces.ListAllAppsForSpace(spaceGuid, new RequestOptions() { Query = "name:" + this.CFAppName }).Result;
-                if (appList.Count() > 1)
-                {
-                    Logger.LogError("There are more applications named {0} in space {1}", this.CFAppName, this.CFSpace);
-                    return false;
-                }
-
-                Guid appGuid = new Guid(appList.FirstOrDefault().EntityMetadata.Guid);
-
-                var bindingsList = client.Apps.ListAllServiceBindingsForApp(appGuid).Result;
-
-                foreach (var bind in bindingsList)
-                {
-                    if (bind.ServiceInstanceGuid.Value == serviceGuid)
+                    foreach (var service in app.GetServices())
                     {
-                        client.Apps.RemoveServiceBindingFromApp(appGuid, new Guid(bind.EntityMetadata.Guid)).Wait();
+                        Logger.LogMessage("Unbinding service {0} from app {1}", service, app.Name);
+
+                        var serviceGuid = Utils.GetServiceGuid(client, service, spaceGuid.Value);
+                        if (serviceGuid.HasValue)
+                        {
+                            var bindingsList = client.Apps.ListAllServiceBindingsForApp(appGuid).Result;
+
+                            foreach (var bind in bindingsList)
+                            {
+                                if (bind.ServiceInstanceGuid.Value == serviceGuid.Value)
+                                {
+                                    client.Apps.RemoveServiceBindingFromApp(appGuid, new Guid(bind.EntityMetadata.Guid)).Wait();
+                                }
+                            }
+                        }
+                        else
+                        {
+                            Logger.LogError("Service {0} not found in space {1}", service, this.CFSpace);
+                        }
                     }
+                }
+                else
+                {
+                    Logger.LogError("App {0} not found in space {1}", app.Name, this.CFSpace);
+                    return false;
                 }
             }
             catch (Exception exception)

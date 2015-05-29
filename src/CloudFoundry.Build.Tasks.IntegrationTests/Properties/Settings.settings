@@ -2,23 +2,17 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="CloudFoundry.Build.Tasks.IntegrationTests.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
+    <Setting Name="Stack" Type="System.String" Scope="User">
+      <Value Profile="(Default)">lucid64</Value>
+    </Setting>
     <Setting Name="Organization" Type="System.String" Scope="User">
       <Value Profile="(Default)">org</Value>
     </Setting>
     <Setting Name="Space" Type="System.String" Scope="User">
       <Value Profile="(Default)">space</Value>
     </Setting>
-    <Setting Name="Stack" Type="System.String" Scope="User">
-      <Value Profile="(Default)">win2012r2</Value>
-    </Setting>
-    <Setting Name="ServiceType" Type="System.String" Scope="User">
-      <Value Profile="(Default)">mssql2012</Value>
-    </Setting>
-    <Setting Name="ServicePlan" Type="System.String" Scope="User">
-      <Value Profile="(Default)">free</Value>
-    </Setting>
     <Setting Name="User" Type="System.String" Scope="User">
-      <Value Profile="(Default)">testUser</Value>
+      <Value Profile="(Default)">testUsername</Value>
     </Setting>
     <Setting Name="Password" Type="System.String" Scope="User">
       <Value Profile="(Default)">testPassword</Value>
@@ -26,8 +20,11 @@
     <Setting Name="ServerUri" Type="System.String" Scope="User">
       <Value Profile="(Default)">https://api.1.2.3.4.xip.io</Value>
     </Setting>
-    <Setting Name="Route" Type="System.String" Scope="User">
-      <Value Profile="(Default)">testapp{0}.1.2.3.4.xip.io</Value>
+    <Setting Name="Host" Type="System.String" Scope="User">
+      <Value Profile="(Default)">testapp{0}</Value>
+    </Setting>
+    <Setting Name="Domain" Type="System.String" Scope="User">
+      <Value Profile="(Default)">1.2.3.4.xip.io</Value>
     </Setting>
   </Settings>
 </SettingsFile>

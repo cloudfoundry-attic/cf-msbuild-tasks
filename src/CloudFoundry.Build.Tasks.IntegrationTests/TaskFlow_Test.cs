@@ -4,6 +4,8 @@ using CloudFoundry.Build.Tasks.IntegrationTests.Properties;
 using System.Net;
 using System.Reflection;
 using System.IO;
+using Microsoft.Build.Utilities;
+using System.Globalization;
 
 namespace CloudFoundry.Build.Tasks.IntegrationTests
 {
@@ -15,13 +17,24 @@ namespace CloudFoundry.Build.Tasks.IntegrationTests
         public void Flow_IntegrationTest()
         {
             string assemblyDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            string appPath = Path.Combine(assemblyDirectory, "TestApp");
+            string appPath = Path.Combine(assemblyDirectory, "PhpApp");
+            string manifest = Path.Combine(assemblyDirectory, "testmanifest.yml");
+
+            string guid=Guid.NewGuid().ToString();
+            string host = string.Format(Settings.Default.Host, guid);
+
+            string man = File.ReadAllText(manifest);
+
+            man = string.Format(CultureInfo.InvariantCulture, man, guid, host, Settings.Default.Domain, appPath, Settings.Default.Stack);
+
+            File.WriteAllText(manifest, man);
 
             LoginTask login = new LoginTask();
             login.BuildEngine = new FakeBuildEngine();
             login.CFUser = Settings.Default.User;
             login.CFPassword = Settings.Default.Password;
             login.CFServerUri = Settings.Default.ServerUri;
+            login.CFManifest = manifest;
             login.CFSkipSslValidation = true;
 
             login.Execute();
@@ -31,14 +44,9 @@ namespace CloudFoundry.Build.Tasks.IntegrationTests
             task.CFRefreshToken = login.CFRefreshToken;
             task.CFServerUri = Settings.Default.ServerUri;
             task.CFSkipSslValidation = true;
-            task.CFAppName = Guid.NewGuid().ToString("N");
-            task.CFAppMemory = 256;
-            task.CFAppInstances = 1;
             task.CFSpace = Settings.Default.Space;
             task.CFOrganization = Settings.Default.Organization;
-            task.CFStack = Settings.Default.Stack;
-            task.CFEnvironmentJson = "{\"mykey\":\"abcd\",\"secondkey\":\"efgh\"}";
-
+            task.CFManifest = manifest;
             task.BuildEngine = new FakeBuildEngine();
             task.Execute();
 
@@ -47,10 +55,10 @@ namespace CloudFoundry.Build.Tasks.IntegrationTests
             pushTask.CFPassword = Settings.Default.Password;
             pushTask.CFServerUri = Settings.Default.ServerUri;
             pushTask.CFSkipSslValidation = true;
-            pushTask.CFAppGuid = task.CFAppGuid;
-            pushTask.CFAppPath = appPath;
-            pushTask.CFStart = true;
-
+            pushTask.CFManifest = manifest;
+            pushTask.CFOrganization = Settings.Default.Organization;
+            pushTask.CFSpace = Settings.Default.Space;
+            
             pushTask.BuildEngine = new FakeBuildEngine();
 
             pushTask.Execute();
@@ -60,9 +68,7 @@ namespace CloudFoundry.Build.Tasks.IntegrationTests
             routeTask.CFPassword = Settings.Default.Password;
             routeTask.CFServerUri = Settings.Default.ServerUri;
             routeTask.CFSkipSslValidation = true;
-            routeTask.CFRoutes = new string[1] { 
-                string.Format(Settings.Default.Route, task.CFAppName)
-            };
+            routeTask.CFManifest = manifest;
             routeTask.CFSpace = Settings.Default.Space;
             routeTask.CFOrganization = Settings.Default.Organization;
 
@@ -76,24 +82,11 @@ namespace CloudFoundry.Build.Tasks.IntegrationTests
             bindTask.CFServerUri = Settings.Default.ServerUri;
             bindTask.BuildEngine = new FakeBuildEngine();
             bindTask.CFSkipSslValidation = true;
-
-            bindTask.CFAppGuid = task.CFAppGuid;
-            bindTask.CFRouteGuids = routeTask.CFRouteGuids;
+            bindTask.CFManifest = manifest;
+            bindTask.CFOrganization = Settings.Default.Organization;
+            bindTask.CFSpace = Settings.Default.Space;
 
             bindTask.Execute();
-
-            CreateService serviceTask = new CreateService();
-            serviceTask.CFUser = Settings.Default.User;
-            serviceTask.CFPassword = Settings.Default.Password;
-            serviceTask.CFServerUri = Settings.Default.ServerUri;
-            serviceTask.BuildEngine = new FakeBuildEngine();
-            serviceTask.CFSkipSslValidation = true;
-            serviceTask.CFServiceName = Guid.NewGuid().ToString("N");
-            serviceTask.CFServicePlan = Settings.Default.ServicePlan;
-            serviceTask.CFServiceType = Settings.Default.ServiceType;
-            serviceTask.CFSpace = Settings.Default.Space;
-            serviceTask.CFOrganization = Settings.Default.Organization;
-            serviceTask.Execute();
 
             BindServices bindServiceTask = new BindServices();
             bindServiceTask.CFUser = Settings.Default.User;
@@ -101,11 +94,23 @@ namespace CloudFoundry.Build.Tasks.IntegrationTests
             bindServiceTask.CFServerUri = Settings.Default.ServerUri;
             bindServiceTask.BuildEngine = new FakeBuildEngine();
             bindServiceTask.CFSkipSslValidation = true;
-            bindServiceTask.CFAppGuid = task.CFAppGuid;
-            bindServiceTask.CFServicesGuids = new string[1] { serviceTask.CFServiceGuid };
+            bindServiceTask.CFManifest = manifest;
+            bindServiceTask.CFOrganization = Settings.Default.Organization;
+            bindServiceTask.CFSpace = Settings.Default.Space;
             bindServiceTask.Execute();
 
-            if (CheckIfAppIsWorking(routeTask.CFRoutes[0], 60) == true)
+            RestartApp restartTask = new RestartApp();
+            restartTask.BuildEngine = new FakeBuildEngine();
+            restartTask.CFUser = Settings.Default.User;
+            restartTask.CFPassword = Settings.Default.Password;
+            restartTask.CFServerUri = Settings.Default.ServerUri;
+            restartTask.CFManifest = manifest;
+            restartTask.CFSkipSslValidation = true;
+            restartTask.CFOrganization = Settings.Default.Organization;
+            restartTask.CFSpace = Settings.Default.Space;
+            restartTask.Execute();
+            
+            if (CheckIfAppIsWorking(string.Format(CultureInfo.InvariantCulture,"{0}.{1}",host, Settings.Default.Domain), 60) == true)
             {
 
                 DeleteApp delTask = new DeleteApp();
@@ -115,7 +120,7 @@ namespace CloudFoundry.Build.Tasks.IntegrationTests
                 delTask.CFSkipSslValidation = true;
                 delTask.CFSpace = Settings.Default.Space;
                 delTask.CFOrganization = Settings.Default.Organization;
-                delTask.CFAppName = task.CFAppName;
+                delTask.CFManifest = manifest;
                 delTask.CFDeleteServices = true;
                 delTask.CFDeleteRoutes = true;
                 delTask.BuildEngine = new FakeBuildEngine();

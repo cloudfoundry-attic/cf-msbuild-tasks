@@ -11,10 +11,7 @@
     using Microsoft.Build.Framework;
 
     public class DeleteApp : BaseTask
-    {
-        [Required]
-        public string CFAppName { get; set; }
-
+    { 
         [Required]
         public string CFOrganization { get; set; }
 
@@ -30,11 +27,13 @@
         {
             this.Logger = new TaskLogger(this);
 
+            var app = LoadAppFromManifest();
+
             try
             {
                 CloudFoundryClient client = InitClient();
 
-                Logger.LogMessage("Deleting application {0} from space {1}", this.CFAppName, this.CFSpace);
+                Logger.LogMessage("Deleting application {0} from space {1}", app.Name, this.CFSpace);
 
                 Guid? spaceGuid = null;
 
@@ -47,10 +46,10 @@
                     }
                 }
 
-                PagedResponseCollection<ListAllAppsForSpaceResponse> appList = client.Spaces.ListAllAppsForSpace(spaceGuid, new RequestOptions() { Query = "name:" + this.CFAppName }).Result;
+                PagedResponseCollection<ListAllAppsForSpaceResponse> appList = client.Spaces.ListAllAppsForSpace(spaceGuid, new RequestOptions() { Query = "name:" + app.Name }).Result;
                 if (appList.Count() > 1)
                 {
-                    Logger.LogError("There are more applications named {0} in space {1}", this.CFAppName, this.CFSpace);
+                    Logger.LogError("There are more applications named {0} in space {1}", app.Name, this.CFSpace);
                     return false;
                 }
 
@@ -58,7 +57,7 @@
 
                 if (this.CFDeleteRoutes == true)
                 {
-                    Logger.LogMessage("Deleting routes associated with {0}", this.CFAppName);
+                    Logger.LogMessage("Deleting routes associated with {0}", app.Name);
                     var routeList = client.Apps.ListAllRoutesForApp(appGuid).Result;
                     foreach (var route in routeList)
                     {
@@ -68,7 +67,7 @@
 
                 if (this.CFDeleteServices == true)
                 {
-                    Logger.LogMessage("Deleting services bound to {0}", this.CFAppName);
+                    Logger.LogMessage("Deleting services bound to {0}", app.Name);
 
                     var serviceBindingList = client.Apps.ListAllServiceBindingsForApp(appGuid).Result;
 
