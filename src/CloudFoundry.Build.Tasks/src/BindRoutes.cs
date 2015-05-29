@@ -6,35 +6,75 @@
     using System.Text;
     using System.Threading.Tasks;
     using CloudFoundry.CloudController.V2.Client;
+    using CloudFoundry.CloudController.V2.Client.Data;
     using CloudFoundry.UAA;
     using Microsoft.Build.Framework;
 
     public class BindRoutes : BaseTask
     {
         [Required]
-        public string CFAppGuid { get; set; }
+        public string CFOrganization { get; set; }
 
         [Required]
-        public string[] CFRouteGuids { get; set; }
+        public string CFSpace { get; set; }
 
         public override bool Execute()
         {
-            this.Logger = new TaskLogger(this);
+            var app = LoadAppFromManifest();
 
-            if (string.IsNullOrWhiteSpace(this.CFAppGuid))
-            {
-                this.Logger.LogError("Application Guid must be specified");
-                return false;
-            }
+            this.Logger = new TaskLogger(this);
 
             try
             {
                 CloudFoundryClient client = InitClient();
 
-                Logger.LogMessage("Binding routes to application {0}", this.CFAppGuid);
-                foreach (string routeGuid in this.CFRouteGuids)
+                Guid? spaceGuid = null;
+
+                if ((!string.IsNullOrWhiteSpace(this.CFSpace)) && (!string.IsNullOrWhiteSpace(this.CFOrganization)))
                 {
-                    client.Apps.AssociateRouteWithApp(new Guid(this.CFAppGuid), new Guid(routeGuid)).Wait();
+                    spaceGuid = Utils.GetSpaceGuid(client, this.Logger, this.CFOrganization, this.CFSpace);
+                    if (spaceGuid == null)
+                    {
+                        return false;
+                    }
+                }
+
+                var appGuid = Utils.GetAppGuid(client, app.Name, spaceGuid.Value);
+
+                if (appGuid.HasValue)
+                {
+                    PagedResponseCollection<ListAllDomainsDeprecatedResponse> domainInfoList = client.DomainsDeprecated.ListAllDomainsDeprecated().Result;
+
+                    foreach (string domain in app.GetDomains())
+                    {
+                        foreach (var host in app.GetHosts())
+                        { 
+                            ListAllDomainsDeprecatedResponse domainInfo = domainInfoList.Where(o => o.Name == domain).FirstOrDefault();
+
+                            if (domainInfo == null)
+                            {
+                                Logger.LogError("Domain {0} not found", domain);
+                                continue;
+                            }
+
+                            var routeGuid = Utils.GetRouteGuid(client, host, domainInfo.EntityMetadata.Guid.ToGuid());
+
+                            if (routeGuid.HasValue)
+                            {
+                                Logger.LogMessage("Binding route {0}.{1} to application {2}", host, domain, app.Name);
+
+                                client.Apps.AssociateRouteWithApp(appGuid.Value, routeGuid.Value).Wait();
+                            }
+                            else
+                            {
+                                Logger.LogError("Could not find route {0}.{1}", host, domain);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    Logger.LogError("App {0} not found on space {1}", app.Name, this.CFSpace);
                 }
             }
             catch (Exception exception)

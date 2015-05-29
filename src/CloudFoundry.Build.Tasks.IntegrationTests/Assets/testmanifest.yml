@@ -1,0 +1,11 @@
+﻿---
+applications:
+- name: testapp{0}
+  memory: 512M
+  instances: 1
+  hosts:
+  - {1}
+  domains:
+  - {2}
+  path: '{3}'
+  stack: {4}

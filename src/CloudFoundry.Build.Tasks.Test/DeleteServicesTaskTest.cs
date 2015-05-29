@@ -7,14 +7,18 @@ using CloudFoundry.Build.Tasks.Test.Properties;
 namespace CloudFoundry.Build.Tasks.Test
 {
     [TestClass]
-    public class DeleteServiceTaskTest
+    public class DeleteServicesTaskTest
     {
         [TestMethod]
-        public void DeleteService_Test()
+        public void DeleteServices_Test()
         {
             using (ShimsContext.Create())
             {
                 CloudFoundry.CloudController.V2.Client.Fakes.ShimCloudFoundryClient.AllInstances.LoginCloudCredentials = TestUtils.CustomLogin;
+
+                CloudFoundry.Manifests.Fakes.ShimManifestDiskRepository.ReadManifestString = TestUtils.CustomReadManifest;
+
+                CloudFoundry.Manifests.Fakes.ShimManifest.AllInstances.Applications = TestUtils.CustomManifestApplications;
 
                 CloudFoundry.CloudController.V2.Client.Base.Fakes.ShimAbstractSpacesEndpoint.AllInstances.ListAllSpacesRequestOptions = TestUtils.CustomListAllSpaces;
 
@@ -37,13 +41,13 @@ namespace CloudFoundry.Build.Tasks.Test
 
                 TestUtils.InitTestMetadata();
 
-                DeleteService task = new DeleteService();
+                DeleteServices task = new DeleteServices();
                 task.CFUser = Settings.Default.User;
                 task.CFPassword = Settings.Default.Password;
                 task.CFServerUri = Settings.Default.ServerUri;
                 task.CFSpace = "TestSpace";
                 task.CFOrganization = "TestOrg";
-                task.CFServiceName = "service1";
+                task.CFManifest = Settings.Default.CFManifest;
 
                 task.BuildEngine = new FakeBuildEngine();
                 Assert.IsTrue(task.Execute());

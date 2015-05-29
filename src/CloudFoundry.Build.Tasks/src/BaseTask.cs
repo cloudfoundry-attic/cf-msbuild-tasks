@@ -4,6 +4,8 @@
     using System.Globalization;
     using System.Security.Authentication;
     using CloudFoundry.CloudController.V2.Client;
+    using CloudFoundry.Manifests;
+    using CloudFoundry.Manifests.Models;
     using CloudFoundry.UAA;
     using Microsoft.Build.Framework;
 
@@ -32,6 +34,9 @@
         public string CFRefreshToken { get; set; }
 
         public bool CFSkipSslValidation { get; set; }
+
+        [Required]
+        public string CFManifest { get; set; }
 
         [Required]
         public string CFServerUri { get; set; }
@@ -91,6 +96,19 @@
             }
 
             return client;
+        }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2201:DoNotRaiseReservedExceptionTypes", Justification = "Throw exception if more than one application present in manifest")]
+        internal Application LoadAppFromManifest()
+        {
+            Manifest man = ManifestDiskRepository.ReadManifest(this.CFManifest);
+
+            if (man.Applications().Length > 1)
+            {
+                throw new InvalidOperationException("More than one application specified in the manifest file");
+            }
+
+            return man.Applications()[0];
         }
     }
 }
