@@ -15,7 +15,10 @@
 
   /t:UnitTest
     Runs unit tests
-    
+
+  /t:IntegrationTests
+    Runs integration tests
+
   /t:RestoreNugetPackages
     Restores nuget packages
     
@@ -105,6 +108,42 @@
     <Exec Command="$(ReportGeneratorCommand) -reports:&quot;$(CoverageXml)&quot; -targetdir:&quot;$(CoverageHtmlDir)&quot;" />
   </Target>
 
+  <!-- Target for running integration tests-->
+  <Target Name="IntegrationTest">
+    <ItemGroup>
+      <TestDlls Include=".\lib\tests\CloudFoundry.Build.Tasks.IntegrationTests.dll"/>
+      <ConfigFile Include=".\lib\tests\CloudFoundry.Build.Tasks.IntegrationTests.dll.config"/>
+    </ItemGroup>
+
+
+    <Warning Text="The CFMSBuildTestsOrganization property not set, value from app.config will be used." Condition="'$(CFMSBuildTestsOrganization)' == ''" />
+    <Warning Text="The CFMSBuildTestsSpace property not set, value from app.config will be used." Condition="'$(CFMSBuildTestsSpace)' == ''" />
+    <Warning Text="The CFMSBuildTestsStack property not set, value from app.config will be used." Condition="'$(CFMSBuildTestsStack)' == ''" />
+    <Warning Text="The CFMSBuildTestsServiceType property not set, value from app.config will be used." Condition="'$(CFMSBuildTestsServiceType)' == ''" />
+    <Warning Text="The CFMSBuildTestsServicePlan property not set, value from app.config will be used." Condition="'$(CFMSBuildTestsServicePlan)' == ''" />
+    <Warning Text="The CFMSBuildTestsUser property not set, value from app.config will be used." Condition="'$(CFMSBuildTestsUser)' == ''" />
+    <Warning Text="The CFMSBuildTestsPassword property not set, value from app.config will be used." Condition="'$(CFMSBuildTestsPassword)' == ''" />
+    <Warning Text="The CFMSBuildTestsServerUri property not set, value from app.config will be used." Condition="'$(CFMSBuildTestsServerUri)' == ''" />
+    <Warning Text="The CFMSBuildTestsRoute property not set, value from app.config will be used." Condition="'$(CFMSBuildTestsRoute)' == ''" />
+
+    <Message Text="Updating config file at %(ConfigFile.Identity)" />
+
+    <XmlPoke Condition="'$(CFMSBuildTestsOrganization)' != ''" XmlInputPath="%(ConfigFile.Identity)" Query="/configuration/userSettings/CloudFoundry.Build.Tasks.IntegrationTests.Properties.Settings/setting[@name='Organization']/value" Value="$(CFMSBuildTestsOrganization)"/>
+    <XmlPoke Condition="'$(CFMSBuildTestsSpace)' != ''" XmlInputPath="%(ConfigFile.Identity)" Query="/configuration/userSettings/CloudFoundry.Build.Tasks.IntegrationTests.Properties.Settings/setting[@name='Space']/value" Value="$(CFMSBuildTestsSpace)"/>
+    <XmlPoke Condition="'$(CFMSBuildTestsStack)' != ''" XmlInputPath="%(ConfigFile.Identity)" Query="/configuration/userSettings/CloudFoundry.Build.Tasks.IntegrationTests.Properties.Settings/setting[@name='Stack']/value" Value="$(CFMSBuildTestsStack)"/>
+    <XmlPoke Condition="'$(CFMSBuildTestsServiceType)' != ''" XmlInputPath="%(ConfigFile.Identity)" Query="/configuration/userSettings/CloudFoundry.Build.Tasks.IntegrationTests.Properties.Settings/setting[@name='ServiceType']/value" Value="$(CFMSBuildTestsServiceType)"/>
+    <XmlPoke Condition="'$(CFMSBuildTestsServicePlan)' != ''" XmlInputPath="%(ConfigFile.Identity)" Query="/configuration/userSettings/CloudFoundry.Build.Tasks.IntegrationTests.Properties.Settings/setting[@name='ServicePlan']/value" Value="$(CFMSBuildTestsServicePlan)"/>
+    <XmlPoke Condition="'$(CFMSBuildTestsUser)' != ''" XmlInputPath="%(ConfigFile.Identity)" Query="/configuration/userSettings/CloudFoundry.Build.Tasks.IntegrationTests.Properties.Settings/setting[@name='User']/value" Value="$(CFMSBuildTestsUser)"/>
+    <XmlPoke Condition="'$(CFMSBuildTestsPassword)' != ''" XmlInputPath="%(ConfigFile.Identity)" Query="/configuration/userSettings/CloudFoundry.Build.Tasks.IntegrationTests.Properties.Settings/setting[@name='Password']/value" Value="$(CFMSBuildTestsPassword)"/>
+    <XmlPoke Condition="'$(CFMSBuildTestsServerUri)' != ''" XmlInputPath="%(ConfigFile.Identity)" Query="/configuration/userSettings/CloudFoundry.Build.Tasks.IntegrationTests.Properties.Settings/setting[@name='ServerUri']/value" Value="$(CFMSBuildTestsServerUri)"/>
+    <XmlPoke Condition="'$(CFMSBuildTestsRoute)' != ''" XmlInputPath="%(ConfigFile.Identity)" Query="/configuration/userSettings/CloudFoundry.Build.Tasks.IntegrationTests.Properties.Settings/setting[@name='Route']/value" Value="$(CFMSBuildTestsRoute)"/>
+
+    <Exec Command="$(VSTestCommand) %(TestDlls.Identity) /inIsolation /settings:CodeCoverage.runsettings /logger:trx"  ConsoleToMSBuild="true">
+      <Output TaskParameter="ExitCode" PropertyName="ErrorCode"/>
+      <Output TaskParameter="ConsoleOutput" PropertyName="OutputOfTestRun" />
+    </Exec>
+  </Target>
+  
   <!-- Target for restoring nuget packages -->
   <Target Name="RestoreNugetPackages">
     <Exec Command="$(NuGetCommand) restore $(SDKMSBuildTasksSolution)"/>
