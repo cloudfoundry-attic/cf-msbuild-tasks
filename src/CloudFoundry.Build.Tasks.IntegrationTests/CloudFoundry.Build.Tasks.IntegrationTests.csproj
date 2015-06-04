@@ -76,9 +76,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="Assets\PhpApp\index.php">
+    <Content Include="Assets\PhpApp\index.php">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    </Content>
     <None Include="Assets\TestApp\Web.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
