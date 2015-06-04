@@ -14,21 +14,47 @@ namespace CloudFoundry.Build.Tasks.IntegrationTests
     public class TaskFlow_Test
     {
         [TestMethod]
-        public void Flow_IntegrationTest()
+        public void PhpApp_IntegrationTest()
         {
             string assemblyDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             string appPath = Path.Combine(assemblyDirectory, "PhpApp");
             string manifest = Path.Combine(assemblyDirectory, "testmanifest.yml");
+            string phpManifest = Path.Combine(assemblyDirectory, "phpmanifest.yml");
 
-            string guid=Guid.NewGuid().ToString();
+            string guid = Guid.NewGuid().ToString();
             string host = string.Format(Settings.Default.Host, guid);
 
             string man = File.ReadAllText(manifest);
 
-            man = string.Format(CultureInfo.InvariantCulture, man, guid, host, Settings.Default.Domain, appPath, Settings.Default.Stack);
+            man = string.Format(CultureInfo.InvariantCulture, man, guid, host, Settings.Default.Domain, appPath, Settings.Default.LinuxStack);
+            man += "  buildpack: https://github.com/cloudfoundry/php-buildpack";
+            File.WriteAllText(phpManifest, man);
 
-            File.WriteAllText(manifest, man);
+            Assert.IsTrue(RunTasks(phpManifest, host));
+        }
 
+        [TestMethod]
+        public void AspApp_IntegrationTest()
+        {
+            string assemblyDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string appPath = Path.Combine(assemblyDirectory, "TestApp");
+            string manifest = Path.Combine(assemblyDirectory, "testmanifest.yml");
+            string aspManifest = Path.Combine(assemblyDirectory, "aspmanifest.yml"); 
+
+            string guid = Guid.NewGuid().ToString();
+            string host = string.Format(Settings.Default.Host, guid);
+
+            string man = File.ReadAllText(manifest);
+
+            man = string.Format(CultureInfo.InvariantCulture, man, guid, host, Settings.Default.Domain, appPath, Settings.Default.WindowsStack);
+
+            File.WriteAllText(aspManifest, man);
+
+            Assert.IsTrue(RunTasks(aspManifest, host));
+        }
+
+        private bool RunTasks(string manifest, string host)
+        {
             LoginTask login = new LoginTask();
             login.BuildEngine = new FakeBuildEngine();
             login.CFUser = Settings.Default.User;
@@ -58,7 +84,7 @@ namespace CloudFoundry.Build.Tasks.IntegrationTests
             pushTask.CFManifest = manifest;
             pushTask.CFOrganization = Settings.Default.Organization;
             pushTask.CFSpace = Settings.Default.Space;
-            
+
             pushTask.BuildEngine = new FakeBuildEngine();
 
             pushTask.Execute();
@@ -109,10 +135,9 @@ namespace CloudFoundry.Build.Tasks.IntegrationTests
             restartTask.CFOrganization = Settings.Default.Organization;
             restartTask.CFSpace = Settings.Default.Space;
             restartTask.Execute();
-            
-            if (CheckIfAppIsWorking(string.Format(CultureInfo.InvariantCulture,"{0}.{1}",host, Settings.Default.Domain), 60) == true)
-            {
 
+            if (CheckIfAppIsWorking(string.Format(CultureInfo.InvariantCulture, "{0}.{1}", host, Settings.Default.Domain), 60) == true)
+            {
                 DeleteApp delTask = new DeleteApp();
                 delTask.CFUser = Settings.Default.User;
                 delTask.CFPassword = Settings.Default.Password;
@@ -125,11 +150,11 @@ namespace CloudFoundry.Build.Tasks.IntegrationTests
                 delTask.CFDeleteRoutes = true;
                 delTask.BuildEngine = new FakeBuildEngine();
 
-                Assert.IsTrue(delTask.Execute());
+                return delTask.Execute();
             }
             else
             {
-                Assert.Fail("Application is not working");
+                return false;
             }
         }
 

@@ -26,12 +26,36 @@ namespace CloudFoundry.Build.Tasks.IntegrationTests.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("lucid64")]
-        public string Stack {
+        public string LinuxStack {
             get {
-                return ((string)(this["Stack"]));
+                return ((string)(this["LinuxStack"]));
             }
             set {
-                this["Stack"] = value;
+                this["LinuxStack"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("testapp{0}")]
+        public string Host {
+            get {
+                return ((string)(this["Host"]));
+            }
+            set {
+                this["Host"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("win2012r2")]
+        public string WindowsStack {
+            get {
+                return ((string)(this["WindowsStack"]));
+            }
+            set {
+                this["WindowsStack"] = value;
             }
         }
         
@@ -92,18 +116,6 @@ namespace CloudFoundry.Build.Tasks.IntegrationTests.Properties {
             }
             set {
                 this["ServerUri"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("testapp{0}")]
-        public string Host {
-            get {
-                return ((string)(this["Host"]));
-            }
-            set {
-                this["Host"] = value;
             }
         }
         
