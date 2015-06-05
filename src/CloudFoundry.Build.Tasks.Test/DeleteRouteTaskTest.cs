@@ -16,6 +16,10 @@ namespace CloudFoundry.Build.Tasks.Test
             {
                 CloudFoundry.CloudController.V2.Client.Fakes.ShimCloudFoundryClient.AllInstances.LoginCloudCredentials = TestUtils.CustomLogin;
 
+                CloudFoundry.Manifests.Fakes.ShimManifestDiskRepository.ReadManifestString = TestUtils.CustomReadManifest;
+
+                CloudFoundry.Manifests.Fakes.ShimManifest.AllInstances.Applications = TestUtils.CustomManifestApplications;
+
                 CloudController.V2.Client.Base.Fakes.ShimAbstractDomainsDeprecatedEndpoint.AllInstances.ListAllDomainsDeprecated = TestUtils.CustomListAllDomains;
 
                 CloudFoundry.CloudController.V2.Client.Fakes.ShimPagedResponseCollection<ListAllDomainsDeprecatedResponse>.AllInstances.ResourcesGet = TestUtils.CustomGetDomains;
@@ -28,11 +32,11 @@ namespace CloudFoundry.Build.Tasks.Test
 
                 TestUtils.InitTestMetadata();
 
-                DeleteRoute task = new DeleteRoute();
+                DeleteRoutes task = new DeleteRoutes();
                 task.CFUser = Settings.Default.User;
                 task.CFPassword = Settings.Default.Password;
                 task.CFServerUri = Settings.Default.ServerUri;
-                task.CFRoute = "test.domain.com";
+                task.CFManifest = Settings.Default.CFManifest;
 
                 task.BuildEngine = new FakeBuildEngine();
                 Assert.IsTrue(task.Execute());

@@ -14,30 +14,18 @@
     public class CreateApp : BaseTask
     {
         [Required]
-        public string CFAppName { get; set; }
-
-        [Required]
         public string CFOrganization { get; set; }
 
         [Required]
         public string CFSpace { get; set; }
-
-        [Required]
-        public string CFStack { get; set; }
-
-        public int CFAppMemory { get; set; }
-
-        public int CFAppInstances { get; set; }
-
-        public string CFEnvironmentJson { get; set; }
-
-        public string CFAppBuildpack { get; set; }
 
         [Output]
         public string CFAppGuid { get; set; }
 
         public override bool Execute()
         {
+            var app = LoadAppFromManifest();
+
             this.Logger = new TaskLogger(this);
             CloudFoundryClient client = InitClient();
 
@@ -55,15 +43,15 @@
                     }
                 }
 
-                if (!string.IsNullOrWhiteSpace(this.CFStack))
+                if (!string.IsNullOrWhiteSpace(app.StackName))
                 {
                     PagedResponseCollection<ListAllStacksResponse> stackList = client.Stacks.ListAllStacks().Result;
 
-                    var stackInfo = stackList.Where(o => o.Name == this.CFStack).FirstOrDefault();
+                    var stackInfo = stackList.Where(o => o.Name == app.StackName).FirstOrDefault();
 
                     if (stackInfo == null)
                     {
-                        Logger.LogError("Stack {0} not found", this.CFStack);
+                        Logger.LogError("Stack {0} not found", app.StackName);
                         return false;
                     }
 
@@ -72,7 +60,7 @@
 
                 if (stackGuid.HasValue && spaceGuid.HasValue)
                 {
-                    PagedResponseCollection<ListAllAppsForSpaceResponse> apps = client.Spaces.ListAllAppsForSpace(spaceGuid, new RequestOptions() { Query = "name:" + this.CFAppName }).Result;
+                    PagedResponseCollection<ListAllAppsForSpaceResponse> apps = client.Spaces.ListAllAppsForSpace(spaceGuid, new RequestOptions() { Query = "name:" + app.Name }).Result;
 
                     if (apps.Count() > 0)
                     {
@@ -82,24 +70,19 @@
                         request.SpaceGuid = spaceGuid;
                         request.StackGuid = stackGuid;
 
-                        if (this.CFEnvironmentJson != null)
-                        {
-                            request.EnvironmentJson = JsonConvert.DeserializeObject<Dictionary<string, string>>(this.CFEnvironmentJson);
-                        }
-
-                        if (this.CFAppMemory > 0)
-                        {
-                            request.Memory = this.CFAppMemory;
-                        }
-
-                        if (this.CFAppInstances > 0)
-                        {
-                            request.Instances = this.CFAppInstances;
-                        }
+                        request.EnvironmentJson = app.EnvironmentVariables;
+                       
+                        request.Memory = (int)app.Memory;
+                       
+                        request.Instances = app.InstanceCount;
+                       
+                        request.Buildpack = app.BuildpackUrl;
                         
-                        if (this.CFAppBuildpack != null)
+                        request.Command = app.Command;
+
+                        if (app.DiskQuota.HasValue)
                         {
-                            request.Buildpack = this.CFAppBuildpack;
+                            request.DiskQuota = app.DiskQuota.Value.ToString(System.Globalization.CultureInfo.InvariantCulture);
                         }
 
                         UpdateAppResponse response = client.Apps.UpdateApp(new Guid(this.CFAppGuid), request).Result;
@@ -108,33 +91,28 @@
                     else
                     {
                         CreateAppRequest request = new CreateAppRequest();
-                        request.Name = this.CFAppName;
+                        request.Name = app.Name;
                         request.SpaceGuid = spaceGuid;
                         request.StackGuid = stackGuid;
 
-                        if (this.CFEnvironmentJson != null)
-                        {
-                            request.EnvironmentJson = JsonConvert.DeserializeObject<Dictionary<string, string>>(this.CFEnvironmentJson);
-                        }
+                        request.EnvironmentJson = app.EnvironmentVariables;
 
-                        if (this.CFAppMemory > 0)
-                        {
-                            request.Memory = this.CFAppMemory;
-                        }
+                        request.Memory = (int)app.Memory;
 
-                        if (this.CFAppInstances > 0)
+                        request.Instances = app.InstanceCount;
+
+                        request.Buildpack = app.BuildpackUrl;
+
+                        request.Command = app.Command;
+
+                        if (app.DiskQuota.HasValue)
                         {
-                            request.Instances = this.CFAppInstances;
-                        }
-                        
-                        if (this.CFAppBuildpack != null)
-                        {
-                            request.Buildpack = this.CFAppBuildpack;
+                            request.DiskQuota = app.DiskQuota.Value.ToString(System.Globalization.CultureInfo.InvariantCulture);
                         }
 
                         CreateAppResponse response = client.Apps.CreateApp(request).Result;
                         this.CFAppGuid = response.EntityMetadata.Guid;
-                        Logger.LogMessage("Created app {0} with guid {1}", this.CFAppName, this.CFAppGuid);
+                        Logger.LogMessage("Created app {0} with guid {1}", app.Name, this.CFAppGuid);
                     }
                 }
             }

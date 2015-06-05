@@ -6,6 +6,7 @@
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
+    using CloudFoundry.CloudController.Common.Exceptions;
     using CloudFoundry.CloudController.V2.Client;
     using CloudFoundry.UAA;
     using Microsoft.Build.Framework;
@@ -13,35 +14,65 @@
     public class PushApp : BaseTask
     {
         [Required]
-        public string CFAppGuid { get; set; }
+        public string CFOrganization { get; set; }
 
         [Required]
-        public string CFAppPath { get; set; }
-
-        public bool CFStart { get; set; }
+        public string CFSpace { get; set; }
 
         public override bool Execute()
         {
             this.Logger = new TaskLogger(this);
+            var app = LoadAppFromManifest();
 
             try
             {
                 CloudFoundryClient client = InitClient();
 
-                if (!Directory.Exists(this.CFAppPath))
+                Guid? spaceGuid = null;
+
+                if ((!string.IsNullOrWhiteSpace(this.CFSpace)) && (!string.IsNullOrWhiteSpace(this.CFOrganization)))
                 {
-                    Logger.LogError("Directory {0} not found", this.CFAppPath);
-                    return false;
+                    spaceGuid = Utils.GetSpaceGuid(client, this.Logger, this.CFOrganization, this.CFSpace);
+
+                    if (spaceGuid == null)
+                    {
+                        return false;
+                    }
                 }
 
-                client.Apps.PushProgress += this.Apps_PushProgress;
+                var appGuid = Utils.GetAppGuid(client, app.Name, spaceGuid.Value);
+                if (appGuid.HasValue)
+                {
+                    if (!Directory.Exists(app.Path))
+                    {
+                        Logger.LogError("Directory {0} not found", app.Path);
+                        return false;
+                    }
 
-                client.Apps.Push(new Guid(this.CFAppGuid), this.CFAppPath, this.CFStart).Wait();
+                    client.Apps.PushProgress += this.Apps_PushProgress;
+
+                    client.Apps.Push(appGuid.Value, app.Path, false).Wait();
+                }
+                else
+                {
+                    Logger.LogError("App {0} not found ", app.Name);
+                    return false;
+                }
             }
-            catch (Exception exception)
+            catch (AggregateException ex)
             {
-                this.Logger.LogError("Push App failed", exception);
-                return false;
+                foreach (Exception e in ex.Flatten().InnerExceptions)
+                {
+                    if (e is CloudFoundryException)
+                    {
+                        Logger.LogWarning(e.Message);
+                    }
+                    else
+                    {
+                        this.Logger.LogError("Push job failed", ex);
+                        return false;
+                    }
+                }
             }
 
             return true;

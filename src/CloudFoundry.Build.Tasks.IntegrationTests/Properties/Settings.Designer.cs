@@ -25,6 +25,42 @@ namespace CloudFoundry.Build.Tasks.IntegrationTests.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("lucid64")]
+        public string LinuxStack {
+            get {
+                return ((string)(this["LinuxStack"]));
+            }
+            set {
+                this["LinuxStack"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("testapp{0}")]
+        public string Host {
+            get {
+                return ((string)(this["Host"]));
+            }
+            set {
+                this["Host"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("win2012r2")]
+        public string WindowsStack {
+            get {
+                return ((string)(this["WindowsStack"]));
+            }
+            set {
+                this["WindowsStack"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("org")]
         public string Organization {
             get {
@@ -49,43 +85,7 @@ namespace CloudFoundry.Build.Tasks.IntegrationTests.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("win2012r2")]
-        public string Stack {
-            get {
-                return ((string)(this["Stack"]));
-            }
-            set {
-                this["Stack"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("mssql2012")]
-        public string ServiceType {
-            get {
-                return ((string)(this["ServiceType"]));
-            }
-            set {
-                this["ServiceType"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("free")]
-        public string ServicePlan {
-            get {
-                return ((string)(this["ServicePlan"]));
-            }
-            set {
-                this["ServicePlan"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("testUser")]
+        [global::System.Configuration.DefaultSettingValueAttribute("testUsername")]
         public string User {
             get {
                 return ((string)(this["User"]));
@@ -121,13 +121,13 @@ namespace CloudFoundry.Build.Tasks.IntegrationTests.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("testapp{0}.1.2.3.4.xip.io")]
-        public string Route {
+        [global::System.Configuration.DefaultSettingValueAttribute("1.2.3.4.xip.io")]
+        public string Domain {
             get {
-                return ((string)(this["Route"]));
+                return ((string)(this["Domain"]));
             }
             set {
-                this["Route"] = value;
+                this["Domain"] = value;
             }
         }
     }

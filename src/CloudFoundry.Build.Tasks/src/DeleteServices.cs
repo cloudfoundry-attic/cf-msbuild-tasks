@@ -9,11 +9,8 @@ namespace CloudFoundry.Build.Tasks
     using CloudFoundry.CloudController.V2.Client.Data;
     using Microsoft.Build.Framework;
 
-    public class DeleteService : BaseTask
+    public class DeleteServices : BaseTask
     {
-        [Required]
-        public string CFServiceName { get; set; }
-
         [Required]
         public string CFOrganization { get; set; }
 
@@ -23,11 +20,11 @@ namespace CloudFoundry.Build.Tasks
         public override bool Execute()
         {
             this.Logger = new TaskLogger(this);
+
+            var app = LoadAppFromManifest();
             try
             {
                 CloudFoundryClient client = InitClient();
-
-                Logger.LogMessage("Deleting service {0} from space {1}", this.CFServiceName, this.CFSpace);
 
                 Guid? spaceGuid = null;
 
@@ -40,15 +37,21 @@ namespace CloudFoundry.Build.Tasks
                     }
                 }
 
-                var servicesList = client.Spaces.ListAllServiceInstancesForSpace(spaceGuid, new RequestOptions() { Query = "name:" + this.CFServiceName }).Result;
-
-                if (servicesList.Count() > 1)
+                foreach (var service in app.GetServices())
                 {
-                    Logger.LogError("There are more services named {0} in space {1}", this.CFServiceName, this.CFSpace);
-                    return false;
-                }
+                    Logger.LogMessage("Deleting service {0} from space {1}", service, this.CFSpace);
 
-                client.ServiceInstances.DeleteServiceInstance(new Guid(servicesList.First().EntityMetadata.Guid)).Wait();
+                    var serviceGuid = Utils.GetServiceGuid(client, service, spaceGuid.Value);
+
+                    if (serviceGuid.HasValue)
+                    {
+                        client.ServiceInstances.DeleteServiceInstance(serviceGuid.Value).Wait();
+                    }
+                    else
+                    {
+                        Logger.LogError("Service {0} not found in space {1}", service, this.CFSpace);
+                    }
+                }
             }
             catch (Exception exception)
             {
