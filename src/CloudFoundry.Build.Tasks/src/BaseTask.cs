@@ -55,10 +55,14 @@
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily", Justification = "Cast needed to change output property")]
         internal CloudFoundryClient InitClient()
         {
+            this.CFServerUri = this.CFServerUri.Trim();
+
             CloudFoundryClient client = new CloudFoundryClient(new Uri(this.CFServerUri), new System.Threading.CancellationToken(), null, this.CFSkipSslValidation);
 
             if (string.IsNullOrWhiteSpace(this.CFUser) == false && (string.IsNullOrWhiteSpace(this.CFPassword) == false || this.CFSavedPassword))
             {
+                this.CFUser = this.CFUser.Trim();
+
                 if (string.IsNullOrWhiteSpace(this.CFPassword))
                 {
                     this.CFPassword = CloudCredentialsManager.GetPassword(new Uri(this.CFServerUri), this.CFUser);
@@ -74,6 +78,8 @@
                     }
                 }
 
+                this.CFPassword = this.CFPassword;
+         
                 CloudCredentials creds = new CloudCredentials();
                 creds.User = this.CFUser;
                 creds.Password = this.CFPassword;
@@ -88,6 +94,8 @@
             }
             else if (string.IsNullOrWhiteSpace(this.CFRefreshToken) == false)
             {
+                this.CFRefreshToken = this.CFRefreshToken.Trim();
+
                 client.Login(this.CFRefreshToken).Wait();
             }
             else
@@ -101,6 +109,8 @@
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2201:DoNotRaiseReservedExceptionTypes", Justification = "Throw exception if more than one application present in manifest")]
         internal Application LoadAppFromManifest()
         {
+            this.CFManifest = this.CFManifest.Trim();
+
             Manifest man = ManifestDiskRepository.ReadManifest(this.CFManifest);
 
             if (man.Applications().Length > 1)

@@ -24,6 +24,9 @@
 
         public override bool Execute()
         {
+            this.CFOrganization = this.CFOrganization.Trim();
+            this.CFSpace = this.CFSpace.Trim();
+
             var app = LoadAppFromManifest();
 
             this.Logger = new TaskLogger(this);
