@@ -13,10 +13,7 @@
     using Microsoft.Build.Framework;
 
     public class CreateRoutes : BaseTask
-    {
-        [Required]
-        public string[] CFRoutes { get; set; }
-
+    {  
         [Required]
         public string CFOrganization { get; set; }
 
@@ -29,6 +26,7 @@
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling", Justification = "Coupling needed")]
         public override bool Execute()
         {
+            var app = LoadAppFromManifest();
             this.Logger = new TaskLogger(this);
 
             try
@@ -52,56 +50,25 @@
 
                 if (spaceGuid.HasValue)
                 {
-                    foreach (string route in this.CFRoutes)
+                    foreach (string domain in app.GetDomains())
                     {
-                        if (route.Contains(';'))
-                        {
-                            foreach (var url in route.Split(';'))
+                            foreach (var host in app.GetHosts())
                             {
-                                Logger.LogMessage("Creating route {0}", url);
-                                string domain = string.Empty;
-                                string host = string.Empty;
-                                Utils.ExtractDomainAndHost(url, out domain, out host);
-
-                                if (string.IsNullOrWhiteSpace(domain) || string.IsNullOrWhiteSpace(host))
+                                if (string.IsNullOrWhiteSpace(host) == false)
                                 {
-                                    Logger.LogError("Error extracting domain and host information from route {0}", url);
-                                    continue;
+                                    Logger.LogMessage("Creating route {0}.{1}", host, domain);
+
+                                    ListAllDomainsDeprecatedResponse domainInfo = domainInfoList.Where(o => o.Name == domain).FirstOrDefault();
+
+                                    if (domainInfo == null)
+                                    {
+                                        Logger.LogError("Domain {0} not found", domain);
+                                        continue;
+                                    }
+
+                                    this.CreateRoute(client, spaceGuid, createdGuid, host, domainInfo);
                                 }
-
-                                ListAllDomainsDeprecatedResponse domainInfo = domainInfoList.Where(o => o.Name == domain).FirstOrDefault();
-
-                                if (domainInfo == null)
-                                {
-                                    Logger.LogError("Domain {0} not found", domain);
-                                    continue;
-                                }
-
-                                this.CreateRoute(client, spaceGuid, createdGuid, host, domainInfo);
                             }
-                        }
-                        else
-                        {
-                            string domain = string.Empty;
-                            string host = string.Empty;
-                            Utils.ExtractDomainAndHost(route, out domain, out host);
-
-                            if (string.IsNullOrWhiteSpace(domain) || string.IsNullOrWhiteSpace(host))
-                            {
-                                Logger.LogError("Error extracting domain and host information from route {0}", route);
-                                continue;
-                            }
-
-                            ListAllDomainsDeprecatedResponse domainInfo = domainInfoList.Where(o => o.Name == domain).FirstOrDefault();
-
-                            if (domainInfo == null)
-                            {
-                                Logger.LogError("Domain {0} not found", domain);
-                                continue;
-                            }
-
-                            this.CreateRoute(client, spaceGuid, createdGuid, host, domainInfo);
-                        }
                     }
 
                     this.CFRouteGuids = createdGuid.ToArray();

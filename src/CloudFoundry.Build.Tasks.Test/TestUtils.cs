@@ -293,7 +293,6 @@ namespace CloudFoundry.Build.Tasks.Test
         internal static List<ListAllOrganizationsResponse> CustomListAllOrganizationsResponse(PagedResponseCollection<ListAllOrganizationsResponse> arg1)
         {
             return new List<ListAllOrganizationsResponse>() { new ListAllOrganizationsResponse(){ EntityMetadata=new Metadata() }};
-
         }
 
         internal static Task<PagedResponseCollection<ListAllSpacesForOrganizationResponse>> CustomListAllSpacesForOrganization(CloudController.V2.Client.Base.AbstractOrganizationsEndpoint arg1, Guid? arg2, RequestOptions arg3)
@@ -309,6 +308,36 @@ namespace CloudFoundry.Build.Tasks.Test
         internal static EntityGuid CustomMetadataGuidGet(Metadata arg1)
         {
             return EntityGuid.FromGuid(Guid.NewGuid());
+        }
+
+        internal static Manifests.Models.Application[] CustomManifestApplications(Manifests.Manifest arg1)
+        {
+            var app = new Manifests.Models.Application() { Name = "testApp", StackName = "testStack", InstanceCount = 1, Memory = 512, Path = "C:\\" };
+
+            app.SetDomains(new string[1] { "domain.com" });
+            app.SetHosts(new string[1] { "testApp" });
+            app.SetServices(new string[1] { "testservice" });
+
+            return new Manifests.Models.Application[1]{
+               app
+            };
+        }
+
+        internal static Task<PagedResponseCollection<ListAllServiceInstancesForSpaceResponse>> CustomListAllServiceInstancesForSpace(CloudController.V2.Client.Base.AbstractSpacesEndpoint arg1, Guid? arg2, RequestOptions arg3)
+        {
+            return Task<PagedResponseCollection<ListAllServiceInstancesForSpaceResponse>>.Factory.StartNew(() => {
+                return new PagedResponseCollection<ListAllServiceInstancesForSpaceResponse>();
+            });
+        }
+
+        internal static List<ListAllServiceInstancesForSpaceResponse> CustomListAllServiceInstancesForSpaceResponse(PagedResponseCollection<ListAllServiceInstancesForSpaceResponse> arg1)
+        {
+            return new List<ListAllServiceInstancesForSpaceResponse>() { new ListAllServiceInstancesForSpaceResponse() { EntityMetadata = new Metadata() } };
+        }
+
+        internal static Manifests.Manifest CustomReadManifest(string arg1)
+        {
+            return new Manifests.Manifest();
         }
     }
 }

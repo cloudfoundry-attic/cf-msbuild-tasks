@@ -2,14 +2,17 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="CloudFoundry.Build.Tasks.Test.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
-    <Setting Name="User" Type="System.String" Scope="User">
-      <Value Profile="(Default)">admin</Value>
-    </Setting>
     <Setting Name="Password" Type="System.String" Scope="User">
       <Value Profile="(Default)">admin</Value>
     </Setting>
     <Setting Name="ServerUri" Type="System.String" Scope="User">
       <Value Profile="(Default)">http://api.15.126.213.170.xip.io</Value>
+    </Setting>
+    <Setting Name="User" Type="System.String" Scope="User">
+      <Value Profile="(Default)">user</Value>
+    </Setting>
+    <Setting Name="CFManifest" Type="System.String" Scope="User">
+      <Value Profile="(Default)">C:\testmanifest.yaml</Value>
     </Setting>
   </Settings>
 </SettingsFile>

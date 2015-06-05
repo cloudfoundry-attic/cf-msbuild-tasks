@@ -15,105 +15,6 @@
 
     internal static class Utils
     {
-        internal static PushProperties DeserializeFromFile(string filePath)
-        {
-            PushProperties returnValue;
-            Deserializer deserializer = new Deserializer();
-            string content = File.ReadAllText(filePath);
-            using (TextReader reader = new StringReader(content))
-            {
-                returnValue = deserializer.Deserialize(reader, typeof(PushProperties)) as PushProperties;
-            }
-
-            return returnValue;
-        }
-
-        internal static void SerializeToFile(PushProperties configurationParameters, string filePath)
-        {
-            Serializer serializer = new Serializer(YamlDotNet.Serialization.SerializationOptions.EmitDefaults, null);
-
-            StringBuilder builder = new StringBuilder();
-
-            using (TextWriter writer = new StringWriter(builder, CultureInfo.InvariantCulture))
-            {
-                serializer.Serialize(writer, configurationParameters);
-            }
-
-            File.WriteAllText(filePath, builder.ToString());
-        }
-
-        internal static string Serialize<T>(T value)
-        {
-            if (value == null)
-            {
-                return null;
-            }
-
-            XmlSerializer serializer = new XmlSerializer(typeof(T));
-
-            XmlWriterSettings settings = new XmlWriterSettings();
-            settings.Encoding = new UnicodeEncoding(false, false); // no BOM in a .NET string
-            settings.Indent = false;
-            settings.OmitXmlDeclaration = false;
-
-            using (StringWriter textWriter = new StringWriter(CultureInfo.InvariantCulture))
-            {
-                using (XmlWriter xmlWriter = XmlWriter.Create(textWriter, settings))
-                {
-                    serializer.Serialize(xmlWriter, value);
-                }
-
-                return textWriter.ToString();
-            }
-        }
-
-        internal static T Deserialize<T>(string xml)
-        {
-            if (string.IsNullOrEmpty(xml))
-            {
-                return default(T);
-            }
-
-            XmlSerializer serializer = new XmlSerializer(typeof(T));
-
-            XmlReaderSettings settings = new XmlReaderSettings();
-            
-            // No settings need modifying here
-            using (StringReader textReader = new StringReader(xml))
-            {
-                using (XmlReader xmlReader = XmlReader.Create(textReader, settings))
-                {
-                    return (T)serializer.Deserialize(xmlReader);
-                }
-            }
-        }
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1308:NormalizeStringsToUppercase", Justification = "Normalization to lowercase is better for urls")]
-        internal static void ExtractDomainAndHost(string route, out string domain, out string host)
-        {
-            route = route.Replace("http://", string.Empty).Replace("https://", string.Empty);
-            domain = route.Substring(route.IndexOf('.') + 1);
-            host = route.Split('.').First().ToLower(CultureInfo.InvariantCulture);
-        }
-
-        internal static Guid? CheckForExistingService(string serviceName, Guid? planGuid, CloudFoundryClient client)
-        {
-            PagedResponseCollection<ListAllServiceInstancesResponse> serviceInstances = client.ServiceInstances.ListAllServiceInstances().Result;
-
-            foreach (ListAllServiceInstancesResponse serviceInstanceDetails in serviceInstances)
-            {
-                if (serviceInstanceDetails.ServicePlanGuid.HasValue)
-                {
-                    if (serviceInstanceDetails.Name == serviceName && serviceInstanceDetails.ServicePlanGuid.Value == planGuid)
-                    {
-                        return serviceInstanceDetails.EntityMetadata.Guid.ToNullableGuid();
-                    }
-                }
-            }
-
-            return null;
-        }
-
         internal static Guid? GetSpaceGuid(CloudFoundryClient client, TaskLogger logger, string cforganization, string cfspace)
         {
             Guid? spaceGuid = null;
@@ -153,6 +54,44 @@
             }
 
             return spaceGuid;
+        }
+
+        internal static Guid? GetAppGuid(CloudFoundryClient client, string appName, Guid spaceGuid)
+        {
+            PagedResponseCollection<ListAllAppsForSpaceResponse> apps = client.Spaces.ListAllAppsForSpace(spaceGuid, new RequestOptions() { Query = "name:" + appName }).Result;
+
+            if (apps.Count() > 0)
+            {
+                var appGuid = apps.FirstOrDefault().EntityMetadata.Guid;
+                return appGuid.ToGuid();
+            }
+
+            return null;
+        }
+
+        internal static Guid? GetRouteGuid(CloudFoundryClient client, string hostname, Guid domain_guid)
+        {
+            var routes = client.Routes.ListAllRoutes(new RequestOptions() { Query = string.Format(CultureInfo.InvariantCulture, "host:{0}&domain_guid:{1}", hostname, domain_guid) }).Result;
+            if (routes.Count() > 0)
+            {
+                var routeGuid = routes.FirstOrDefault().EntityMetadata.Guid;
+                return routeGuid.ToGuid();
+            }
+        
+            return null;
+        }
+
+        internal static Guid? GetServiceGuid(CloudFoundryClient client, string serviceName, Guid spaceGuid)
+        {
+            var serviceInstancesList = client.Spaces.ListAllServiceInstancesForSpace(spaceGuid, new RequestOptions() { Query = "name:" + serviceName }).Result;
+
+            if (serviceInstancesList.Count() > 0)
+            {
+                var serviceInstanceGuid = serviceInstancesList.FirstOrDefault().EntityMetadata.Guid;
+                return serviceInstanceGuid.ToGuid();
+            }
+            
+            return null;
         }
     }
 }

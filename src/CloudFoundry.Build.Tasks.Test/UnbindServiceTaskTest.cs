@@ -16,6 +16,10 @@ namespace CloudFoundry.Build.Tasks.Test
             {
                 CloudFoundry.CloudController.V2.Client.Fakes.ShimCloudFoundryClient.AllInstances.LoginCloudCredentials = TestUtils.CustomLogin;
 
+                CloudFoundry.Manifests.Fakes.ShimManifestDiskRepository.ReadManifestString = TestUtils.CustomReadManifest;
+
+                CloudFoundry.Manifests.Fakes.ShimManifest.AllInstances.Applications = TestUtils.CustomManifestApplications;
+
                 CloudFoundry.CloudController.V2.Client.Base.Fakes.ShimAbstractSpacesEndpoint.AllInstances.ListAllSpacesRequestOptions = TestUtils.CustomListAllSpaces;
 
                 CloudFoundry.CloudController.V2.Client.Fakes.ShimPagedResponseCollection<ListAllSpacesResponse>.AllInstances.ResourcesGet = TestUtils.CustomGetPaged;
@@ -50,8 +54,7 @@ namespace CloudFoundry.Build.Tasks.Test
                 task.CFServerUri = Settings.Default.ServerUri;
                 task.CFSpace = "TestSpace";
                 task.CFOrganization = "TestOrg";
-                task.CFAppName = "testApp";
-                task.CFServiceName = "service1";
+                task.CFManifest = Settings.Default.CFManifest;
                 task.BuildEngine = new FakeBuildEngine();
                 Assert.IsTrue(task.Execute());
             }

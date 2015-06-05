@@ -4,6 +4,7 @@ using Microsoft.QualityTools.Testing.Fakes;
 using CloudFoundry.Build.Tasks.Test.Properties;
 using System.Threading.Tasks;
 using System.IO;
+using CloudFoundry.CloudController.V2.Client.Data;
 
 namespace CloudFoundry.Build.Tasks.Test
 {
@@ -19,10 +20,28 @@ namespace CloudFoundry.Build.Tasks.Test
 
                 CloudFoundry.CloudController.V2.Client.Fakes.ShimAppsEndpoint.AllInstances.PushGuidStringBoolean = CustomPushJob;
 
+                CloudFoundry.Manifests.Fakes.ShimManifestDiskRepository.ReadManifestString = TestUtils.CustomReadManifest;
+
+                CloudFoundry.Manifests.Fakes.ShimManifest.AllInstances.Applications = TestUtils.CustomManifestApplications;
+
+                CloudFoundry.CloudController.V2.Client.Fakes.ShimPagedResponseCollection<ListAllAppsForSpaceResponse>.AllInstances.ResourcesGet = TestUtils.CusomListAllAppsForSpacePagedResponse;
+
+                CloudFoundry.CloudController.V2.Client.Base.Fakes.ShimAbstractSpacesEndpoint.AllInstances.ListAllAppsForSpaceNullableOfGuidRequestOptions = TestUtils.CustomListAllAppsForSpace;
+
+                CloudFoundry.CloudController.V2.Client.Fakes.ShimPagedResponseCollection<ListAllOrganizationsResponse>.AllInstances.ResourcesGet = TestUtils.CustomListAllOrganizationsResponse;
+
+                CloudFoundry.CloudController.V2.Client.Base.Fakes.ShimAbstractOrganizationsEndpoint.AllInstances.ListAllOrganizationsRequestOptions = TestUtils.CustomListAllOrganizations;
+
+                CloudFoundry.CloudController.V2.Client.Fakes.ShimPagedResponseCollection<ListAllSpacesForOrganizationResponse>.AllInstances.ResourcesGet = TestUtils.CustomListAllSpacesForOrganizationResponse;
+
+                CloudFoundry.CloudController.V2.Client.Base.Fakes.ShimAbstractOrganizationsEndpoint.AllInstances.ListAllSpacesForOrganizationNullableOfGuidRequestOptions = TestUtils.CustomListAllSpacesForOrganization;
+
+                TestUtils.InitTestMetadata();
+
                 PushApp task = new PushApp();
-                task.CFAppGuid = Guid.NewGuid().ToString();
-                task.CFAppPath = Path.GetTempPath();
-                task.CFStart = true;
+                task.CFSpace = "TestSpace";
+                task.CFOrganization = "TestOrg";
+                task.CFManifest = Settings.Default.CFManifest;
                 task.CFUser = Settings.Default.User;
                 task.CFPassword = Settings.Default.Password;
                 task.CFServerUri = Settings.Default.ServerUri;
