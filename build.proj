@@ -150,7 +150,7 @@
 
   <!-- Target for creating the nuget package -->
   <Target Name="NugetPack">
-    <Exec Command="$(NuGetCommand) pack &quot;$(LibraryRoot)cf-msbuild-tasks.nuspec&quot; -Prop commit=$(commit);version=$(version) "/>
+    <Exec Command="$(NuGetCommand) pack &quot;$(LibraryRoot)\lib\package\cf-msbuild-tasks.nuspec&quot; -Prop commit=$(commit);version=$(version) "/>
   </Target>
 
   <!-- Target for automatically versioning the assemblies -->
