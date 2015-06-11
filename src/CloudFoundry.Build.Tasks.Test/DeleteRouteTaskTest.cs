@@ -37,6 +37,8 @@ namespace CloudFoundry.Build.Tasks.Test
                 task.CFPassword = Settings.Default.Password;
                 task.CFServerUri = Settings.Default.ServerUri;
                 task.CFManifest = Settings.Default.CFManifest;
+                task.CFOrganization = "TestOrg";
+                task.CFSpace = "TestSpace";
 
                 task.BuildEngine = new FakeBuildEngine();
                 Assert.IsTrue(task.Execute());

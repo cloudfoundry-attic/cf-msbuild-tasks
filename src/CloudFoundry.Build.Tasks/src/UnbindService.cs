@@ -19,6 +19,9 @@ namespace CloudFoundry.Build.Tasks
 
         public override bool Execute()
         {
+            this.CFOrganization = this.CFOrganization.Trim();
+            this.CFSpace = this.CFSpace.Trim();
+
             this.Logger = new TaskLogger(this);
 
             var app = LoadAppFromManifest();
