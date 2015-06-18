@@ -19,6 +19,8 @@
 
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v12.0\Web\Microsoft.Web.Publishing.targets" Condition="false" />
 
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v12.0\Web\Microsoft.WebSite.Publishing.targets" />
+
   <PropertyGroup>
     <NewGuid>$([System.Guid]::NewGuid())</NewGuid>
     <PublishTempAppPath>$(TEMP)\$(NewGuid)</PublishTempAppPath>

@@ -1,0 +1,15 @@
+﻿<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import file="C:\Path_to_targets_file_from_package"/>
+  <PropertyGroup>
+    <CFUser></CFUser>
+    <CFPassword></CFPassword>
+    <CFServerUri></CFServerUri>
+
+    <CFManifest></CFManifest>
+
+	<CFOrganization></CFOrganization>
+    <CFSpace></CFSpace>
+    
+	<WebPublishMethod>CloudFoundry</WebPublishMethod>
+  </PropertyGroup>
+</Project>
