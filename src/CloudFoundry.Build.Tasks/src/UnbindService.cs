@@ -45,7 +45,7 @@ namespace CloudFoundry.Build.Tasks
 
                 if (appGuid.HasValue)
                 {
-                    foreach (var service in app.GetServices())
+                    foreach (string service in app.Services)
                     {
                         Logger.LogMessage("Unbinding service {0} from app {1}", service, app.Name);
 

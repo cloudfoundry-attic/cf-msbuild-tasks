@@ -47,9 +47,9 @@ namespace CloudFoundry.Build.Tasks
                 {
                     PagedResponseCollection<ListAllDomainsDeprecatedResponse> domainInfoList = client.DomainsDeprecated.ListAllDomainsDeprecated().Result;
 
-                    foreach (var domain in app.GetDomains())
+                    foreach (string domain in app.Domains)
                     {
-                        foreach (var host in app.GetHosts())
+                        foreach (string host in app.Hosts)
                         {
                             Logger.LogMessage("Unbinding route {0}.{1} from app {2}", host, domain, app.Name);
 

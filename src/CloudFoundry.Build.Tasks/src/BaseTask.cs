@@ -3,13 +3,14 @@
     using System;
     using System.Globalization;
     using System.Security.Authentication;
+    using System.Threading;
     using CloudFoundry.CloudController.V2.Client;
     using CloudFoundry.Manifests;
     using CloudFoundry.Manifests.Models;
     using CloudFoundry.UAA;
     using Microsoft.Build.Framework;
 
-    public class BaseTask : ITask
+    public class BaseTask : ITask, ICancelableTask
     {
         private TaskLogger logger;
         
@@ -47,17 +48,25 @@
             set { this.logger = value; }
         }
 
+        internal CancellationTokenSource CancelToken { get; set; }
+
         public virtual bool Execute()
         {
             return true;
+        }
+
+        public void Cancel()
+        {
+            this.CancelToken.Cancel();
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily", Justification = "Cast needed to change output property")]
         internal CloudFoundryClient InitClient()
         {
             this.CFServerUri = this.CFServerUri.Trim();
+            this.CancelToken = new CancellationTokenSource();
 
-            CloudFoundryClient client = new CloudFoundryClient(new Uri(this.CFServerUri), new System.Threading.CancellationToken(), null, this.CFSkipSslValidation);
+            CloudFoundryClient client = new CloudFoundryClient(new Uri(this.CFServerUri), this.CancelToken.Token, null, this.CFSkipSslValidation);
 
             if (string.IsNullOrWhiteSpace(this.CFUser) == false && (string.IsNullOrWhiteSpace(this.CFPassword) == false || this.CFSavedPassword))
             {

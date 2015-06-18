@@ -51,7 +51,7 @@
 
                 PagedResponseCollection<ListAllDomainsDeprecatedResponse> domainInfoList = client.DomainsDeprecated.ListAllDomainsDeprecated().Result;
 
-                foreach (string domain in app.GetDomains())
+                foreach (string domain in app.Domains)
                 {
                     this.Logger.LogMessage("Validating domain {0}", domain);
 
