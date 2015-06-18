@@ -110,7 +110,7 @@
 
                         if (app.DiskQuota.HasValue)
                         {
-                            request.DiskQuota = app.DiskQuota.Value.ToString(System.Globalization.CultureInfo.InvariantCulture);
+                            request.DiskQuota = Convert.ToInt32(app.DiskQuota.Value, System.Globalization.CultureInfo.InvariantCulture);
                         }
 
                         CreateAppResponse response = client.Apps.CreateApp(request).Result;

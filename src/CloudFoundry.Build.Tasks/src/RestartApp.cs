@@ -170,6 +170,11 @@
             // ======= WAIT FOR APP TO COME ONLINE =======
             while (true)
             {
+                if (this.CancelToken.IsCancellationRequested == true)
+                {
+                    break;
+                }
+
                 GetAppSummaryResponse appSummary = client.Apps.GetAppSummary(appGuid.Value).Result;
 
                 if (appSummary.RunningInstances > 0)

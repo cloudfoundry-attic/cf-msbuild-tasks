@@ -21,6 +21,7 @@
 x64/
 x86/
 bld/
+package/libs/
 [Bb]in/
 [Oo]bj/
 
