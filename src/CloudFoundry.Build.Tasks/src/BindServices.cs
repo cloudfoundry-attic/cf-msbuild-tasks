@@ -55,9 +55,9 @@
                 Logger.LogMessage("Binding services to app {0}", app.Name);
 
                 List<string> bindingGuids = new List<string>();
-                if (app.GetServices().Length > 0)
+                if (app.Services != null)
                 {
-                    foreach (string serviceName in app.GetServices())
+                    foreach (string serviceName in app.Services)
                     {
                         var serviceGuid = Utils.GetServiceGuid(client, serviceName, spaceGuid.Value);
 
