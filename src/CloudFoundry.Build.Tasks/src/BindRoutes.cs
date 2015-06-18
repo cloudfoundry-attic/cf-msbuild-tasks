@@ -48,9 +48,9 @@
                 {
                     PagedResponseCollection<ListAllDomainsDeprecatedResponse> domainInfoList = client.DomainsDeprecated.ListAllDomainsDeprecated().Result;
 
-                    foreach (string domain in app.GetDomains())
+                    foreach (string domain in app.Domains)
                     {
-                        foreach (var host in app.GetHosts())
+                        foreach (string host in app.Hosts)
                         { 
                             ListAllDomainsDeprecatedResponse domainInfo = domainInfoList.Where(o => o.Name == domain).FirstOrDefault();
 

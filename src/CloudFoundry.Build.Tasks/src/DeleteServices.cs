@@ -40,7 +40,7 @@ namespace CloudFoundry.Build.Tasks
                     }
                 }
 
-                foreach (var service in app.GetServices())
+                foreach (string service in app.Services)
                 {
                     Logger.LogMessage("Deleting service {0} from space {1}", service, this.CFSpace);
 

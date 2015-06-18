@@ -314,9 +314,9 @@ namespace CloudFoundry.Build.Tasks.Test
         {
             var app = new Manifests.Models.Application() { Name = "testApp", StackName = "testStack", InstanceCount = 1, Memory = 512, Path = "C:\\" };
 
-            app.SetDomains(new string[1] { "domain.com" });
-            app.SetHosts(new string[1] { "testApp" });
-            app.SetServices(new string[1] { "testservice" });
+            app.Domains.Add("domain.com" );
+            app.Hosts.Add("testApp" );
+            app.Services.Add("testservice");
 
             return new Manifests.Models.Application[1]{
                app

@@ -53,9 +53,9 @@
 
                 if (spaceGuid.HasValue)
                 {
-                    foreach (string domain in app.GetDomains())
+                    foreach (string domain in app.Domains)
                     {
-                            foreach (var host in app.GetHosts())
+                            foreach (string host in app.Hosts)
                             {
                                 if (string.IsNullOrWhiteSpace(host) == false)
                                 {
