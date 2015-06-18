@@ -16,9 +16,4 @@
     <copyright>© Copyright 2015 Hewlett-Packard Development Company, L.P.</copyright>
     <tags>cloud foundy cloudfoundry net .net dotnet msbuild tasks helion</tags>
   </metadata>
-  <files>
-    <file src="lib\*.*" target="build" />
-    <file src="src\CloudFoundry.Build.Tasks\build\*.*" target="build" />
-    <file src="src\CloudFoundry.Build.Tasks\tools\*.*" target="tools" />
-  </files>
 </package>
