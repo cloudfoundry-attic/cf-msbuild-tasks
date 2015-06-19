@@ -42,11 +42,13 @@ Global
 		{30B57F81-4D58-4FF8-B131-075EF7ED9A7F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{30B57F81-4D58-4FF8-B131-075EF7ED9A7F}.Debug|x86.ActiveCfg = Debug|Any CPU
 		{30B57F81-4D58-4FF8-B131-075EF7ED9A7F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{30B57F81-4D58-4FF8-B131-075EF7ED9A7F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{30B57F81-4D58-4FF8-B131-075EF7ED9A7F}.Release|x86.ActiveCfg = Release|Any CPU
 		{F7B6E157-42CA-40A7-A40C-2D3C8D8C1D30}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F7B6E157-42CA-40A7-A40C-2D3C8D8C1D30}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F7B6E157-42CA-40A7-A40C-2D3C8D8C1D30}.Debug|x86.ActiveCfg = Debug|Any CPU
 		{F7B6E157-42CA-40A7-A40C-2D3C8D8C1D30}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F7B6E157-42CA-40A7-A40C-2D3C8D8C1D30}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F7B6E157-42CA-40A7-A40C-2D3C8D8C1D30}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution

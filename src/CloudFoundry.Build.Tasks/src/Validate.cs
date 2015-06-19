@@ -33,7 +33,7 @@ namespace CloudFoundry.Build.Tasks
         {
             logger = new Microsoft.Build.Utilities.TaskLoggingHelper(this);
             CloudFoundryClient client = InitClient();
-            
+
             PagedResponseCollection<ListAllStacksResponse> stackList = client.Stacks.ListAllStacks().Result;
 
             var stackInfo = stackList.Where(o => o.Name == CFStack).FirstOrDefault();
@@ -43,7 +43,7 @@ namespace CloudFoundry.Build.Tasks
                 logger.LogError("Stack {0} not found", CFStack);
                 return false;
             }
-            
+
             Guid? spaceGuid = Utils.GetSpaceGuid(client, logger, CFOrganization, CFSpace);
 
             if (spaceGuid.HasValue == false)
