@@ -86,7 +86,7 @@
 
         private void GetLogsUsingLoggregator(CloudFoundryClient client, Guid? appGuid, GetInfoResponse detailedInfo)
         {
-            using (Loggregator.Client.LoggregatorLog loggregator = new Loggregator.Client.LoggregatorLog(new Uri(detailedInfo.LoggingEndpoint), string.Format(CultureInfo.InvariantCulture, "bearer {0}", client.AuthorizationToken)))
+            using (Loggregator.Client.LoggregatorLog loggregator = new Loggregator.Client.LoggregatorLog(new Uri(detailedInfo.LoggingEndpoint), string.Format(CultureInfo.InvariantCulture, "bearer {0}", client.AuthorizationToken), null, this.CFSkipSslValidation))
             {
                 loggregator.ErrorReceived += (sender, error) =>
                 {

@@ -2,6 +2,7 @@
 {
     using System;
     using System.Globalization;
+    using System.IO;
     using System.Security.Authentication;
     using System.Threading;
     using CloudFoundry.CloudController.V2.Client;
@@ -9,7 +10,7 @@
     using CloudFoundry.Manifests.Models;
     using CloudFoundry.UAA;
     using Microsoft.Build.Framework;
-
+    
     public class BaseTask : ITask, ICancelableTask
     {
         private TaskLogger logger;
@@ -121,7 +122,7 @@
             this.CFManifest = this.CFManifest.Trim();
 
             Manifest man = ManifestDiskRepository.ReadManifest(this.CFManifest);
-
+         
             if (man.Applications().Length > 1)
             {
                 throw new InvalidOperationException("More than one application specified in the manifest file");
