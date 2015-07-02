@@ -17,30 +17,9 @@
   <UsingTask AssemblyFile="Cloudfoundry.Build.Tasks.dll" TaskName="UnbindRoute" />
   <UsingTask AssemblyFile="Cloudfoundry.Build.Tasks.dll" TaskName="UnbindService" />
 
-  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v12.0\Web\Microsoft.Web.Publishing.targets" Condition="false" />
-
-  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v12.0\Web\Microsoft.WebSite.Publishing.targets" />
-
-  <PropertyGroup>
-    <NewGuid>$([System.Guid]::NewGuid())</NewGuid>
-    <PublishTempAppPath>$(TEMP)\$(NewGuid)</PublishTempAppPath>
-  </PropertyGroup>
-
-  <!-- Publish application to TEMP location -->
-  <Target Name="PublishToTemp" DependsOnTargets="PipelinePreDeployCopyAllFilesToOneFolder">
-    <Error Condition="'$(PublishTempAppPath)'==''" Text="The PublishTempAppPath property must be set to the intended publishing destination." />
-    <MakeDir Condition="!Exists($(PublishTempAppPath))" Directories="$(PublishTempAppPath)" />
-    <ItemGroup>
-      <PublishFiles Include="$(_PackageTempDir)\**\*.*" />
-    </ItemGroup>
-    <Copy SourceFiles="@(PublishFiles)" DestinationFiles="@(PublishFiles->'$(PublishTempAppPath)\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="True" />
-  </Target>
-
   <!-- Publish application to cf deployment: create app, push app, create routes, bind routes, create services, bind services, start app -->
   <Target Name="WebCloudFoundryPublish">
-	  
-    <CallTarget Targets="PublishToTemp"></CallTarget>
-
+	
     <ItemGroup>
       <CFRefreshToken Include="$(CFRefreshToken)"></CFRefreshToken>
     </ItemGroup>
@@ -68,8 +47,6 @@
 
     <RestartApp CFManifest="$(CFManifest)" CFOrganization="$(CFOrganization)" CFSpace="$(CFSpace)" CFServerUri="$(CFServerUri)" CFRefreshToken="$(CFRefreshToken)" CFSkipSslValidation="$(CFSkipSslValidation)"></RestartApp>
 
-    <!-- Remove previously created temp directory -->
-    <RemoveDir Directories="$(PublishTempAppPath)" />
   </Target>
 
   <!-- This task will remove the application, bound routes and bound provisioned service instances -->
