@@ -11,6 +11,20 @@ namespace CloudFoundry.Build.Tasks.Test
     [TestClass]
     public class PushAppTaskTest
     {
+        string tempDir;
+
+        [TestInitialize]
+        public void BeforeTest()
+        {
+            tempDir = Directory.CreateDirectory(Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString())).FullName;
+        }
+
+        [TestCleanup]
+        public void AfterTest()
+        {
+            Directory.Delete(tempDir, true);
+        }
+
         [TestMethod]
         public void PushApp_Test()
         {
@@ -41,6 +55,7 @@ namespace CloudFoundry.Build.Tasks.Test
                 PushApp task = new PushApp();
                 task.CFSpace = "TestSpace";
                 task.CFOrganization = "TestOrg";
+                task.CFAppPath = tempDir;
                 task.CFManifest = Settings.Default.CFManifest;
                 task.CFUser = Settings.Default.User;
                 task.CFPassword = Settings.Default.Password;

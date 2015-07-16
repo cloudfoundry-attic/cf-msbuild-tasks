@@ -17,36 +17,65 @@
   <UsingTask AssemblyFile="Cloudfoundry.Build.Tasks.dll" TaskName="UnbindRoute" />
   <UsingTask AssemblyFile="Cloudfoundry.Build.Tasks.dll" TaskName="UnbindService" />
 
+  <PropertyGroup>
+    <NewGuid>$([System.Guid]::NewGuid())</NewGuid>
+    <PublishTempAppPath>$(TEMP)\$(NewGuid)</PublishTempAppPath>
+  </PropertyGroup>
+
+  <!-- Publish application to TEMP location -->
+  <Target Name="PublishToTemp" DependsOnTargets="PipelinePreDeployCopyAllFilesToOneFolder">
+    <Error Condition="'$(PublishTempAppPath)'==''" Text="The PublishTempAppPath property must be set to the intended publishing destination." />
+    <MakeDir Condition="!Exists($(PublishTempAppPath))" Directories="$(PublishTempAppPath)" />
+    <ItemGroup>
+      <PublishFiles Include="$(_PackageTempDir)\**\*.*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(PublishFiles)" DestinationFiles="@(PublishFiles->'$(PublishTempAppPath)\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="True" />
+  </Target>
+
   <!-- Publish application to cf deployment: create app, push app, create routes, bind routes, create services, bind services, start app -->
   <Target Name="WebCloudFoundryPublish">
-	
+
+    <CallTarget Targets="PublishToTemp"></CallTarget>
+
+    <CombinePath BasePath="$(MSBuildProjectDirectory)" Paths="$(CFManifest)">
+      <Output PropertyName="CFManifestRelativePath" TaskParameter="CombinedPaths"/>
+    </CombinePath>
+
+    <PropertyGroup>
+      <CFManifestAbsolutePath>$([System.IO.Path]::GetFullPath('$(CFManifestRelativePath)'))</CFManifestAbsolutePath>
+    </PropertyGroup>
+
+    <Message Text="Pushing application artifacts from $(CFManifestAbsolutePath)" Importance="high" />
+
     <ItemGroup>
       <CFRefreshToken Include="$(CFRefreshToken)"></CFRefreshToken>
     </ItemGroup>
 
-    <LoginTask Condition="'$(CFUser)' != ''" CFUser="$(CFUser)" CFPassword="$(CFPassword)" CFSavedPassword="$(CFSavedPassword)" CFServerUri="$(CFServerUri)" CFSkipSslValidation="$(CFSkipSslValidation)" CFManifest="$(CFManifest)">
+    <LoginTask Condition="'$(CFUser)' != ''" CFUser="$(CFUser)" CFPassword="$(CFPassword)" CFSavedPassword="$(CFSavedPassword)" CFServerUri="$(CFServerUri)" CFSkipSslValidation="$(CFSkipSslValidation)" CFManifest="$(CFManifestAbsolutePath)">
       <Output TaskParameter="CFRefreshToken" PropertyName="CFRefreshToken"/>
     </LoginTask>
 
-	<Validate CFManifest="$(CFManifest)" CFOrganization="$(CFOrganization)" CFSpace="$(CFSpace)" CFServerUri="$(CFServerUri)" CFRefreshToken="$(CFRefreshToken)" CFSkipSslValidation="$(CFSkipSslValidation)">
-	</Validate>
-	
-    <CreateApp CFManifest="$(CFManifest)" CFOrganization="$(CFOrganization)" CFSpace="$(CFSpace)" CFServerUri="$(CFServerUri)" CFRefreshToken="$(CFRefreshToken)" CFSkipSslValidation="$(CFSkipSslValidation)">
+    <Validate CFManifest="$(CFManifestAbsolutePath)" CFOrganization="$(CFOrganization)" CFSpace="$(CFSpace)" CFServerUri="$(CFServerUri)" CFRefreshToken="$(CFRefreshToken)" CFSkipSslValidation="$(CFSkipSslValidation)">
+    </Validate>
+
+    <CreateApp CFManifest="$(CFManifestAbsolutePath)" CFOrganization="$(CFOrganization)" CFSpace="$(CFSpace)" CFServerUri="$(CFServerUri)" CFRefreshToken="$(CFRefreshToken)" CFSkipSslValidation="$(CFSkipSslValidation)">
       <Output TaskParameter="CFAppGuid" PropertyName="CFAppGuid"/>
     </CreateApp>
 
-    <PushApp CFManifest="$(CFManifest)" CFOrganization="$(CFOrganization)" CFSpace="$(CFSpace)" CFServerUri="$(CFServerUri)" CFRefreshToken="$(CFRefreshToken)" CFSkipSslValidation="$(CFSkipSslValidation)"></PushApp>
+    <PushApp CFManifest="$(CFManifestAbsolutePath)" CFAppPath="$(PublishTempAppPath)" CFOrganization="$(CFOrganization)" CFSpace="$(CFSpace)" CFServerUri="$(CFServerUri)" CFRefreshToken="$(CFRefreshToken)" CFSkipSslValidation="$(CFSkipSslValidation)"></PushApp>
 
-    <CreateRoutes CFServerUri="$(CFServerUri)" CFRefreshToken="$(CFRefreshToken)" CFManifest="$(CFManifest)" CFOrganization="$(CFOrganization)" CFSpace="$(CFSpace)" CFSkipSslValidation="$(CFSkipSslValidation)">
+    <CreateRoutes CFServerUri="$(CFServerUri)" CFRefreshToken="$(CFRefreshToken)" CFManifest="$(CFManifestAbsolutePath)" CFOrganization="$(CFOrganization)" CFSpace="$(CFSpace)" CFSkipSslValidation="$(CFSkipSslValidation)">
       <Output TaskParameter="CFRouteGuids" PropertyName="CFRouteGuids"></Output>
     </CreateRoutes>
 
-    <BindRoutes CFServerUri="$(CFServerUri)" CFRefreshToken="$(CFRefreshToken)" CFManifest="$(CFManifest)" CFOrganization="$(CFOrganization)" CFSpace="$(CFSpace)" CFSkipSslValidation="$(CFSkipSslValidation)"></BindRoutes>
+    <BindRoutes CFServerUri="$(CFServerUri)" CFRefreshToken="$(CFRefreshToken)" CFManifest="$(CFManifestAbsolutePath)" CFOrganization="$(CFOrganization)" CFSpace="$(CFSpace)" CFSkipSslValidation="$(CFSkipSslValidation)"></BindRoutes>
 
-    <BindServices CFServerUri="$(CFServerUri)" CFRefreshToken="$(CFRefreshToken)" CFManifest="$(CFManifest)" CFOrganization="$(CFOrganization)" CFSpace="$(CFSpace)" CFSkipSslValidation="$(CFSkipSslValidation)"></BindServices>
+    <BindServices CFServerUri="$(CFServerUri)" CFRefreshToken="$(CFRefreshToken)" CFManifest="$(CFManifestAbsolutePath)" CFOrganization="$(CFOrganization)" CFSpace="$(CFSpace)" CFSkipSslValidation="$(CFSkipSslValidation)"></BindServices>
 
-    <RestartApp CFManifest="$(CFManifest)" CFOrganization="$(CFOrganization)" CFSpace="$(CFSpace)" CFServerUri="$(CFServerUri)" CFRefreshToken="$(CFRefreshToken)" CFSkipSslValidation="$(CFSkipSslValidation)"></RestartApp>
+    <RestartApp CFManifest="$(CFManifestAbsolutePath)" CFOrganization="$(CFOrganization)" CFSpace="$(CFSpace)" CFServerUri="$(CFServerUri)" CFRefreshToken="$(CFRefreshToken)" CFSkipSslValidation="$(CFSkipSslValidation)"></RestartApp>
 
+    <!-- Remove previously created temp directory -->
+    <RemoveDir Directories="$(PublishTempAppPath)" />
   </Target>
 
   <!-- This task will remove the application, bound routes and bound provisioned service instances -->
