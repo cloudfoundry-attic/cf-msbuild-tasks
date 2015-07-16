@@ -19,10 +19,14 @@
         [Required]
         public string CFSpace { get; set; }
 
+        [Required]
+        public string CFAppPath { get; set; }
+
         public override bool Execute()
         {
             this.CFOrganization = this.CFOrganization.Trim();
             this.CFSpace = this.CFSpace.Trim();
+            this.CFAppPath = this.CFAppPath.Trim();
 
             this.Logger = new TaskLogger(this);
             var app = LoadAppFromManifest();
@@ -46,15 +50,15 @@
                 var appGuid = Utils.GetAppGuid(client, app.Name, spaceGuid.Value);
                 if (appGuid.HasValue)
                 {
-                    if (!Directory.Exists(app.Path))
+                    if (!Directory.Exists(this.CFAppPath))
                     {
-                        Logger.LogError("Directory {0} not found", app.Path);
+                        Logger.LogError("Directory {0} not found", this.CFAppPath);
                         return false;
                     }
 
                     client.Apps.PushProgress += this.Apps_PushProgress;
 
-                    client.Apps.Push(appGuid.Value, app.Path, false).Wait();
+                    client.Apps.Push(appGuid.Value, this.CFAppPath, false).Wait();
                 }
                 else
                 {
