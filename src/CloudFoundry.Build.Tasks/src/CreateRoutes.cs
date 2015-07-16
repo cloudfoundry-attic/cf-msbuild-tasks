@@ -104,7 +104,7 @@
                 if (routes.Count() > 0)
                 {
                     ListAllRoutesResponse routeInfo = routes.FirstOrDefault();
-                    Logger.LogMessage("Route {0}.{1} already exists", routeInfo.Host, routeInfo.DomainUrl);
+                    Logger.LogMessage("Route {0}.{1} already exists", routeInfo.Host, domainInfo.Name);
                     if (routeInfo != null)
                     {
                         createdGuid.Add(routeInfo.EntityMetadata.Guid);
