@@ -27,10 +27,10 @@ namespace CloudFoundry.Build.Tasks.IntegrationTests
             string man = File.ReadAllText(manifest);
 
             man = string.Format(CultureInfo.InvariantCulture, man, guid, host, Settings.Default.Domain, appPath, Settings.Default.LinuxStack);
-            man += "  buildpack: https://github.com/cloudfoundry/php-buildpack";
+            man += "  buildpack: https://github.com/ActiveState/php-buildpack";
             File.WriteAllText(phpManifest, man);
 
-            Assert.IsTrue(RunTasks(phpManifest, host));
+            Assert.IsTrue(RunTasks(phpManifest, host, appPath));
         }
 
         [TestMethod]
@@ -50,10 +50,10 @@ namespace CloudFoundry.Build.Tasks.IntegrationTests
 
             File.WriteAllText(aspManifest, man);
 
-            Assert.IsTrue(RunTasks(aspManifest, host));
+            Assert.IsTrue(RunTasks(aspManifest, host, appPath));
         }
 
-        private bool RunTasks(string manifest, string host)
+        private bool RunTasks(string manifest, string host, string appPath)
         {
             LoginTask login = new LoginTask();
             login.BuildEngine = new FakeBuildEngine();
@@ -84,6 +84,7 @@ namespace CloudFoundry.Build.Tasks.IntegrationTests
             pushTask.CFManifest = manifest;
             pushTask.CFOrganization = Settings.Default.Organization;
             pushTask.CFSpace = Settings.Default.Space;
+            pushTask.CFAppPath = appPath;
 
             pushTask.BuildEngine = new FakeBuildEngine();
 

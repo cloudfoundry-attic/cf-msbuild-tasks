@@ -105,9 +105,8 @@
 
                 loggregator.MessageReceived += (sender, message) =>
                 {
-                    var timeInTicks = message.LogMessage.Timestamp * TimeSpan.TicksPerSecond;
-
-                    var logTimeStamp = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc).AddTicks(timeInTicks);
+                    long timeInMilliSeconds = message.LogMessage.Timestamp / 1000 / 1000;
+                    var logTimeStamp = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc).AddMilliseconds(timeInMilliSeconds);
 
                     Logger.LogMessage("[{0}] - {1}: {2}", message.LogMessage.SourceName, logTimeStamp.ToString(), message.LogMessage.Message);
                 };
