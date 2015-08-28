@@ -149,6 +149,9 @@
     <None Include="sample.cf.pubxml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="tools\Install.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <CodeAnalysisDictionary Include="cf-build-tasks.xml" />
