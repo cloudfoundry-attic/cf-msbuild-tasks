@@ -203,11 +203,6 @@ namespace CloudFoundry.Build.Tasks.Test
             return Task.Factory.StartNew(() => { });
         }
 
-        internal static Task CustomDeleteServiceInstance(CloudController.V2.Client.Base.AbstractServiceInstancesEndpoint arg1, Guid? arg2)
-        {
-            return Task.Factory.StartNew(() => { });
-        }
-
         internal static Task<PagedResponseCollection<ListAllRoutesResponse>> CustomListAllRoutes(CloudController.V2.Client.Base.AbstractRoutesEndpoint arg1, RequestOptions arg2)
         {
             return Task.Factory.StartNew<PagedResponseCollection<ListAllRoutesResponse>>(() =>
@@ -338,6 +333,14 @@ namespace CloudFoundry.Build.Tasks.Test
         internal static Manifests.Manifest CustomReadManifest(string arg1)
         {
             return new Manifests.Manifest();
+        }
+
+        internal static Task<DeleteServiceInstanceResponse> CustomDeleteServiceInstance(ServiceInstancesEndpoint arg1, Guid? arg2)
+        {
+            return Task<DeleteServiceInstanceResponse>.Factory.StartNew(() =>
+            {
+                return new DeleteServiceInstanceResponse();
+            });
         }
     }
 }
