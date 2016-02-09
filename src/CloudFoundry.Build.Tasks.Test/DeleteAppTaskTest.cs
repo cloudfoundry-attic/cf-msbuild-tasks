@@ -42,7 +42,7 @@ namespace CloudFoundry.Build.Tasks.Test
 
                 CloudFoundry.CloudController.V2.Client.Base.Fakes.ShimAbstractServiceBindingsEndpoint.AllInstances.DeleteServiceBindingNullableOfGuid = TestUtils.CustomDeleteServiceBinding;
 
-                CloudFoundry.CloudController.V2.Client.Base.Fakes.ShimAbstractServiceInstancesEndpoint.AllInstances.DeleteServiceInstanceNullableOfGuid = TestUtils.CustomDeleteServiceInstance;
+                CloudFoundry.CloudController.V2.Client.Fakes.ShimServiceInstancesEndpoint.AllInstances.DeleteServiceInstanceNullableOfGuid = TestUtils.CustomDeleteServiceInstance ;
 
                 CloudFoundry.CloudController.V2.Client.Fakes.ShimPagedResponseCollection<ListAllOrganizationsResponse>.AllInstances.ResourcesGet = TestUtils.CustomListAllOrganizationsResponse;
 
