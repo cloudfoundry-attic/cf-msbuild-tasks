@@ -27,7 +27,6 @@ namespace CloudFoundry.Build.Tasks.IntegrationTests
             string man = File.ReadAllText(manifest);
 
             man = string.Format(CultureInfo.InvariantCulture, man, guid, host, Settings.Default.Domain, appPath, Settings.Default.LinuxStack);
-            man += "  buildpack: https://github.com/ActiveState/php-buildpack";
             File.WriteAllText(phpManifest, man);
 
             Assert.IsTrue(RunTasks(phpManifest, host, appPath));
