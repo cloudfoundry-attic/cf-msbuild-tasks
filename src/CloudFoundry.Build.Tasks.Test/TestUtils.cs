@@ -229,11 +229,6 @@ namespace CloudFoundry.Build.Tasks.Test
             return new List<ListAllServiceInstancesForSpaceResponse>() { new ListAllServiceInstancesForSpaceResponse() { EntityMetadata = new Metadata() } };
         }
 
-        internal static Task<RemoveAppFromRouteResponse> CustomRemoveAppFromRoute(CloudController.V2.Client.Base.AbstractRoutesEndpoint arg1, Guid? arg2, Guid? arg3)
-        {
-            return Task.Factory.StartNew(() => { return new RemoveAppFromRouteResponse(); });
-        }
-
         private static int callNumber = 0;
         internal static Task<GetAppSummaryResponse> CustomGetAppSummary(CloudController.V2.Client.Base.AbstractAppsEndpoint arg1, Guid? arg2)
         {
