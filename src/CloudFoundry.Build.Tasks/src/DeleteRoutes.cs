@@ -41,7 +41,7 @@ namespace CloudFoundry.Build.Tasks
                         var routeGuid = Utils.GetRouteGuid(client, host, domainInfo.EntityMetadata.Guid.ToGuid());
                         if (routeGuid.HasValue)
                         {
-                            client.Routes.DeleteRoute(routeGuid.Value).Wait();
+                            client.Routes.DeleteRoute(routeGuid.Value, true).Wait();
                         }
                         else
                         {

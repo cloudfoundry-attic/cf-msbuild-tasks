@@ -180,11 +180,6 @@ namespace CloudFoundry.Build.Tasks.Test
             return new List<ListAllRoutesForAppResponse>() { new ListAllRoutesForAppResponse() { Host = "test", DomainGuid = testGuid, EntityMetadata = new Metadata() } };
         }
 
-        internal static Task CustomDeleteRoute(CloudController.V2.Client.Base.AbstractRoutesEndpoint arg1, Guid? arg2)
-        {
-            return Task.Factory.StartNew(() => { });
-        }
-
         internal static Task<PagedResponseCollection<ListAllServiceBindingsForAppResponse>> CustomListAllServiceBindingsForApp(CloudController.V2.Client.Base.AbstractAppsEndpoint arg1, Guid? arg2)
         {
             return Task.Factory.StartNew<PagedResponseCollection<ListAllServiceBindingsForAppResponse>>(() =>
@@ -336,6 +331,11 @@ namespace CloudFoundry.Build.Tasks.Test
             {
                 return new DeleteServiceInstanceResponse();
             });
+        }
+
+        internal static Task CustomDeleteRoute(CloudController.V2.Client.Base.AbstractRoutesEndpoint arg1, Guid? arg2, object arg3)
+        {
+            return Task.Factory.StartNew(() => { });
         }
     }
 }
