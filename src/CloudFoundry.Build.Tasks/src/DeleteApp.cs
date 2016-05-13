@@ -64,7 +64,7 @@
                     var routeList = client.Apps.ListAllRoutesForApp(appGuid).Result;
                     foreach (var route in routeList)
                     {
-                        client.Routes.DeleteRoute(new Guid(route.EntityMetadata.Guid)).Wait();
+                        client.Routes.DeleteRoute(new Guid(route.EntityMetadata.Guid), true).Wait();
                     }
                 }
 

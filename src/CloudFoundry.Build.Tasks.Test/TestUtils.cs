@@ -180,7 +180,7 @@ namespace CloudFoundry.Build.Tasks.Test
             return new List<ListAllRoutesForAppResponse>() { new ListAllRoutesForAppResponse() { Host = "test", DomainGuid = testGuid, EntityMetadata = new Metadata() } };
         }
 
-        internal static Task CustomDeleteRoute(CloudController.V2.Client.Base.AbstractRoutesEndpoint arg1, Guid? arg2)
+        internal static Task CustomDeleteRoute(CloudController.V2.Client.Base.AbstractRoutesEndpoint arg1, Guid? arg2, dynamic arg3)
         {
             return Task.Factory.StartNew(() => { });
         }
