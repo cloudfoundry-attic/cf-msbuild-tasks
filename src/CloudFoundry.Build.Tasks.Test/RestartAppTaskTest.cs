@@ -1,5 +1,6 @@
 ﻿using CloudFoundry.Build.Tasks.Test.Properties;
 using CloudFoundry.CloudController.V2.Client.Data;
+using CloudFoundry.Loggregator.Client;
 using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
@@ -30,7 +31,9 @@ namespace CloudFoundry.Build.Tasks.Test
 
                 CloudFoundry.CloudController.V2.Client.Fakes.ShimInfoEndpoint.AllInstances.GetV1Info = TestUtils.CustomGetV1Info;
 
-                CloudFoundry.Logyard.Client.Fakes.ShimLogyardLog.AllInstances.StartLogStreamString = TestUtils.CustomStartLogStreamString;
+                CloudFoundry.CloudController.V2.Client.Base.Fakes.ShimAbstractInfoEndpoint.AllInstances.GetInfo = TestUtils.CustomGetInfo;
+
+                CloudFoundry.Loggregator.Client.Fakes.ShimLoggregatorLog.AllInstances.TailString = TestUtils.CustomTailString;
 
                 CloudFoundry.CloudController.V2.Client.Fakes.ShimPagedResponseCollection<ListAllAppsForSpaceResponse>.AllInstances.ResourcesGet = TestUtils.CusomListAllAppsForSpacePagedResponse;
 

@@ -9,7 +9,7 @@
     using System.Threading.Tasks;
     using CloudFoundry.CloudController.V2.Client;
     using CloudFoundry.CloudController.V2.Client.Data;
-    using CloudFoundry.Logyard.Client;
+    using CloudFoundry.Loggregator.Client;
     using Microsoft.Build.Framework;
 
     public class RestartApp : BaseTask
@@ -55,24 +55,15 @@
                 Logger.LogMessage("Restarting application {0}", app.Name);
 
                 // ======= HOOKUP LOGGING =======
-                GetV1InfoResponse info = client.Info.GetV1Info().Result;
+                GetInfoResponse detailedInfo = client.Info.GetInfo().Result;
 
-                if (string.IsNullOrWhiteSpace(info.AppLogEndpoint) == false)
+                if (string.IsNullOrWhiteSpace(detailedInfo.LoggingEndpoint) == false)
                 {
-                    this.GetLogsUsingLogyard(client, appGuid, info);
+                    this.GetLogsUsingLoggregator(client, appGuid, detailedInfo);
                 }
                 else
                 {
-                    GetInfoResponse detailedInfo = client.Info.GetInfo().Result;
-
-                    if (string.IsNullOrWhiteSpace(detailedInfo.LoggingEndpoint) == false)
-                    {
-                        this.GetLogsUsingLoggregator(client, appGuid, detailedInfo);
-                    }
-                    else
-                    {
-                        this.Logger.LogError("Could not retrieve application logs");
-                    }
+                    this.Logger.LogError("Could not retrieve application logs");
                 }
             }
             catch (Exception exception)
@@ -116,38 +107,6 @@
                 this.MonitorApp(client, appGuid);
 
                 loggregator.StopLogStream();
-            }
-        }
-
-        private void GetLogsUsingLogyard(CloudFoundryClient client, Guid? appGuid, GetV1InfoResponse info)
-        {
-            using (LogyardLog logyard = new LogyardLog(new Uri(info.AppLogEndpoint), string.Format(CultureInfo.InvariantCulture, "bearer {0}", client.AuthorizationToken), null, CFSkipSslValidation))
-            {
-                logyard.ErrorReceived += (sender, error) =>
-                {
-                    Logger.LogErrorFromException(error.Error);
-                };
-
-                logyard.StreamOpened += (sender, args) =>
-                {
-                    Logger.LogMessage("Log stream opened.");
-                };
-
-                logyard.StreamClosed += (sender, args) =>
-                {
-                    Logger.LogMessage("Log stream closed.");
-                };
-
-                logyard.MessageReceived += (sender, message) =>
-                {
-                    Logger.LogMessage("[{0}] - {1}: {2}", message.Message.Value.Source, message.Message.Value.HumanTime, message.Message.Value.Text);
-                };
-
-                logyard.StartLogStream(appGuid.Value.ToString(), 0, true);
-
-                this.MonitorApp(client, appGuid);
-
-                logyard.StopLogStream();
             }
         }
 
