@@ -260,11 +260,6 @@ namespace CloudFoundry.Build.Tasks.Test
             return Task.Factory.StartNew<GetV1InfoResponse>(() => { return new GetV1InfoResponse() { AppLogEndpoint = "ws://logs.1.2.3.4.xip.io" }; });
         }
 
-        internal static void CustomStartLogStreamString(Logyard.Client.LogyardLog arg1, string arg2)
-        {
-         
-        }
-
         internal static Task<PagedResponseCollection<ListAllServiceInstancesResponse>> CustomListAllServiceInstancesPlain(CloudController.V2.Client.Base.AbstractServiceInstancesEndpoint arg1)
         {
             return Task.Factory.StartNew<PagedResponseCollection<ListAllServiceInstancesResponse>>(() => { return new PagedResponseCollection<ListAllServiceInstancesResponse>(); });
@@ -336,6 +331,16 @@ namespace CloudFoundry.Build.Tasks.Test
             {
                 return new DeleteServiceInstanceResponse();
             });
+        }
+
+        internal static Task<GetInfoResponse> CustomGetInfo(CloudController.V2.Client.Base.AbstractInfoEndpoint arg1)
+        {
+            return Task.Factory.StartNew<GetInfoResponse>(() => { return new GetInfoResponse() { LoggingEndpoint = "wss://logs.1.2.3.4.xip.io" }; });
+        }
+
+        internal static void CustomTailString(Loggregator.Client.LoggregatorLog arg1, string arg2)
+        {
+
         }
     }
 }
