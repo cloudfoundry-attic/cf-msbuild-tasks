@@ -53,6 +53,8 @@ Tasks implemented in this library:
 
 In order to use this library it is necessary to map the task that is referenced to the assembly that contains the task implementation (in this case the cf-dotnet-sdk-msbuild-tasks library). This can be done by adding the UsingTask Element in your msbuild project file (https://msdn.microsoft.com/en-us/library/t41tzex2.aspx)
 
+Logs can be found in the applications data directory of the user (%APPDATA%\Roaming\CloudFoundry\ *.log).
+
 #**Project dependencies**
 
 This library uses Cloud Foundry .NET SDK and YamlDotNet libraries.

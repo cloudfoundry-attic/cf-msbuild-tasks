@@ -75,6 +75,7 @@
                 {
                     System.Net.ServicePointManager.ServerCertificateValidationCallback = ((sender, certificate, chain, sslPolicyErrors) => true);
                 }
+
                 this.CFUser = this.CFUser.Trim();
 
                 if (string.IsNullOrWhiteSpace(this.CFPassword))
