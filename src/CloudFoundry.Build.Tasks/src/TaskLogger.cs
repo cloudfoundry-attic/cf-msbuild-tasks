@@ -9,11 +9,11 @@
     using System.Threading.Tasks;
     using Microsoft.Build.Framework;
     using Microsoft.Build.Utilities;
-
+   
     internal class TaskLogger
     {
         private TaskLoggingHelper logger;
-    
+       
         public TaskLogger(ITask task)
         {
             this.logger = new TaskLoggingHelper(task);
@@ -27,7 +27,9 @@
                 List<string> messages = new List<string>();
                 messages.Add(msg);
                 FormatExceptionMessage(exception, messages);
-                this.logger.LogError(string.Join(Environment.NewLine, messages));
+
+                FileLogger.LogError(string.Join(Environment.NewLine, messages), exception);
+                this.logger.LogError(exception.Message);
                 this.LogExceptionVerbose(msg, exception);
             }
             else
@@ -43,16 +45,19 @@
 
         internal void LogMessage(string message, params object[] args)
         {
+            FileLogger.LogMessage(string.Format(CultureInfo.InvariantCulture, message, args));
             this.logger.LogMessage(message, args);
         }
 
         internal void LogWarning(string message, params object[] args)
         {
+            FileLogger.LogMessage(string.Format(CultureInfo.InvariantCulture, message, args));
             this.logger.LogWarning(message, args);
         }
 
         internal void LogErrorFromException(Exception ex)
         {
+            FileLogger.LogError(string.Empty, ex);
             this.logger.LogErrorFromException(ex);
         }
 
@@ -87,7 +92,8 @@
             }
             else
             {
-                this.logger.LogMessage(MessageImportance.Low, string.Format(CultureInfo.InstalledUICulture, "{0}: {1}", message, exception.ToString()));
+                FileLogger.LogError(message, exception);
+                this.logger.LogMessage(MessageImportance.Low, string.Format(CultureInfo.InstalledUICulture, "{0}: {1}", message, exception.Message));
             }
         }
     }

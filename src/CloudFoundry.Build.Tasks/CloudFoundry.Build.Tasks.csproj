@@ -63,6 +63,10 @@
       <HintPath>..\..\packages\Newtonsoft.Json.6.0.5\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\NLog.4.3.9\lib\net45\NLog.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="protobuf-net, Version=2.0.0.668, Culture=neutral, PublicKeyToken=257b51d87d2e4d67, processorArchitecture=MSIL">
       <HintPath>..\..\packages\protobuf-net.2.0.0.668\lib\net40\protobuf-net.dll</HintPath>
       <Private>True</Private>
@@ -116,6 +120,7 @@
     <Compile Include="src\DeleteRoutes.cs" />
     <Compile Include="src\DeleteServices.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="src\FileLogger.cs" />
     <Compile Include="src\LoginTask.cs" />
     <Compile Include="src\ProvisionedService.cs" />
     <Compile Include="src\PushApp.cs" />
@@ -133,6 +138,12 @@
     <Content Include="cf-msbuild-tasks.nuspec">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="NLog.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <None Include="NLog.xsd">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
