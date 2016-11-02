@@ -8,7 +8,7 @@
     using NLog;
     using NLog.Config;
     using NLog.Targets;
- 
+
     internal static class FileLogger
     {
         private static NLog.Logger fileLogger = LogManager.GetLogger(System.AppDomain.CurrentDomain.FriendlyName);
@@ -18,7 +18,7 @@
             using (var fileTarget = new FileTarget())
             {
                 string logFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-                fileTarget.FileName = System.IO.Path.Combine(logFolder,"CloudFoundry", "cfmsbuild-${shortdate}.log");
+                fileTarget.FileName = System.IO.Path.Combine(logFolder, "CloudFoundry", "cfmsbuild-${shortdate}.log");
                 fileTarget.Layout = "${longdate} ${uppercase:${level}} ${message}";
                 var config = new LoggingConfiguration();
                 config.AddTarget("file", fileTarget);

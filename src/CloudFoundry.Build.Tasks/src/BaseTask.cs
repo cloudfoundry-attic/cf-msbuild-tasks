@@ -71,11 +71,6 @@
 
             if (string.IsNullOrWhiteSpace(this.CFUser) == false && (string.IsNullOrWhiteSpace(this.CFPassword) == false || this.CFSavedPassword))
             {
-                if (this.CFSkipSslValidation)
-                {
-                    System.Net.ServicePointManager.ServerCertificateValidationCallback = ((sender, certificate, chain, sslPolicyErrors) => true);
-                }
-
                 this.CFUser = this.CFUser.Trim();
 
                 if (string.IsNullOrWhiteSpace(this.CFPassword))
