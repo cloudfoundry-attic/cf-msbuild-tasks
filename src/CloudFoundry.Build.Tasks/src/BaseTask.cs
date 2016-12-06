@@ -10,11 +10,11 @@
     using CloudFoundry.Manifests.Models;
     using CloudFoundry.UAA;
     using Microsoft.Build.Framework;
-    
+
     public class BaseTask : ITask, ICancelableTask
     {
         private TaskLogger logger;
-        
+
         public IBuildEngine BuildEngine
         {
             get;
@@ -71,6 +71,11 @@
 
             if (string.IsNullOrWhiteSpace(this.CFUser) == false && (string.IsNullOrWhiteSpace(this.CFPassword) == false || this.CFSavedPassword))
             {
+                if (this.CFSkipSslValidation)
+                {
+                    System.Net.ServicePointManager.ServerCertificateValidationCallback = ((sender, certificate, chain, sslPolicyErrors) => true);
+                }
+
                 this.CFUser = this.CFUser.Trim();
 
                 if (string.IsNullOrWhiteSpace(this.CFPassword))
@@ -89,7 +94,7 @@
                 }
 
                 this.CFPassword = this.CFPassword;
-         
+
                 CloudCredentials creds = new CloudCredentials();
                 creds.User = this.CFUser;
                 creds.Password = this.CFPassword;
@@ -122,7 +127,7 @@
             this.CFManifest = this.CFManifest.Trim();
 
             Manifest man = ManifestDiskRepository.ReadManifest(this.CFManifest);
-         
+
             if (man.Applications().Length > 1)
             {
                 throw new InvalidOperationException("More than one application specified in the manifest file");
