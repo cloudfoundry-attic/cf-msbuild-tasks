@@ -57,6 +57,11 @@
                 // ======= HOOKUP LOGGING =======
                 GetInfoResponse detailedInfo = client.Info.GetInfo().Result;
 
+                if (string.IsNullOrWhiteSpace(detailedInfo.DopplerLoggingEndpoint) == false)
+                {
+                    this.GetLogsUsingDoppler(client, appGuid, detailedInfo);
+                }
+                else
                 if (string.IsNullOrWhiteSpace(detailedInfo.LoggingEndpoint) == false)
                 {
                     this.GetLogsUsingLoggregator(client, appGuid, detailedInfo);
@@ -75,9 +80,44 @@
             return true;
         }
 
+        private void GetLogsUsingDoppler(CloudFoundryClient client, Guid? appGuid, GetInfoResponse detailedInfo)
+        {
+            using (var doppler = new Doppler.Client.DopplerLog(new Uri(detailedInfo.DopplerLoggingEndpoint), string.Format(CultureInfo.InvariantCulture, "bearer {0}", client.AuthorizationToken), null, this.CFSkipSslValidation))
+            {
+                doppler.ErrorReceived += (sender, error) =>
+                {
+                    Logger.LogErrorFromException(error.Error);
+                };
+
+                doppler.StreamOpened += (sender, args) =>
+                {
+                    Logger.LogMessage("Log stream opened.");
+                };
+
+                doppler.StreamClosed += (sender, args) =>
+                {
+                    Logger.LogMessage("Log stream closed.");
+                };
+
+                doppler.MessageReceived += (sender, message) =>
+                {
+                    long timeInMilliSeconds = message.LogMessage.timestamp / 1000 / 1000;
+                    var logTimeStamp = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc).AddMilliseconds(timeInMilliSeconds);
+
+                    Logger.LogMessage("[{0}] - {1}: {2}", message.LogMessage.logMessage.source_type.ToString(), logTimeStamp.ToString(CultureInfo.InvariantCulture), Encoding.UTF8.GetString(message.LogMessage.logMessage.message));
+                };
+
+                doppler.Tail(appGuid.Value.ToString());
+
+                this.MonitorApp(client, appGuid);
+
+                doppler.StopLogStream();
+            }
+        }
+
         private void GetLogsUsingLoggregator(CloudFoundryClient client, Guid? appGuid, GetInfoResponse detailedInfo)
         {
-            using (Loggregator.Client.LoggregatorLog loggregator = new Loggregator.Client.LoggregatorLog(new Uri(detailedInfo.LoggingEndpoint), string.Format(CultureInfo.InvariantCulture, "bearer {0}", client.AuthorizationToken), null, this.CFSkipSslValidation))
+            using (var loggregator = new Loggregator.Client.LoggregatorLog(new Uri(detailedInfo.LoggingEndpoint), string.Format(CultureInfo.InvariantCulture, "bearer {0}", client.AuthorizationToken), null, this.CFSkipSslValidation))
             {
                 loggregator.ErrorReceived += (sender, error) =>
                 {
@@ -99,7 +139,7 @@
                     long timeInMilliSeconds = message.LogMessage.Timestamp / 1000 / 1000;
                     var logTimeStamp = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc).AddMilliseconds(timeInMilliSeconds);
 
-                    Logger.LogMessage("[{0}] - {1}: {2}", message.LogMessage.SourceName, logTimeStamp.ToString(), message.LogMessage.Message);
+                    Logger.LogMessage("[{0}] - {1}: {2}", message.LogMessage.SourceName, logTimeStamp.ToString(CultureInfo.InvariantCulture), message.LogMessage.Message);
                 };
 
                 loggregator.Tail(appGuid.Value.ToString());
